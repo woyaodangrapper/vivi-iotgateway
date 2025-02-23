@@ -39,6 +39,7 @@
     "DetailLog": "DetailLog",
     "WebSocketPort": "WebSocketPort",
     "StartWithId": "StartWithId",
+    "AnonymousEnable": "AnonymousEnable",
     "DeviceRpcEnable": "DeviceRpcEnable",
     "RpcWriteTopic": "RpcWriteTopic",
     "BigTextScriptDeviceModel": "BigTextScriptDeviceModel",

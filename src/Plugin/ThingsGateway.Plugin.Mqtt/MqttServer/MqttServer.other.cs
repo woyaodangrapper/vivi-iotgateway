@@ -279,6 +279,12 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableDa
             return;
         }
 
+        if(_driverPropertys.AnonymousEnable)
+        {
+            arg.ReasonCode = MqttConnectReasonCode.Success;
+            return;
+        }
+
         var _userService = App.RootServices.GetRequiredService<ISysUserService>();
         var userInfo = await _userService.GetUserByAccountAsync(arg.UserName, null).ConfigureAwait(false);//获取用户信息
         if (userInfo == null)

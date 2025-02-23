@@ -33,7 +33,6 @@ public class OpcUaMaster : CollectBase
 
     private CancellationToken _token;
 
-    private volatile bool connectFirstFail;
     private volatile bool connectFirstFailLoged;
     private volatile bool success = true;
 
@@ -114,21 +113,19 @@ public class OpcUaMaster : CollectBase
         catch (Exception ex)
         {
             LogMessage?.LogWarning(ex, "Connect Fail");
-            connectFirstFail = true;
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }
 
     protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
-        if (connectFirstFail && !IsConnected())
+        if (_plc.Session==null)
         {
             try
             {
-                await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
-
-
-                connectFirstFail = false;
+                await Task.Delay(100,cancellationToken).ConfigureAwait(false);
+                if (_plc.Session == null)
+                    await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -139,10 +136,6 @@ public class OpcUaMaster : CollectBase
                 CurrentDevice.SetDeviceStatus(TimerX.Now, true, ex.Message);
                 await Task.Delay(10000, cancellationToken).ConfigureAwait(false);
             }
-        }
-        else
-        {
-            connectFirstFail = false;
         }
         if (_driverProperties.ActiveSubscribe)
         {

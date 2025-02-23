@@ -42,6 +42,7 @@
     "WebSocketPort": "Websocket端口",
     "StartWithId": "允许连接的ID前缀",
 
+    "AnonymousEnable": "允许匿名登录",
     "DeviceRpcEnable": "允许Rpc写入",
     "RpcWriteTopic": "Rpc写入主题",
 
