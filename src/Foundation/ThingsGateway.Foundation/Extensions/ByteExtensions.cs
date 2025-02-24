@@ -89,16 +89,16 @@ public static class ByteExtensions
             return Array.Empty<byte>();
         }
         // 创建新数组进行补齐
-        byte[] paddedBytes = inBytes.CopyArray<byte>().ArrayExpandToLengthEven();
+        byte[] lengthEven = inBytes.CopyArray<byte>().ArrayExpandToLengthEven();
         // 进行双字节反转
-        for (int index = 0; index < paddedBytes.Length; index += 2)
+        for (int index = 0; index < lengthEven.Length / 2; ++index)
         {
-            byte temp = paddedBytes[index];
-            paddedBytes[index] = paddedBytes[index + 1];
-            paddedBytes[index + 1] = temp;
+            byte num = lengthEven[index * 2];
+            lengthEven[index * 2] = lengthEven[index * 2 + 1];
+            lengthEven[index * 2 + 1] = num;
         }
 
-        return paddedBytes;
+        return lengthEven;
     }
 
     /// <summary>

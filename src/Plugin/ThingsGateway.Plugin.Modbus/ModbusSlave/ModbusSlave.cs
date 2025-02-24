@@ -93,7 +93,7 @@ public class ModbusSlave : BusinessBase
 
         try
         {
-            _plc.Channel.Connect(_plc.Channel.ChannelOptions.ConnectTimeout, CancellationToken.None);
+            await _plc.Channel.ConnectAsync(_plc.Channel.ChannelOptions.ConnectTimeout, CancellationToken.None).ConfigureAwait(false);
         }
         catch
         {

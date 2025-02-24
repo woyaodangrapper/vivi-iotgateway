@@ -40,10 +40,7 @@
         "Text": "OpcDaMaster"
       },
 
-      {
-        "Url": "/AllenBradleyCipMaster",
-        "Text": "AllenBradleyCipMaster"
-      },
+
       {
         "Url": "/DCONMaster",
         "Text": "DCONMaster"
@@ -69,6 +66,20 @@
           }
         ]
       },
+      {
+        "Text": "罗克韦尔PLC",
+        "Items": [
+          {
+            "Url": "/ControlLogixMaster",
+            "Text": "ControlLogixMaster"
+          },
+          {
+            "Url": "/PCCCMaster",
+            "Text": "PCCCMaster"
+          }
+        ]
+      },
+
       {
         "Url": "/LKSISMaster",
         "Text": "LKSISMaster"

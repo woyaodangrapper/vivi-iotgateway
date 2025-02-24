@@ -106,7 +106,8 @@ public class Startup : AppStartup
             // setting.MetadataPropertyHandling = MetadataPropertyHandling.Ignore; // 解决DateTimeOffset异常
             // setting.DateParseHandling = DateParseHandling.None; // 解决DateTimeOffset异常
             // setting.Converters.Add(new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }); // 解决DateTimeOffset异常
-        };
+        }
+        ;
 
         services.AddControllers()
             .AddNewtonsoftJson(options => SetNewtonsoftJsonSetting(options.SerializerSettings))

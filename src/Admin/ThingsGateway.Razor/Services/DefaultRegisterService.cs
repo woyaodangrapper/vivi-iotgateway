@@ -12,8 +12,6 @@ using Microsoft.Extensions.Hosting;
 
 using ThingsGateway.DataEncryption;
 using ThingsGateway.NewLife;
-using ThingsGateway.NewLife.Caching;
-using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Razor;
 

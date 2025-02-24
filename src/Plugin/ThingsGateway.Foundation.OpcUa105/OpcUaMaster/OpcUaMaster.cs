@@ -879,7 +879,7 @@ public class OpcUaMaster : IDisposable
             }
             //创建本地证书
             if (useSecurity)
-            await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
+                await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
 
             m_session = await Opc.Ua.Client.Session.Create(
 

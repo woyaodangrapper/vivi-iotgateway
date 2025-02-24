@@ -183,6 +183,7 @@ public static class StringExtensions
     /// <see cref="DataTransUtil.HexStringToBytes(string)"/>
     public static byte[] HexStringToBytes(this string str) => DataTransUtil.HexStringToBytes(str);
     private static readonly char[] DotSeparator = new char[] { '.' };
+    private static readonly char[] SlashSeparator = new char[] { '/' };
     private static readonly char[] CommaSeparator = new char[] { ',' };
     private static readonly char[] SemicolonSeparator = new char[] { ';' };
     private static readonly char[] Separator = new char[] { '-' };
@@ -232,7 +233,13 @@ public static class StringExtensions
     {
         return str?.Split(DotSeparator, StringSplitOptions.RemoveEmptyEntries);
     }
-
+    /// <summary>
+    /// 根据斜杠进行分割字符串，去除空白的字符
+    /// </summary>
+    public static string[]? SplitStringBySlash(this string? str)
+    {
+        return str?.Split(SlashSeparator, StringSplitOptions.RemoveEmptyEntries);
+    }
     /// <summary>
     /// 根据英文分号分割字符串，去除空白的字符
     /// </summary>

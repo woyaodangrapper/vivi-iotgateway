@@ -24,7 +24,7 @@ public class S7BitConverter : ThingsGatewayBitConverter
     public S7BitConverter(EndianType endianType) : base(endianType)
     {
     }
-
+    public override int? StringLength { get; set; } = 100;
     /// <inheritdoc/>
     public override string ToString(byte[] buffer, int offset, int length)
     {

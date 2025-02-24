@@ -119,11 +119,11 @@ public class OpcUaMaster : CollectBase
 
     protected override async ValueTask ProtectedExecuteAsync(CancellationToken cancellationToken)
     {
-        if (_plc.Session==null)
+        if (_plc.Session == null)
         {
             try
             {
-                await Task.Delay(100,cancellationToken).ConfigureAwait(false);
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
                 if (_plc.Session == null)
                     await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
             }
@@ -154,8 +154,8 @@ public class OpcUaMaster : CollectBase
                         if (_plc.Session.Subscriptions.FirstOrDefault(a => a.DisplayName == variableSourceRead.RegisterAddress) == null)
                         {
                             await _plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), _plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
-                            
-                           LogMessage?.LogInformation($"AddSubscription {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
+
+                            LogMessage?.LogInformation($"AddSubscription {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
 
                         }
                     }

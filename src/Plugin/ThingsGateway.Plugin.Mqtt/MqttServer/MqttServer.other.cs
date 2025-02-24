@@ -279,7 +279,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableDa
             return;
         }
 
-        if(_driverPropertys.AnonymousEnable)
+        if (_driverPropertys.AnonymousEnable)
         {
             arg.ReasonCode = MqttConnectReasonCode.Success;
             return;

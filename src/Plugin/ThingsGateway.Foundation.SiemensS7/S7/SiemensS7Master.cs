@@ -493,7 +493,6 @@ public partial class SiemensS7Master : DeviceBase
     /// <inheritdoc/>
     public override async ValueTask<OperResult<string[]>> ReadStringAsync(string address, int length, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
-        var siemensS7Address = SiemensS7Address.ParseFrom(address);
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         if (bitConverter.IsVariableStringLength)
         {
@@ -520,7 +519,6 @@ public partial class SiemensS7Master : DeviceBase
     /// <inheritdoc/>
     public override ValueTask<OperResult> WriteAsync(string address, string value, IThingsGatewayBitConverter bitConverter = null, CancellationToken cancellationToken = default)
     {
-        var siemensS7Address = SiemensS7Address.ParseFrom(address);
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         if (bitConverter.IsVariableStringLength)
         {

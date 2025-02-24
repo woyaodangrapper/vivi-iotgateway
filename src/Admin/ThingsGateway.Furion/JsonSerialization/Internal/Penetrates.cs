@@ -34,7 +34,8 @@ internal static class Penetrates
         if (reader.TokenType == JsonTokenType.Number && reader.TryGetInt64(out var longValue))
         {
             return longValue.ConvertToDateTime();
-        };
+        }
+        ;
 
         var stringValue = reader.GetString();
 

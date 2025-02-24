@@ -123,8 +123,8 @@ public class OpcUa105Master : CollectBase
         {
             try
             {
-                await Task.Delay(100,cancellationToken).ConfigureAwait(false);
-                if(_plc.Session == null)
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                if (_plc.Session == null)
                     await _plc.ConnectAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
