@@ -25,6 +25,11 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     private bool _isOnline;
     private bool? _isOnlineChanged;
     protected object? _value;
+    /// <summary>
+    /// 动态变量
+    /// </summary>
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true, Order = 5)]
+    public bool DynamicVariable { get; set; } = false;
 
     /// <summary>
     /// 变化时间

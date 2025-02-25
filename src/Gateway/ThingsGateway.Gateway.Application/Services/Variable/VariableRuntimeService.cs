@@ -23,13 +23,13 @@ namespace ThingsGateway.Gateway.Application;
 
 public class VariableRuntimeService : IVariableRuntimeService
 {
-    private WaitLock WaitLock { get; set; } = new WaitLock();
+    //private WaitLock WaitLock { get; set; } = new WaitLock();
 
     public async Task AddBatchAsync(List<Variable> input)
     {
         try
         {
-            await WaitLock.WaitAsync().ConfigureAwait(false);
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             await GlobalData.VariableService.AddBatchAsync(input).ConfigureAwait(false);
 
@@ -89,7 +89,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
         finally
         {
-            WaitLock.Release();
+            //WaitLock.Release();
         }
     }
 
@@ -97,7 +97,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-            await WaitLock.WaitAsync().ConfigureAwait(false);
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             models = models.Adapt<List<Variable>>();
             oldModel = oldModel.Adapt<Variable>();
@@ -164,7 +164,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
         finally
         {
-            WaitLock.Release();
+            //WaitLock.Release();
         }
     }
 
@@ -172,7 +172,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-            await WaitLock.WaitAsync().ConfigureAwait(false);
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
 
 
             ids = ids.ToHashSet();
@@ -226,7 +226,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
         finally
         {
-            WaitLock.Release();
+            //WaitLock.Release();
         }
 
 
@@ -238,7 +238,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
         try
         {
-            await WaitLock.WaitAsync().ConfigureAwait(false);
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.VariableService.ImportVariableAsync(input).ConfigureAwait(false);
 
@@ -303,7 +303,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
         finally
         {
-            WaitLock.Release();
+            //WaitLock.Release();
         }
 
     }
@@ -312,7 +312,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-            await WaitLock.WaitAsync().ConfigureAwait(false);
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
 
 
 
@@ -398,7 +398,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
         finally
         {
-            WaitLock.Release();
+            //WaitLock.Release();
         }
 
     }
@@ -413,7 +413,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         try
         {
             input = input.Adapt<Variable>();
-            await WaitLock.WaitAsync().ConfigureAwait(false);
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
 
 
 
@@ -475,7 +475,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
         finally
         {
-            WaitLock.Release();
+            //WaitLock.Release();
         }
     }
 
@@ -483,5 +483,134 @@ public class VariableRuntimeService : IVariableRuntimeService
 
 
     public Task<MemoryStream> ExportMemoryStream(List<Variable> data, string deviceName) => GlobalData.VariableService.ExportMemoryStream(data, deviceName);
+
+
+
+    public async Task AddDynamicVariable(IEnumerable<VariableRuntime> newVariableRuntimes)
+    {
+        //动态变量不入配置数据库
+        try
+        {
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
+            var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+
+            HashSet<IDriver> changedDriver = new();
+            foreach (var group in data)
+            {
+                //这里改动的可能是旧绑定设备
+                //需要改动DeviceRuntim的变量字典
+                foreach (var item in group)
+                {
+                    //需要重启业务线程
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.Value.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    foreach (var deviceRuntime in deviceRuntimes)
+                    {
+                        if (deviceRuntime.Driver != null)
+                        {
+                            changedDriver.Add(deviceRuntime.Driver);
+                        }
+                    }
+
+                    item.Value.Dispose();
+                }
+                if (group.Key != null)
+                {
+                    if (group.Key.Driver != null)
+                    {
+                        changedDriver.Add(group.Key.Driver);
+                    }
+                }
+            }
+
+            //批量修改之后，需要重新加载
+            foreach (var newVariableRuntime in newVariableRuntimes)
+            {
+                newVariableRuntime.DynamicVariable = true;
+                if (GlobalData.IdDevices.TryGetValue(newVariableRuntime.DeviceId, out var deviceRuntime))
+                {
+                    newVariableRuntime.Init(deviceRuntime);
+
+                    if (deviceRuntime.Driver != null && !changedDriver.Contains(deviceRuntime.Driver))
+                    {
+                        changedDriver.Add(deviceRuntime.Driver);
+                    }
+                }
+            }
+
+            //根据条件重启通道线程
+            foreach (var driver in changedDriver)
+            {
+                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+            }
+
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+
+    }
+
+
+    public async Task DeleteDynamicVariable(IEnumerable<long> variableIds)
+    {
+        try
+        {
+           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            var ids = variableIds.ToHashSet();
+
+            var variableRuntimes = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).Select(a => a.Value).Where(a => a.DynamicVariable).ToList();
+
+            foreach (var variableRuntime in variableRuntimes)
+            {
+                variableRuntime.Dispose();
+            }
+            var data = variableRuntimes.Where(a => a.DeviceRuntime?.Driver != null).GroupBy(a => a.DeviceRuntime);
+
+            HashSet<IDriver> changedDriver = new();
+            foreach (var group in data)
+            {
+                //这里改动的可能是旧绑定设备
+                //需要改动DeviceRuntim的变量字典
+                foreach (var item in group)
+                {
+                    //需要重启业务线程
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    foreach (var deviceRuntime in deviceRuntimes)
+                    {
+                        if (deviceRuntime.Driver != null)
+                        {
+                            changedDriver.Add(deviceRuntime.Driver);
+                        }
+                    }
+
+                    item.Dispose();
+                }
+                if (group.Key != null)
+                {
+                    if (group.Key.Driver != null)
+                    {
+                        changedDriver.Add(group.Key.Driver);
+                    }
+                }
+            }
+
+            foreach (var driver in changedDriver)
+            {
+                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+            }
+
+
+
+        }
+        finally
+        {
+            //WaitLock.Release();
+        }
+
+
+    }
 
 }

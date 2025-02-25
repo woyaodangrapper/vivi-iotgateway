@@ -11,6 +11,8 @@
 using ThingsGateway.Debug;
 using ThingsGateway.Gateway.Application;
 
+using Yitter.IdGenerator;
+
 namespace ThingsGateway.Plugin.Modbus;
 
 /// <summary>
@@ -49,6 +51,19 @@ public class ModbusMaster : CollectBase
     protected override async Task InitChannelAsync(IChannel? channel = null)
     {
 
+        //List<VariableRuntime> variableRuntimes = new();
+        //variableRuntimes.Add(new VariableRuntime()
+        //{
+        //    DynamicVariable = true,
+        //    DeviceId = CurrentDevice.Id,
+        //    Id = YitIdHelper.NextId(),
+        //    Name = DeviceName + "testDynamic",
+        //    RegisterAddress = "40001",
+        //});
+
+        //await GlobalData.VariableRuntimeService.AddDynamicVariable(variableRuntimes).ConfigureAwait(false);
+
+
         ArgumentNullException.ThrowIfNull(channel);
         //载入配置
         _plc.DataFormat = _driverPropertys.DataFormat;
@@ -62,6 +77,7 @@ public class ModbusMaster : CollectBase
         _plc.Heartbeat = _driverPropertys.Heartbeat;
         _plc.InitChannel(channel, LogMessage);
         await base.InitChannelAsync(channel).ConfigureAwait(false);
+
     }
 
     /// <inheritdoc/>

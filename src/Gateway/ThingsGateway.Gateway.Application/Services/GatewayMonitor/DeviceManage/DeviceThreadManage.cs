@@ -506,7 +506,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
                 if (IsCollectChannel == true)
                 {
-                    saveDevices.AddRange(driver.VariableRuntimes.Where(a => a.Value.SaveValue).Select(a => a.Value));
+                    saveDevices.AddRange(driver.VariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
                 }
 
                 // 取消驱动程序的操作
