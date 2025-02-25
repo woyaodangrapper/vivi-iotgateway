@@ -828,7 +828,7 @@ public class OpcUaMaster : IDisposable
     /// <returns></returns>
     public async Task CheckApplicationInstanceCertificate()
     {
-        await m_application.CheckApplicationInstanceCertificate(true, 0, 1200).ConfigureAwait(false);
+        await m_application.CheckApplicationInstanceCertificates(true, 1200).ConfigureAwait(false);
     }
 
     SemaphoreSlim waitLock = new(1, 1);
@@ -879,7 +879,7 @@ public class OpcUaMaster : IDisposable
             }
             //创建本地证书
             if (useSecurity)
-                await m_application.CheckApplicationInstanceCertificate(true, 0, 1200, cancellationToken).ConfigureAwait(false);
+                await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
 
             m_session = await Opc.Ua.Client.Session.Create(
 

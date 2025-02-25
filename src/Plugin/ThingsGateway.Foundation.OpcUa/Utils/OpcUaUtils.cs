@@ -42,7 +42,7 @@ public class OpcUaUtils
             // Connect to the server's discovery endpoint and find the available configuration.
             Uri url = new Uri(client.Endpoint.EndpointUrl);
             var endpoints = await client.GetEndpointsAsync(null).ConfigureAwait(false);
-            var selectedEndpoint = CoreClientUtils.SelectEndpoint(url, endpoints, useSecurity);
+            var selectedEndpoint = CoreClientUtils.SelectEndpoint(application, url, endpoints, useSecurity);
 
             Uri endpointUrl = Utils.ParseUri(selectedEndpoint.EndpointUrl);
             if (endpointUrl != null && endpointUrl.Scheme == uri.Scheme)

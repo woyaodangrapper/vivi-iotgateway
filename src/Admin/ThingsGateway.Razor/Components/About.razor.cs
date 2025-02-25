@@ -33,5 +33,6 @@ public partial class About
             await ToastService.Default();
         else
             await ToastService.Default(false);
+        await InvokeAsync(StateHasChanged);
     }
 }

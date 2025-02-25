@@ -32,13 +32,6 @@
 			<IncludeAssets> native;</IncludeAssets>
 		</PackageReference>
 
-
-		<!--OpcUa 插件-->
-		<PackageReference Include="ThingsGateway.Plugin.OpcUa105" Version="$(PluginVersion)" GeneratePathProperty="true">
-			<Private>false</Private>
-			<IncludeAssets> native;</IncludeAssets>
-		</PackageReference>
-
 		<!--DB 插件-->
 		<PackageReference Include="ThingsGateway.Plugin.DB" Version="$(PluginVersion)" GeneratePathProperty="true">
 			<Private>false</Private>
@@ -88,7 +81,6 @@
 			<PkgThingsGateway_Plugin_OpcDaPackageFiles Include="$(PkgThingsGateway_Plugin_OpcDa)\Content\$(PluginTargetFramework)\**\*.*" />
 
 			<PkgThingsGateway_Plugin_OpcUaPackageFiles Include="$(PkgThingsGateway_Plugin_OpcUa)\Content\$(PluginTargetFramework)\**\*.*" />
-			<PkgThingsGateway_Plugin_OpcUa105PackageFiles Include="$(PkgThingsGateway_Plugin_OpcUa105)\Content\$(PluginTargetFramework)\**\*.*" />
 			<PkgThingsGateway_Plugin_RabbitMQPackageFiles Include="$(PkgThingsGateway_Plugin_RabbitMQ)\Content\$(PluginTargetFramework)\**\*.*" />
 		</ItemGroup>
 
@@ -101,7 +93,6 @@
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_MqttPackageFiles)" DestinationFolder="$(GatewayPluginFolder)ThingsGateway.Plugin.Mqtt%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_OpcDaPackageFiles)" DestinationFolder="$(GatewayPluginFolder)ThingsGateway.Plugin.OpcDa%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_OpcUaPackageFiles)" DestinationFolder="$(GatewayPluginFolder)ThingsGateway.Plugin.OpcUa%(RecursiveDir)" />
-		<Copy SourceFiles="@(PkgThingsGateway_Plugin_OpcUa105PackageFiles)" DestinationFolder="$(GatewayPluginFolder)ThingsGateway.Plugin.OpcUa%(RecursiveDir)" />
 		<Copy SourceFiles="@(PkgThingsGateway_Plugin_RabbitMQPackageFiles)" DestinationFolder="$(GatewayPluginFolder)ThingsGateway.Plugin.RabbitMQ%(RecursiveDir)" />
 
 	</Target>

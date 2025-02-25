@@ -86,6 +86,7 @@ public class Program
                    u.Limits.MaxRequestBodySize = null;
                });
 
+               //builder.Services.AddSingleton<ThingsGateway.Razor.IRegisterService, ThingsGateway.Razor.RegisterService>();
            })
             .Configure(app =>
             {

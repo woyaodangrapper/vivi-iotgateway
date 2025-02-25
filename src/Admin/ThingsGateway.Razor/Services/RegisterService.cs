@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 using ThingsGateway.DataEncryption;
 using ThingsGateway.NewLife;
@@ -19,19 +20,22 @@ namespace ThingsGateway.Razor;
 
 public class RegisterService : IRegisterService
 {
-
-    public RegisterService(IHostApplicationLifetime hostApplicationLifetime)
+    ILogger _logger;
+    IHostApplicationLifetime _hostApplicationLifetime;
+    public RegisterService(IHostApplicationLifetime hostApplicationLifetime,ILogger<RegisterService> logger)
     {
         UUID = DESEncryption.Encrypt($"{MachineInfo.Current.UUID}{MachineInfo.Current.Guid}{MachineInfo.Current.DiskID}");
-
+        _logger = logger;
+        _hostApplicationLifetime = hostApplicationLifetime;
         _ = Task.Run(async () =>
         {
             while (true)
             {
-                await Task.Delay(86400000);
+                await Task.Delay(TimeSpan.FromDays(30));
                 if (!IsRegistered())
                 {
-                    hostApplicationLifetime.StopApplication();
+                    _logger.LogError("The software is not registered and has expired normally");
+                    _hostApplicationLifetime.StopApplication();
                 }
             }
         });
@@ -41,7 +45,7 @@ public class RegisterService : IRegisterService
     /// 唯一编码
     /// </summary>
     public string UUID { get; }
-    private const string cacheKey = $"{nameof(DefaultRegisterService)}_{nameof(IsRegistered)}";
+    private const string cacheKey = $"{nameof(RegisterService)}_{nameof(IsRegistered)}";
     public bool IsRegistered()
     {
         return MemoryCache.Instance.GetOrAdd(cacheKey, (a) =>
