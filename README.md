@@ -53,6 +53,7 @@ docker pull registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway_arm64
 | Dlt6452007  | Supports Serial/Tcp/Udp links                                 |
 | OpcDaMaster | Compiled for 64-bit                                           |
 | OpcUaMaster | Supports certificate login, object extension, Json read/write |
+| Webhook          | Webhook                                             |
 
 #### Business Plugins
 

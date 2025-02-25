@@ -514,16 +514,16 @@ public class JWTEncryption
             : callAssembly;
 
         // 获取 程序集名称
-        var furionAssemblyName = executeAssembly.GetReferencedAssemblies()
+        var thingsGatewayAssemblyName = executeAssembly.GetReferencedAssemblies()
             .FirstOrDefault(u => u.Name == "ThingsGateway" || u.Name == "ThingsGateway.Furion")
             ?? throw new InvalidOperationException("No `ThingsGateway` assembly installed in the current project was detected.");
 
         // 加载 程序集
-        var furionAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(furionAssemblyName);
+        var thingsGatewayAssembly = AssemblyLoadContext.Default.LoadFromAssemblyName(thingsGatewayAssemblyName);
 
         // 获取 App 静态类
-        FrameworkApp = furionAssembly.GetType("ThingsGateway.App");
+        FrameworkApp = thingsGatewayAssembly.GetType("ThingsGateway.App");
 
-        return furionAssembly;
+        return thingsGatewayAssembly;
     }
 }

@@ -11,12 +11,16 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Net.Http.Headers;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 
 using ThingsGateway.Extensions;
 using ThingsGateway.Utilities;
+
+using StringWithQualityHeaderValue = System.Net.Http.Headers.StringWithQualityHeaderValue;
 
 namespace ThingsGateway.HttpRemote.Extensions;
 
@@ -38,16 +42,17 @@ public static class HttpRemoteExtensions
     public static IHttpClientBuilder AddProfilerDelegatingHandler(this IHttpClientBuilder builder,
         Func<bool>? disableConfigure = null)
     {
-        // 获取 IServiceCollection 实例
-        var services = builder.Services;
+        // 检查是否禁用请求分析工具
+        if (disableConfigure?.Invoke() == true)
+        {
+            return builder;
+        }
 
         // 注册请求分析工具服务
-        services.TryAddTransient<ProfilerDelegatingHandler>();
+        builder.Services.TryAddTransient<ProfilerDelegatingHandler>();
 
-        // 检查自定义禁用配置委托
-        return disableConfigure?.Invoke() == true
-            ? builder
-            : builder.AddHttpMessageHandler<ProfilerDelegatingHandler>();
+        // 添加请求分析工具处理委托
+        return builder.AddHttpMessageHandler<ProfilerDelegatingHandler>();
     }
 
     /// <summary>
@@ -196,5 +201,125 @@ public static class HttpRemoteExtensions
         return StringUtility.FormatKeyValuesSummary(
             [new KeyValuePair<string, IEnumerable<string>>(string.Empty, [bodyString])],
             $"{summary} ({httpContent.GetType().Name})");
+    }
+
+    /// <summary>
+    ///     克隆 <see cref="HttpRequestMessage" />
+    /// </summary>
+    /// <param name="httpRequestMessage">
+    ///     <see cref="HttpRequestMessage" />
+    /// </param>
+    /// <param name="cancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="HttpRequestMessage" />
+    /// </returns>
+    public static async Task<HttpRequestMessage> CloneAsync(this HttpRequestMessage httpRequestMessage,
+        CancellationToken cancellationToken = default)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(httpRequestMessage);
+
+        // 初始化克隆的 HttpRequestMessage 实例
+        var clonedHttpRequestMessage = new HttpRequestMessage(httpRequestMessage.Method, httpRequestMessage.RequestUri);
+
+        // 复制请求标头
+        foreach (var header in httpRequestMessage.Headers)
+        {
+            clonedHttpRequestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+        // 检查是否包含请求内容
+        if (httpRequestMessage.Content is null)
+        {
+            return clonedHttpRequestMessage;
+        }
+
+        // 复制请求内容
+        var memoryStream = new MemoryStream();
+        await httpRequestMessage.Content.CopyToAsync(memoryStream, cancellationToken).ConfigureAwait(false);
+        memoryStream.Position = 0;
+
+        // 设置请求内容
+        clonedHttpRequestMessage.Content = new StreamContent(memoryStream);
+
+        // 复制请求内容标头
+        foreach (var header in httpRequestMessage.Content.Headers)
+        {
+            clonedHttpRequestMessage.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+        return clonedHttpRequestMessage;
+    }
+
+    /// <summary>
+    ///     克隆 <see cref="HttpRequestMessage" />
+    /// </summary>
+    /// <param name="httpRequestMessage">
+    ///     <see cref="HttpRequestMessage" />
+    /// </param>
+    /// <param name="cancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="HttpRequestMessage" />
+    /// </returns>
+    public static HttpRequestMessage Clone(this HttpRequestMessage httpRequestMessage,
+        CancellationToken cancellationToken = default) =>
+        httpRequestMessage.CloneAsync(cancellationToken).GetAwaiter().GetResult();
+
+    /// <summary>
+    ///     尝试获取响应标头 <c>Set-Cookie</c> 集合
+    /// </summary>
+    /// <param name="httpResponseMessage">
+    ///     <see cref="HttpResponseMessage" />
+    /// </param>
+    /// <param name="setCookies">响应标头 <c>Set-Cookie</c> 集合</param>
+    /// <param name="rawSetCookies">原始响应标头 <c>Set-Cookie</c> 集合</param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    public static bool TryGetSetCookies(this HttpResponseMessage httpResponseMessage,
+        [NotNullWhen(true)] out IList<SetCookieHeaderValue>? setCookies,
+        [NotNullWhen(true)] out List<string>? rawSetCookies)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(httpResponseMessage);
+
+        return httpResponseMessage.Headers.TryGetSetCookies(out setCookies, out rawSetCookies);
+    }
+
+    /// <summary>
+    ///     尝试获取响应标头 <c>Set-Cookie</c> 集合
+    /// </summary>
+    /// <param name="responseHeaders">
+    ///     <see cref="HttpResponseHeaders" />
+    /// </param>
+    /// <param name="setCookies">响应标头 <c>Set-Cookie</c> 集合</param>
+    /// <param name="rawSetCookies">原始响应标头 <c>Set-Cookie</c> 集合</param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    public static bool TryGetSetCookies(this HttpResponseHeaders responseHeaders,
+        [NotNullWhen(true)] out IList<SetCookieHeaderValue>? setCookies,
+        [NotNullWhen(true)] out List<string>? rawSetCookies)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(responseHeaders);
+
+        // 检查响应标头是否包含 Set-Cookie 设置
+        if (!responseHeaders.TryGetValues(HeaderNames.SetCookie, out var setCookieValues))
+        {
+            setCookies = null;
+            rawSetCookies = null;
+
+            return false;
+        }
+
+        rawSetCookies = setCookieValues.ToList();
+        setCookies = SetCookieHeaderValue.ParseList(rawSetCookies);
+
+        return true;
     }
 }

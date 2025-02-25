@@ -27,7 +27,7 @@ public sealed partial class HttpRequestBuilder
     /// <summary>
     ///     请求方式
     /// </summary>
-    public HttpMethod? Method { get; }
+    public HttpMethod? Method { get; private set; }
 
     /// <summary>
     ///     跟踪标识
@@ -212,7 +212,7 @@ public sealed partial class HttpRequestBuilder
     /// <summary>
     ///     用于请求结束时需要释放的对象集合
     /// </summary>
-    internal List<IDisposable>? Disposables { get; private set; }
+    internal HashSet<IDisposable>? Disposables { get; private set; }
 
     /// <summary>
     ///     <see cref="HttpClient" /> 实例管理器
@@ -230,6 +230,11 @@ public sealed partial class HttpRequestBuilder
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
     internal bool ProfilerEnabled { get; private set; }
+
+    /// <summary>
+    ///     请求分析工具委托
+    /// </summary>
+    internal Action<HttpRemoteAnalyzer>? ProfilerPredicate { get; private set; }
 
     /// <summary>
     ///     是否启用性能优化

@@ -1,0 +1,25 @@
+﻿{
+  "ThingsGateway.Plugin.Webhook.WebhookVariableProperty": {
+  },
+  "ThingsGateway.Plugin.Webhook.WebhookProperty": {
+    "DetailLog": "DetailLog",
+    "BigTextScriptDeviceModel": "BigTextScriptDeviceModel",
+    "BigTextScriptVariableModel": "BigTextScriptVariableModel",
+    "BigTextScriptAlarmModel": "BigTextScriptAlarmModel",
+    "IsDeviceList": "IsDeviceList",
+    "IsVariableList": "IsVariableList",
+    "IsAlarmList": "IsAlarmList",
+    "DeviceTopic": "DeviceCallbackUrl",
+    "VariableTopic": "VariableCallbackUrl",
+    "AlarmTopic": "AlarmCallbackUrl",
+    "BusinessUpdateEnum": "BusinessUpdateEnum",
+    "BusinessInterval": "BusinessInterval",
+    "IsAllVariable": "IsAllVariable",
+    "QueueMaxCount": "QueueMaxCount",
+    "CacheFileMaxLength": "CacheFileMaxLength(mb)",
+    "SplitSize": "SplitSize",
+    "CacheEnable": "CacheEnable"
+
+  }
+
+}

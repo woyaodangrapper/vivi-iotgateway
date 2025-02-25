@@ -420,16 +420,23 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
 
         // 构建 HttpRequestMessage 实例
         var httpRequestMessage =
-            httpRequestBuilder.Build(_httpRemoteOptions, _httpContentProcessorFactory, httpClient.BaseAddress);
+            httpRequestBuilder.Build(_httpRemoteOptions, _httpContentProcessorFactory,
+                httpClient.BaseAddress ?? _httpRemoteOptions.FallbackBaseAddress);
 
         // 处理发送 HTTP 请求之前
         HandlePreSendRequest(httpRequestBuilder, requestEventHandler, httpRequestMessage);
 
+        // 初始化 HttpRemoteAnalyzer 实例
+        HttpRemoteAnalyzer? httpRemoteAnalyzer = null;
+
         // 检查是否启用请求分析工具
         if (httpRequestBuilder.ProfilerEnabled)
         {
+            // 初始化 HttpRemoteAnalyzer 实例
+            httpRemoteAnalyzer = httpRequestBuilder.ProfilerPredicate is not null ? new HttpRemoteAnalyzer() : null;
+
             await ProfilerDelegatingHandler.LogRequestAsync(_logger, _httpRemoteOptions, httpRequestMessage,
-                cancellationToken).ConfigureAwait(false);
+                httpRemoteAnalyzer, cancellationToken).ConfigureAwait(false);
         }
 
         // 创建关联的超时 Token 标识
@@ -442,6 +449,7 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
         }
 
         HttpResponseMessage? httpResponseMessage = null;
+        long requestDuration = 0;
 
         // 初始化 Stopwatch 实例并开启计时操作
         var stopwatch = Stopwatch.StartNew();
@@ -454,10 +462,13 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
                     timeoutCancellationTokenSource.Token).ConfigureAwait(false)
                 : sendMethod!(httpClient, httpRequestMessage, completionOption, timeoutCancellationTokenSource.Token);
 
-            // 处理重定向问题
+            // 初始化当前重定向次数和原始请求方法
             var redirections = 0;
-            while (Helpers.IsRedirectStatusCode(httpResponseMessage.StatusCode) &&
-                   _httpRemoteOptions.AllowAutoRedirect &&
+            var originalHttpMethod = httpRequestBuilder.Method!;
+
+            // 处理请求重定向
+            while (Helpers.DetermineRedirectMethod(httpResponseMessage.StatusCode, originalHttpMethod,
+                       out var redirectMethod) && _httpRemoteOptions.AllowAutoRedirect &&
                    redirections < _httpRemoteOptions.MaximumAutomaticRedirections)
             {
                 // 获取重定向地址
@@ -469,22 +480,23 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
                     break;
                 }
 
-                // 构建新的 HttpRequestMessage 实例（TODO：未来考虑克隆新的 HttpRequestBuilder 实例）
-                var newHttpRequestMessage = httpRequestBuilder
-                    // 处理相对地址
-                    .RewriteRequestUri(redirectUrl.IsAbsoluteUri
-                        ? redirectUrl
-                        : new Uri(Helpers.ParseBaseAddress(httpRequestMessage.RequestUri), redirectUrl))
-                    .Build(_httpRemoteOptions, _httpContentProcessorFactory, httpClient.BaseAddress);
+                // 构建新的 HttpRequestMessage 实例
+                var redirectHttpRequestMessage = httpRequestBuilder
+                    .ConfigureForRedirect(
+                        redirectUrl.IsAbsoluteUri
+                            ? redirectUrl
+                            : new Uri(Helpers.ParseBaseAddress(httpRequestMessage.RequestUri), redirectUrl),
+                        redirectMethod).Build(_httpRemoteOptions, _httpContentProcessorFactory,
+                        httpClient.BaseAddress ?? _httpRemoteOptions.FallbackBaseAddress);
 
                 // 释放前一个 HttpResponseMessage 实例
                 httpResponseMessage.Dispose();
 
                 // 重新调用发送 HTTP 请求委托
                 httpResponseMessage = sendAsyncMethod is not null
-                    ? await sendAsyncMethod(httpClient, newHttpRequestMessage, completionOption,
+                    ? await sendAsyncMethod(httpClient, redirectHttpRequestMessage, completionOption,
                         timeoutCancellationTokenSource.Token).ConfigureAwait(false)
-                    : sendMethod!(httpClient, newHttpRequestMessage, completionOption,
+                    : sendMethod!(httpClient, redirectHttpRequestMessage, completionOption,
                         timeoutCancellationTokenSource.Token);
 
                 // 递增重定向次数
@@ -492,7 +504,7 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
             }
 
             // 获取请求耗时
-            var requestDuration = stopwatch.ElapsedMilliseconds;
+            requestDuration = stopwatch.ElapsedMilliseconds;
 
             // 调用状态码处理程序
             if (sendAsyncMethod is not null)
@@ -504,13 +516,6 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
             {
                 // ReSharper disable once MethodHasAsyncOverload
                 InvokeStatusCodeHandlers(httpRequestBuilder, httpResponseMessage, timeoutCancellationTokenSource.Token);
-            }
-
-            // 检查是否启用请求分析工具
-            if (httpRequestBuilder.ProfilerEnabled)
-            {
-                await ProfilerDelegatingHandler.LogResponseAsync(_logger, _httpRemoteOptions, httpResponseMessage,
-                    requestDuration, cancellationToken).ConfigureAwait(false);
             }
 
             // 检查 HTTP 响应内容长度是否在设定的最大缓冲区大小限制内
@@ -543,6 +548,16 @@ internal sealed partial class HttpRemoteService : IHttpRemoteService
             if (!httpRequestBuilder.HttpClientPoolingEnabled)
             {
                 httpRequestBuilder.ReleaseResources();
+            }
+
+            // 检查是否启用请求分析工具
+            if (httpResponseMessage is not null && httpRequestBuilder.ProfilerEnabled)
+            {
+                await ProfilerDelegatingHandler.LogResponseAsync(_logger, _httpRemoteOptions, httpResponseMessage,
+                    requestDuration, httpRemoteAnalyzer, cancellationToken).ConfigureAwait(false);
+
+                // 调用请求分析工具委托
+                httpRequestBuilder.ProfilerPredicate?.TryInvoke(httpRemoteAnalyzer!);
             }
         }
     }

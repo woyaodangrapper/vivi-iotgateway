@@ -59,6 +59,7 @@ docker pull registry.cn-shenzhen.aliyuncs.com/thingsgateway/thingsgateway_arm64
 | SqlHistoryAlarm      | 报警历史数据关系数据库存储                                 |
 | TDengineDB       | 时序数据库存储                                             |
 | QuestDB          | 时序数据库存储                                             |
+| Webhook          | Webhook                                             |
 
 ## 协议
 

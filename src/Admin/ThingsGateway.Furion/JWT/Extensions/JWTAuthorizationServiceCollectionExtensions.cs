@@ -111,10 +111,10 @@ public static class JWTAuthorizationServiceCollectionExtensions
         where TAuthorizationHandler : class, IAuthorizationHandler
     {
         // 植入框架
-        var furionAssembly = JWTEncryption.GetFrameworkContext(Assembly.GetCallingAssembly());
+        var thingsGatewayAssembly = JWTEncryption.GetFrameworkContext(Assembly.GetCallingAssembly());
 
         // 获取添加授权类型
-        var authorizationServiceCollectionExtensionsType = furionAssembly.GetType("Microsoft.Extensions.DependencyInjection.AuthorizationServiceCollectionExtensions");
+        var authorizationServiceCollectionExtensionsType = thingsGatewayAssembly.GetType("Microsoft.Extensions.DependencyInjection.AuthorizationServiceCollectionExtensions");
         var addAppAuthorizationMethod = authorizationServiceCollectionExtensionsType
             .GetMethods(BindingFlags.Public | BindingFlags.Static)
             .Where(u => u.Name == "AddAppAuthorization" && u.IsGenericMethod && u.GetParameters().Length > 0 && u.GetParameters()[0].ParameterType == typeof(IServiceCollection)).First();

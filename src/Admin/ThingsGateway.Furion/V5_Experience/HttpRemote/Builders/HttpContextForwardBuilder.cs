@@ -349,22 +349,21 @@ public sealed class HttpContextForwardBuilder
         // 初始化 MultipartReader 实例
         var multipartReader = new MultipartReader(boundary, bodyStream);
 
-        while ((await multipartReader.ReadNextSectionAsync(cancellationToken).ConfigureAwait(false)) is { } multipartSection)
+        // 读取下一个 MultipartSection
+        while (await multipartReader.ReadNextSectionAsync(cancellationToken).ConfigureAwait(false) is { } multipartSection)
         {
             // 检查当前节是否为文件节
             if (multipartSection.AsFileSection() is not null)
             {
                 // 复制多部分表单内容文件节内容
                 await CopyFileMultipartSectionAsync(multipartSection, httpMultipartFormDataBuilder, httpRequestBuilder,
-                                    cancellationToken).ConfigureAwait(false);
+                    cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 // 复制多部分表单内容文本节内容
                 await CopyTextMultipartSectionAsync(multipartSection, httpMultipartFormDataBuilder, cancellationToken).ConfigureAwait(false);
             }
-
-
         }
 
         // 设置多部分表单内容
@@ -418,8 +417,8 @@ public sealed class HttpContextForwardBuilder
     ///     <see cref="CancellationToken" />
     /// </param>
     internal static async Task CopyFileMultipartSectionAsync(MultipartSection multipartSection,
-            HttpMultipartFormDataBuilder httpMultipartFormDataBuilder, HttpRequestBuilder httpRequestBuilder,
-            CancellationToken cancellationToken)
+        HttpMultipartFormDataBuilder httpMultipartFormDataBuilder, HttpRequestBuilder httpRequestBuilder,
+        CancellationToken cancellationToken)
     {
         // 初始化 MemoryStream 实例
         var memoryStream = new MemoryStream();

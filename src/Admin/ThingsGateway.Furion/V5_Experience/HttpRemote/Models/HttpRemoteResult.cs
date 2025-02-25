@@ -63,6 +63,11 @@ public sealed class HttpRemoteResult<TResult>
     public long? ContentLength { get; private set; }
 
     /// <summary>
+    ///     响应 <c>Server</c> 标头
+    /// </summary>
+    public HttpHeaderValueCollection<ProductInfoHeaderValue> Server { get; private set; } = null!;
+
+    /// <summary>
     ///     原始响应标头 <c>Set-Cookie</c> 集合
     /// </summary>
     public List<string>? RawSetCookies { get; private set; }
@@ -137,6 +142,7 @@ public sealed class HttpRemoteResult<TResult>
     {
         Headers = ResponseMessage.Headers;
         ContentHeaders = ResponseMessage.Content.Headers;
+        Server = ResponseMessage.Headers.Server;
     }
 
     /// <summary>
@@ -161,14 +167,14 @@ public sealed class HttpRemoteResult<TResult>
     /// </param>
     internal void ParseSetCookies(HttpResponseHeaders responseHeaders)
     {
-        // 检查响应标头是否包含 Set-Cookie 设置
-        if (!responseHeaders.TryGetValues(HeaderNames.SetCookie, out var setCookieValues))
+        // 尝试获取响应标头 Set-Cookie 集合
+        if (!responseHeaders.TryGetSetCookies(out var setCookies, out var rawSetCookies))
         {
             return;
         }
 
-        RawSetCookies = setCookieValues.ToList();
-        SetCookies = SetCookieHeaderValue.ParseList(RawSetCookies);
+        SetCookies = setCookies;
+        RawSetCookies = rawSetCookies;
     }
 
     /// <inheritdoc />
