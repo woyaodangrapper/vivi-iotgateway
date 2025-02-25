@@ -93,6 +93,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.RulesEngine",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.UpgradeServer", "Gateway\ThingsGateway.UpgradeServer\ThingsGateway.UpgradeServer.csproj", "{C9A5E317-65F3-4608-A095-E7A21F1946CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThingsGateway.Plugin.Http", "Plugin\ThingsGateway.Plugin.Http\ThingsGateway.Plugin.Http.csproj", "{7E4696E3-1170-6AF6-844C-265BBCEC5DA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -247,6 +249,10 @@ Global
 		{C9A5E317-65F3-4608-A095-E7A21F1946CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9A5E317-65F3-4608-A095-E7A21F1946CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9A5E317-65F3-4608-A095-E7A21F1946CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E4696E3-1170-6AF6-844C-265BBCEC5DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E4696E3-1170-6AF6-844C-265BBCEC5DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E4696E3-1170-6AF6-844C-265BBCEC5DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E4696E3-1170-6AF6-844C-265BBCEC5DA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -287,10 +293,11 @@ Global
 		{F82B07C6-967F-404D-888A-0611E27D0C98} = {5948EA23-4B42-4C22-A266-2E0AE5FA575F}
 		{07D554EF-3D43-4722-84FC-DD3A0B614CA0} = {5948EA23-4B42-4C22-A266-2E0AE5FA575F}
 		{C9A5E317-65F3-4608-A095-E7A21F1946CF} = {5948EA23-4B42-4C22-A266-2E0AE5FA575F}
+		{7E4696E3-1170-6AF6-844C-265BBCEC5DA7} = {36510D70-161F-4241-B8D0-781E21032816}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {199B1B96-4F56-4828-9531-813BA02DB282}
-		RESX_NeutralResourcesLanguage = zh-Hans
 		RESX_Rules = {"EnabledRules":[]}
+		RESX_NeutralResourcesLanguage = zh-Hans
 	EndGlobalSection
 EndGlobal
