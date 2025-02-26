@@ -105,4 +105,7 @@ internal interface IVariableService
     /// 保存初始值
     /// </summary>
     Task UpdateInitValueAsync(List<Variable> variables);
+
+
+    Task<List<Variable>> GetByDeviceIdAsync(List<long> deviceIds);
 }

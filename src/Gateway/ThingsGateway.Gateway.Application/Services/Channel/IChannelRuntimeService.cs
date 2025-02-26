@@ -44,4 +44,5 @@ public interface IChannelRuntimeService
     Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter);
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
     Task<MemoryStream> ExportMemoryStream(List<Channel> data);
+    Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes);
 }

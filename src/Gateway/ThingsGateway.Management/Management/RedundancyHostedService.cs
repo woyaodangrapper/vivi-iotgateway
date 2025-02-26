@@ -125,7 +125,7 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
 
     private static Task RestartAsync()
     {
-        return GlobalData.ChannelThreadManage.RestartChannelAsync(GlobalData.ReadOnlyChannels.Values);
+        return GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.ReadOnlyChannels.Values);
     }
 
     /// <summary>

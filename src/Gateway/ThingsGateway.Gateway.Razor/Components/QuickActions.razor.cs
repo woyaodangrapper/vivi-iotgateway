@@ -81,7 +81,7 @@ public partial class QuickActions
         await Task.Run(async () =>
         {
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-            await GlobalData.ChannelThreadManage.RestartChannelAsync(data.Select(a => a.Value));
+            await GlobalData.ChannelRuntimeService.RestartChannelAsync(data.Select(a => a.Value));
         });
     }
 

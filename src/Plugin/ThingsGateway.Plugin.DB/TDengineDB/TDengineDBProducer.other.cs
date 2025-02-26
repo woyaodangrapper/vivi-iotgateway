@@ -10,6 +10,9 @@
 
 using Mapster;
 
+using SqlSugar;
+using SqlSugar.TDengine;
+
 using ThingsGateway.Foundation;
 using ThingsGateway.Plugin.DB;
 
@@ -60,7 +63,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
     {
         try
         {
-            var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+            var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableName);
             db.Ado.CancellationToken = cancellationToken;
 
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
@@ -75,7 +78,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
             }
             else
             {
-                var result = await db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
 
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                 if (result > 0)

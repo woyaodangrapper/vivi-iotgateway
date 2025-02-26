@@ -191,6 +191,7 @@ internal sealed class ChannelThreadManage : IChannelThreadManage
             NewChannelLock.Release();
         }
     }
+
     #endregion
 
 

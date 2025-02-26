@@ -10,19 +10,25 @@
 
 using BootstrapBlazor.Components;
 
-using CSScripting;
-
 using Mapster;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife;
+
+using TouchSocket.Core;
 
 namespace ThingsGateway.Gateway.Application;
 
 public class ChannelRuntimeService : IChannelRuntimeService
 {
+    private ILogger _logger;
+    public ChannelRuntimeService(ILogger<ChannelRuntimeService> logger)
+    {
+        _logger = logger;
+    }
     private WaitLock WaitLock { get; set; } = new WaitLock();
     public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model)
     {
@@ -181,6 +187,73 @@ public class ChannelRuntimeService : IChannelRuntimeService
             await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntime).ConfigureAwait(false);
 
             return true;
+        }
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
+
+    public async Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes)
+    {
+        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes.SelectMany(a => a.Value.VariableRuntimes)).ParallelForEach(a => a.Value.SafeDispose());
+        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).ParallelForEach(a => a.Value.SafeDispose());
+        oldChannelRuntimes.ParallelForEach(a => a.SafeDispose());
+        var ids = oldChannelRuntimes.Select(a => a.Id).ToHashSet();
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            //网关启动时，获取所有通道
+            var channelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id) || !GlobalData.Channels.ContainsKey(a.Id)).Adapt<List<ChannelRuntime>>();
+
+            var chanelIds = channelRuntimes.Select(a => a.Id).ToHashSet();
+            var deviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => chanelIds.Contains(a.ChannelId)).Adapt<List<DeviceRuntime>>();
+
+            var variableRuntimes = (await GlobalData.VariableService.GetByDeviceIdAsync(deviceRuntimes.Select(a => a.Id).ToList()).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+            foreach (var channelRuntime in channelRuntimes)
+            {
+                try
+                {
+                    channelRuntime.Init();
+                    var devRuntimes = deviceRuntimes.Where(x => x.ChannelId == channelRuntime.Id);
+                    foreach (var item in devRuntimes)
+                    {
+                        item.Init(channelRuntime);
+
+                        var varRuntimes = variableRuntimes.Where(x => x.DeviceId == item.Id);
+
+                        varRuntimes.ParallelForEach(varItem =>
+                        {
+                            varItem.Init(item);
+                        });
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Init Channel");
+                }
+            }
+
+            var startCollectChannelEnable = GlobalData.StartCollectChannelEnable;
+            var startBusinessChannelEnable = GlobalData.StartBusinessChannelEnable;
+
+            var collectChannelRuntimes = channelRuntimes.Where(x => (x.Enable && x.IsCollect == true && startCollectChannelEnable));
+
+            var businessChannelRuntimes = channelRuntimes.Where(x => (x.Enable && x.IsCollect == false && startBusinessChannelEnable));
+
+            //根据初始冗余属性，筛选启动
+            await GlobalData.ChannelThreadManage.RestartChannelAsync(businessChannelRuntimes).ConfigureAwait(false);
+            await GlobalData.ChannelThreadManage.RestartChannelAsync(collectChannelRuntimes).ConfigureAwait(false);
+
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Start error");
         }
         finally
         {

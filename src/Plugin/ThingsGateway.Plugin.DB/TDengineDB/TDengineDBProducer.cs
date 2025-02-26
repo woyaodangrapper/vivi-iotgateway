@@ -26,7 +26,11 @@ namespace ThingsGateway.Plugin.TDengineDB;
 /// </summary>
 public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableModel<TDengineDBHistoryValue>, IDBHistoryValueService
 {
-    internal readonly RealDBProducerProperty _driverPropertys = new() { DbType = DbType.TDengine };
+    internal readonly RealDBProducerProperty _driverPropertys = new()
+    {
+        DbType = DbType.TDengine,
+        BigTextConnectStr = "Host=localhost;Port=6030;Username=root;Password=taosdata;Database=power"
+    };
     private readonly TDengineDBProducerVariableProperty _variablePropertys = new();
     /// <inheritdoc/>
     public override Type DriverPropertyUIType => typeof(RealDBProducerPropertyRazor);
@@ -80,8 +84,8 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     internal ISugarQueryable<TDengineDBHistoryValue> Query(DBHistoryValuePageInput input)
     {
-        var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
-        var query = db.Queryable<TDengineDBHistoryValue>().AS(_driverPropertys.TableName)
+        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableName);
+        var query = db.Queryable<TDengineDBHistoryValue>()
                              .WhereIF(input.StartTime != null, a => a.CreateTime >= input.StartTime)
                            .WhereIF(input.EndTime != null, a => a.CreateTime <= input.EndTime)
                            .WhereIF(!string.IsNullOrEmpty(input.VariableName), it => it.Name.Contains(input.VariableName))
@@ -99,7 +103,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     internal async Task<QueryData<TDengineDBHistoryValue>> QueryData(QueryPageOptions option)
     {
-        using var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableName);
         var ret = new QueryData<TDengineDBHistoryValue>()
         {
             IsSorted = option.SortOrder != SortOrder.Unset,
@@ -107,7 +111,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
             IsAdvanceSearch = option.AdvanceSearches.Count > 0 || option.CustomerSearches.Count > 0,
             IsSearch = option.Searches.Count > 0
         };
-        var query = db.Queryable<TDengineDBHistoryValue>().AS(_driverPropertys.TableName);
+        var query = db.Queryable<TDengineDBHistoryValue>().AsTDengineSTable();
 
         query = db.GetQuery<TDengineDBHistoryValue>(option, query);
 
@@ -140,8 +144,10 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
 
     protected override async Task ProtectedStartAsync(CancellationToken cancellationToken)
     {
-        var db = BusinessDatabaseUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr);
+        var db = TDengineDBUtil.GetDb(_driverPropertys.DbType, _driverPropertys.BigTextConnectStr, _driverPropertys.TableName);
         db.DbMaintenance.CreateDatabase();
+
+
         //必须为间隔上传
         if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
         {
@@ -152,7 +158,7 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         }
         else
         {
-            db.CodeFirst.As<TDengineDBHistoryValue>(_driverPropertys.TableName).InitTables(typeof(TDengineDBHistoryValue));
+            db.CodeFirst.InitTables(typeof(TDengineDBHistoryValue));
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }

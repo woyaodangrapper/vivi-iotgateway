@@ -71,6 +71,18 @@ public class ControlController : ControllerBase
         throw Oops.Bah("device not found");
     }
     /// <summary>
+    /// 重启当前机构线程
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("restartScopeThread")]
+    [DisplayName("重启当前机构线程")]
+    public async Task RestartScopeThread()
+    {
+        var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.RestartChannelAsync(data.Select(a => a.Value)).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// 重启全部线程
     /// </summary>
     /// <returns></returns>
@@ -78,8 +90,7 @@ public class ControlController : ControllerBase
     [DisplayName("重启全部线程")]
     public async Task RestartAllThread()
     {
-        var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-        await GlobalData.ChannelThreadManage.RestartChannelAsync(data.Select(a => a.Value)).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.RestartChannelAsync(GlobalData.Channels.Values).ConfigureAwait(false);
     }
 
     /// <summary>

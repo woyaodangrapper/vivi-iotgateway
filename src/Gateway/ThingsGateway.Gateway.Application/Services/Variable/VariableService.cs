@@ -284,6 +284,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         return result;
     }
 
+    public async Task<List<Variable>> GetByDeviceIdAsync(List<long> deviceIds)
+    {
+        using var db = GetDB();
+        var deviceVariables = await db.Queryable<Variable>().Where(a => deviceIds.Contains(a.DeviceId)).ToListAsync().ConfigureAwait(false);
+        return deviceVariables;
+    }
     public async Task<List<Variable>> GetAllAsync(long? devId = null)
     {
         using var db = GetDB();
@@ -948,6 +954,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             FileUtility.Delete(path);
         }
     }
+
 
     #endregion 导入
 }
