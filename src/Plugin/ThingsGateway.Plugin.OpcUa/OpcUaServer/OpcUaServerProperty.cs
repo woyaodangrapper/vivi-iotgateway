@@ -17,7 +17,7 @@ using ThingsGateway.Gateway.Application;
 namespace ThingsGateway.Plugin.OpcUa;
 
 /// <inheritdoc/>
-public class OpcUaServerProperty : BusinessPropertyBase
+public class OpcUaServerProperty : BusinessPropertyBase, IBusinessPropertyAllVariableBase
 {
     [DynamicProperty]
     public bool IsAllVariable { get; set; } = false;

@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.Foundation;
-
 namespace ThingsGateway.Plugin.Webhook;
 
 /// <summary>

@@ -12,6 +12,7 @@ using System.Reflection;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Reflection;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -46,6 +47,26 @@ public static class DynamicModelExtension
     {
         if (variableRuntime == null || propertyName.IsNullOrWhiteSpace())
             return null;
+
+        if (GlobalData.IdDevices.TryGetValue(businessId, out var deviceRuntime))
+        {
+            if (deviceRuntime.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property)
+            {
+                if (property.IsAllVariable)
+                {
+                    // 检查是否存在对应的业务设备Id
+                    if (variableRuntime.VariablePropertys?.ContainsKey(businessId) == true)
+                    {
+                        variableRuntime.VariablePropertys[businessId].TryGetValue(propertyName, out var value);
+                        return value; // 返回属性值
+                    }
+                    else
+                    {
+                        return ThingsGatewayStringConverter.Default.Serialize(null, property.GetValue(propertyName, false));
+                    }
+                }
+            }
+        }
 
         // 检查是否存在对应的业务设备Id
         if (variableRuntime.VariablePropertys?.ContainsKey(businessId) == true)

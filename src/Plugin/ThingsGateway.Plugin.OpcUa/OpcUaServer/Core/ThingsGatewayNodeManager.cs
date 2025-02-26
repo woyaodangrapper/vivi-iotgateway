@@ -8,6 +8,8 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using Mapster;
+
 using Newtonsoft.Json.Linq;
 
 using Opc.Ua;
@@ -27,7 +29,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 {
     private const string ReferenceServer = "https://thingsgateway.cn/";
 
-    //private readonly TypeAdapterConfig _config;
+    private readonly TypeAdapterConfig _config;
     /// <summary>
     /// OPC和网关对应表
     /// </summary>
@@ -40,14 +42,16 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     public ThingsGatewayNodeManager(BusinessBase businessBase, IServerInternal server, ApplicationConfiguration configuration) : base(server, configuration, ReferenceServer)
     {
         _businessBase = businessBase;
-        //_config = new TypeAdapterConfig();
-        //_config.ForType<HistoryValue, DataValue>()
-        //.Map(dest => dest.WrappedValue, (src) => new Variant(src.Value))
-        //.Map(dest => dest.SourceTimestamp, src => DateTime.SpecifyKind(src.CollectTime, DateTimeKind.Utc))
-        //.Map(dest => dest.StatusCode, (src) =>
-        //src.IsOnline ? StatusCodes.Good : StatusCodes.Bad);
+        _config = new TypeAdapterConfig();
+        _config.ForType<IDBHistoryValue, DataValue>()
+        .Map(dest => dest.WrappedValue, (src) => new Variant(src.Value))
+        .Map(dest => dest.SourceTimestamp, src => DateTime.SpecifyKind(src.CollectTime, DateTimeKind.Local))
+        .Map(dest => dest.ServerTimestamp, src => DateTime.SpecifyKind(src.CreateTime, DateTimeKind.Local))
+        .Map(dest => dest.StatusCode, (src) =>
+        src.IsOnline ? StatusCodes.Good : StatusCodes.Bad);
     }
-
+    Dictionary<long, IDriver>? driverDict;
+    internal FolderState rootFolder;
     /// <summary>
     /// 创建服务目录结构
     /// </summary>
@@ -56,12 +60,14 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     {
         lock (Lock)
         {
+
+            driverDict = GlobalData.GetEnableDevices().Where(a => a.Value.Driver is IDBHistoryValueService).ToDictionary(a => a.Key, a => a.Value.Driver);
             if (!externalReferences.TryGetValue(ObjectIds.ObjectsFolder, out IList<IReference> references))
             {
                 externalReferences[ObjectIds.ObjectsFolder] = references = new List<IReference>();
             }
             //首节点
-            FolderState rootFolder = CreateFolder(null, "ThingsGateway", "ThingsGateway");
+            rootFolder = CreateFolder(null, "ThingsGateway", "ThingsGateway");
             rootFolder.AddReference(ReferenceTypes.Organizes, true, ObjectIds.ObjectsFolder);
             references.Add(new NodeStateReference(ReferenceTypes.Organizes, false, rootFolder.NodeId));
             rootFolder.EventNotifier = EventNotifiers.SubscribeToEvents;
@@ -86,85 +92,99 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 }
             }
             AddPredefinedNode(SystemContext, rootFolder);
+
         }
     }
 
-    ///// <summary>
-    ///// 读取历史数据
-    ///// </summary>
-    //public override void HistoryRead(OperationContext context,
-    //    HistoryReadDetails details,
-    //    TimestampsToReturn timestampsToReturn,
-    //    bool releaseContinuationPoints,
-    //    IList<HistoryReadValueId> nodesToRead,
-    //    IList<HistoryReadResult> results,
-    //    IList<ServiceResult> errors)
-    //{
-    //    base.HistoryRead(context, details, timestampsToReturn, releaseContinuationPoints, nodesToRead, results, errors);
-    //    //必须带有时间范围
-    //    if (details is not ReadRawModifiedDetails readDetail || readDetail.StartTime == DateTime.MinValue || readDetail.EndTime == DateTime.MinValue)
-    //    {
-    //        errors[0] = StatusCodes.BadHistoryOperationUnsupported;
-    //        return;
-    //    }
-    //    var service = BackgroundServiceUtil.GetBackgroundService<HistoryValueWorker>();
-    //    if (!service.StatuString.IsSuccess)
-    //    {
-    //        errors[0] = StatusCodes.BadHistoryOperationUnsupported;
-    //        return;
-    //    }
+    /// <summary>
+    /// 读取历史数据
+    /// </summary>
+    public override void HistoryRead(OperationContext context,
+        HistoryReadDetails details,
+        TimestampsToReturn timestampsToReturn,
+        bool releaseContinuationPoints,
+        IList<HistoryReadValueId> nodesToRead,
+        IList<HistoryReadResult> results,
+        IList<ServiceResult> errors)
+    {
+        base.HistoryRead(context, details, timestampsToReturn, releaseContinuationPoints, nodesToRead, results, errors);
+        //必须带有时间范围
+        if (details is not ReadRawModifiedDetails readDetail || readDetail.StartTime == DateTime.MinValue || readDetail.EndTime == DateTime.MinValue || driverDict == null)
+        {
+            errors[0] = StatusCodes.BadHistoryOperationUnsupported;
+            return;
+        }
 
-    //    var db = service.GetHistoryDbAsync().GetAwaiter().GetResult();
-    //    if (!db.IsSuccess)
-    //    {
-    //        errors[0] = StatusCodes.BadHistoryOperationUnsupported;
-    //        return;
-    //    }
-    //    var startTime = readDetail.StartTime;
-    //    var endTime = readDetail.EndTime;
+        var startTime = readDetail.StartTime;
+        var endTime = readDetail.EndTime;
 
-    //    for (int i = 0; i < nodesToRead.Count; i++)
-    //    {
-    //        var historyRead = nodesToRead[i];
-    //        if (NodeIdTags.TryGetValue(historyRead.NodeId, out OPCUATag tag))
-    //        {
-    //            var data = db.Content.Queryable<HistoryValue>()
-    //                .Where(a => a.Name == tag.SymbolicName)
-    //                .Where(a => a.CollectTime >= startTime)
-    //                .Where(a => a.CollectTime <= endTime)
-    //                .ToList();
 
-    //            if (data.Count > 0)
-    //            {
-    //                var hisDataValue = data.Adapt<List<DataValue>>(_config);
-    //                HistoryData hisData = new();
-    //                hisData.DataValues.AddRange(hisDataValue);
-    //                errors[i] = StatusCodes.Good;
-    //                //切记Processed设为true，否则客户端会报错
-    //                historyRead.Processed = true;
-    //                results[i] = new HistoryReadResult()
-    //                {
-    //                    StatusCode = StatusCodes.Good,
-    //                    HistoryData = new ExtensionObject(hisData)
-    //                };
-    //            }
-    //            else
-    //            {
-    //                results[i] = new HistoryReadResult()
-    //                {
-    //                    StatusCode = StatusCodes.GoodNoData
-    //                };
-    //            }
-    //        }
-    //        else
-    //        {
-    //            results[i] = new HistoryReadResult()
-    //            {
-    //                StatusCode = StatusCodes.BadNotFound
-    //            };
-    //        }
-    //    }
-    //}
+        for (int i = 0; i < nodesToRead.Count; i++)
+        {
+            var historyRead = nodesToRead[i];
+            if (NodeIdTags.TryGetValue(historyRead.NodeId.Identifier.ToString(), out OpcUaTag tag))
+            {
+                if (!GlobalData.ReadOnlyVariables.TryGetValue(tag.SymbolicName, out var variableRuntime))
+                {
+                    results[i] = new HistoryReadResult()
+                    {
+                        StatusCode = StatusCodes.GoodNoData
+                    };
+                    continue;
+                }
+
+
+                var service = driverDict.FirstOrDefault(a => GlobalData.ContainsVariable(a.Key, variableRuntime)).Value;
+                if (service == null)
+                {
+                    results[i] = new HistoryReadResult()
+                    {
+                        StatusCode = StatusCodes.BadNotFound
+                    };
+                    continue;
+                }
+                var historyValueService = (IDBHistoryValueService)service;
+
+                var data = historyValueService.GetDBHistoryValuesAsync(new DBHistoryValuePageInput()
+                {
+                    EndTime = endTime,
+                    StartTime = startTime,
+                    VariableName = tag.SymbolicName
+                }).ConfigureAwait(false).GetAwaiter().GetResult();
+
+
+                if (data.Count > 0)
+                {
+                    var hisDataValue = data.Adapt<List<DataValue>>(_config);
+                    HistoryData hisData = new();
+                    hisData.DataValues.AddRange(hisDataValue);
+                    errors[i] = StatusCodes.Good;
+                    //切记Processed设为true，否则客户端会报错
+                    historyRead.Processed = true;
+                    results[i] = new HistoryReadResult()
+                    {
+                        StatusCode = StatusCodes.Good,
+                        HistoryData = new ExtensionObject(hisData)
+                    };
+                }
+                else
+                {
+                    results[i] = new HistoryReadResult()
+                    {
+                        StatusCode = StatusCodes.GoodNoData
+                    };
+                }
+            }
+            else
+            {
+                results[i] = new HistoryReadResult()
+                {
+                    StatusCode = StatusCodes.BadNotFound
+                };
+            }
+        }
+
+    }
 
     /// <inheritdoc/>
     public override NodeId New(ISystemContext context, NodeState node)
@@ -379,10 +399,12 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             Id = variableRuntime.Id,
             DataType = DataNodeType(variableRuntime)
         };
-        var level = ThingsGatewayNodeManager.ProtectTypeTrans(variableRuntime);
+        var service = driverDict.FirstOrDefault(a => GlobalData.ContainsVariable(a.Key, variableRuntime)).Value;
+        var level = ThingsGatewayNodeManager.ProtectTypeTrans(variableRuntime, service != null);
         variable.AccessLevel = level;
         variable.UserAccessLevel = level;
-        variable.Historizing = false;//历史存储状态
+
+        variable.Historizing = service != null;//历史存储状态
         variable.Value = Opc.Ua.TypeInfo.GetDefaultValue(variable.DataType, ValueRanks.Any, Server.TypeTree);
         var code = variableRuntime.IsOnline ? StatusCodes.Good : StatusCodes.Bad;
         variable.StatusCode = code;
@@ -459,7 +481,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         }
     }
 
-    private static byte ProtectTypeTrans(VariableRuntime variableRuntime)
+    private static byte ProtectTypeTrans(VariableRuntime variableRuntime, bool historizing)
     {
         byte result = 0;
         result = variableRuntime.ProtectType switch
@@ -468,10 +490,10 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             ProtectTypeEnum.ReadWrite => (byte)(result | AccessLevels.CurrentReadOrWrite),
             _ => (byte)(result | AccessLevels.CurrentRead),
         };
-        //if (variableRuntime.HistoryEnable)
-        //{
-        //    result = (byte)(result | AccessLevels.HistoryRead);
-        //}
+        if (historizing)
+        {
+            result = (byte)(result | AccessLevels.HistoryRead);
+        }
         return result;
     }
 }

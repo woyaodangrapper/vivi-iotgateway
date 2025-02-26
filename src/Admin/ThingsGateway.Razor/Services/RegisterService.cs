@@ -22,7 +22,7 @@ public class RegisterService : IRegisterService
 {
     ILogger _logger;
     IHostApplicationLifetime _hostApplicationLifetime;
-    public RegisterService(IHostApplicationLifetime hostApplicationLifetime,ILogger<RegisterService> logger)
+    public RegisterService(IHostApplicationLifetime hostApplicationLifetime, ILogger<RegisterService> logger)
     {
         UUID = DESEncryption.Encrypt($"{MachineInfo.Current.UUID}{MachineInfo.Current.Guid}{MachineInfo.Current.DiskID}");
         _logger = logger;

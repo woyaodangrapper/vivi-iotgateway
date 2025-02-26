@@ -18,3 +18,14 @@ namespace ThingsGateway.Gateway.Application;
 public abstract class BusinessPropertyBase : DriverPropertyBase
 {
 }
+
+/// <summary>
+/// 插件配置项
+/// <br></br>
+/// 使用<see cref="DynamicPropertyAttribute"/> 标识所需的配置属性  ，取消特性后不会在页面上显示
+/// </summary>
+public interface IBusinessPropertyAllVariableBase
+{
+    [DynamicProperty]
+    public bool IsAllVariable { get; set; }
+}

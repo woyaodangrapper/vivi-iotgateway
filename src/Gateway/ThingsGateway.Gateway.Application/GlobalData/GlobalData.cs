@@ -100,6 +100,22 @@ public static class GlobalData
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
     }
 
+    public static bool ContainsVariable(long businessDeviceId, VariableRuntime a)
+    {
+        if (GlobalData.IdDevices.TryGetValue(businessDeviceId, out var deviceRuntime))
+        {
+            if (deviceRuntime.Driver?.DriverProperties is IBusinessPropertyAllVariableBase property)
+            {
+                if (property.IsAllVariable)
+                {
+                    return true;
+                }
+            }
+        }
+        return a.VariablePropertys?.ContainsKey(businessDeviceId) == true;
+
+    }
+
     /// <summary>
     /// 只读的通道字典，提供对通道的只读访问
     /// </summary>

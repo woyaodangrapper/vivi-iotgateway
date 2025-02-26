@@ -12,7 +12,7 @@ namespace ThingsGateway.Gateway.Application;
 /// <summary>
 /// <inheritdoc/>
 /// </summary>
-public class BusinessPropertyWithCacheInterval : BusinessPropertyWithCache
+public class BusinessPropertyWithCacheInterval : BusinessPropertyWithCache, IBusinessPropertyAllVariableBase
 {
     [DynamicProperty]
     public virtual bool IsAllVariable { get; set; } = false;

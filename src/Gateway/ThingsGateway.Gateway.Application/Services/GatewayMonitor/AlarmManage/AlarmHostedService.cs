@@ -397,47 +397,36 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
     {
         try
         {
-            if (!GlobalData.StartCollectChannelEnable)
+            if (!GlobalData.StartBusinessChannelEnable)
                 return;
 
             //Stopwatch stopwatch = Stopwatch.StartNew();
             // 遍历设备变量列表
 
-            foreach (var kv in GlobalData.AlarmEnableVariables)
+            GlobalData.AlarmEnableVariables.ParallelForEach((kv, state, index) =>
             {
-                // 如果取消请求已经被触发，则结束任务
-                if (cancellation.IsCancellationRequested)
-                    return;
-
-                var item = kv.Value;
-
-                // 如果该变量的报警功能未启用，则跳过该变量
-                if (!item.AlarmEnable)
-                    continue;
-
-                // 如果该变量离线，则跳过该变量
-                if (!item.IsOnline)
-                    continue;
-
-                // 对该变量进行报警分析
-                AlarmAnalysis(item);
-
-
-            }
-
-
-            foreach (var item in GlobalData.RealAlarmVariables)
-            {
-                if (!GlobalData.AlarmEnableVariables.ContainsKey(item.Value.Id))
                 {
-                    if (GlobalData.RealAlarmVariables.TryRemove(item.Key, out var oldAlarm))
-                    {
-                        oldAlarm.EventType = EventTypeEnum.Finish;
-                        oldAlarm.EventTime = DateTime.Now;
-                        GlobalData.AlarmChange(item.Adapt<AlarmVariable>());
-                    }
+                    // 如果取消请求已经被触发，则结束任务
+                    if (cancellation.IsCancellationRequested)
+                        return;
+
+                    var item = kv.Value;
+
+                    // 如果该变量的报警功能未启用，则跳过该变量
+                    if (!item.AlarmEnable)
+                        return;
+
+                    // 如果该变量离线，则跳过该变量
+                    if (!item.IsOnline)
+                        return;
+
+                    // 对该变量进行报警分析
+                    AlarmAnalysis(item);
+
+
                 }
-            }
+            });
+
 
             //stopwatch.Stop();
             //_logger.LogInformation("报警分析耗时：" + stopwatch.ElapsedMilliseconds + "ms");
@@ -449,7 +438,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
         finally
         {
             // 延迟一段时间，避免过于频繁地执行任务
-            await Task.Delay(500, cancellation).ConfigureAwait(false);
+            await Task.Delay(50, cancellation).ConfigureAwait(false);
         }
     }
 

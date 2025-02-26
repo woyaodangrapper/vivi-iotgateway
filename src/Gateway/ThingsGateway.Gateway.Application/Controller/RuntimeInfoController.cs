@@ -85,7 +85,11 @@ public class RuntimeInfoController : ControllerBase
             .WhereIF(!input.RegisterAddress.IsNullOrEmpty(), a => a.RegisterAddress == input.RegisterAddress)
             .WhereIF(!input.Name.IsNullOrEmpty(), a => a.Name == input.Name)
             .WhereIF(!input.DeviceName.IsNullOrEmpty(), a => a.DeviceName == input.DeviceName)
-            .WhereIF(input.BusinessDeviceId > 0, a => a.VariablePropertys?.ContainsKey(input.BusinessDeviceId) == true)
+            .WhereIF(input.BusinessDeviceId > 0, a =>
+            {
+                return GlobalData.ContainsVariable(input.BusinessDeviceId, a);
+            }
+           )
             .ToPagedList(input);
         return data.Adapt<SqlSugarPagedList<AlarmVariable>>();
     }
@@ -119,7 +123,12 @@ public class RuntimeInfoController : ControllerBase
         .WhereIF(!input.Name.IsNullOrWhiteSpace(), a => a.Name == input.Name)
          .WhereIF(!input.DeviceName.IsNullOrEmpty(), a => a.DeviceName == input.DeviceName)
             .WhereIF(!input.RegisterAddress.IsNullOrWhiteSpace(), a => a.RegisterAddress == input.RegisterAddress)
-            .WhereIF(input.BusinessDeviceId > 0, a => a.VariablePropertys?.ContainsKey(input.BusinessDeviceId) == true)
+            .WhereIF(input.BusinessDeviceId > 0, a =>
+            {
+                return GlobalData.ContainsVariable(input.BusinessDeviceId, a);
+            }
+           )
+
 
             .ToPagedList(input);
         return data;

@@ -20,6 +20,7 @@ public interface IDeviceThreadManage : IAsyncDisposable
     LoggerGroup LogMessage { get; }
     string LogPath { get; }
     IChannelThreadManage ChannelThreadManage { get; }
+    IChannel? Channel { get; }
 
     Task SetLogAsync(bool enable, LogLevel? logLevel = null, bool upDataBase = true);
     Task RestartDeviceAsync(DeviceRuntime deviceRuntime, bool deleteCache);

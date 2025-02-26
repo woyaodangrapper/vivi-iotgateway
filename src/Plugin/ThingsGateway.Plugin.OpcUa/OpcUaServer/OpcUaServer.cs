@@ -34,7 +34,7 @@ public partial class OpcUaServer : BusinessBase
     private readonly OpcUaServerProperty _driverPropertys = new();
     private readonly OpcUaServerVariableProperty _variablePropertys = new();
     private ApplicationInstance m_application;
-    private ApplicationConfiguration m_configuration;
+    internal ApplicationConfiguration m_configuration;
     private ThingsGatewayServer m_server;
     private volatile bool success = true;
 
@@ -52,6 +52,33 @@ public partial class OpcUaServer : BusinessBase
 
     public override async Task AfterVariablesChangedAsync()
     {
+        if (m_server != null && m_application != null)
+        {
+            m_server?.Stop();
+            m_server?.SafeDispose();
+
+            ApplicationInstance.MessageDlg = new ApplicationMessageDlg(LogMessage);//默认返回true
+
+            CollectVariableRuntimes?.Clear();
+            //Utils.SetLogger(new OpcUaLogger(LogMessage)); //调试用途
+            m_application = new ApplicationInstance();
+            m_configuration = GetDefaultConfiguration();
+            await m_configuration.Validate(ApplicationType.Server).ConfigureAwait(false);
+            m_application.ApplicationConfiguration = m_configuration;
+            if (m_configuration.SecurityConfiguration.AutoAcceptUntrustedCertificates)
+            {
+                m_configuration.CertificateValidator.CertificateValidation += (s, e) =>
+                {
+                    e.Accept = (e.Error.StatusCode == StatusCodes.BadCertificateUntrusted);
+                };
+            }
+
+            m_server = new(this);
+
+        }
+
+
+
         // 如果业务属性指定了全部变量，则设置当前设备的变量运行时列表和采集设备列表
         if (_driverPropertys.IsAllVariable)
         {
@@ -68,6 +95,8 @@ public partial class OpcUaServer : BusinessBase
         {
             VariableValueChange(a.Value, a.Value.Adapt<VariableData>());
         });
+
+
     }
 
 
@@ -75,6 +104,7 @@ public partial class OpcUaServer : BusinessBase
     {
         ApplicationInstance.MessageDlg = new ApplicationMessageDlg(LogMessage);//默认返回true
 
+        CollectVariableRuntimes?.Clear();
         //Utils.SetLogger(new OpcUaLogger(LogMessage)); //调试用途
         m_application = new ApplicationInstance();
         m_configuration = GetDefaultConfiguration();
@@ -96,6 +126,8 @@ public partial class OpcUaServer : BusinessBase
 
         Localizer = App.CreateLocalizerByType(typeof(OpcUaServer))!;
         await base.InitChannelAsync(channel).ConfigureAwait(false);
+
+
     }
 
     /// <inheritdoc/>
@@ -119,6 +151,7 @@ public partial class OpcUaServer : BusinessBase
         m_application?.Stop();
         m_server?.SafeDispose();
         CollectVariableRuntimes?.Clear();
+        VariableRuntimes?.Clear();
         base.Dispose(disposing);
     }
 
@@ -144,9 +177,14 @@ public partial class OpcUaServer : BusinessBase
                 CurrentDevice.SetDeviceStatus(TimerX.Now, true);
                 try
                 {
+                    await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
                     await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
                     await m_application.Start(m_server).ConfigureAwait(false);
                     success = true;
+                    VariableRuntimes.ForEach(a =>
+                    {
+                        VariableValueChange(a.Value, a.Value.Adapt<VariableData>());
+                    });
                 }
                 catch (Exception ex)
                 {

@@ -17,7 +17,6 @@ using Opc.Ua.Server;
 using System.Security.Cryptography.X509Certificates;
 
 using ThingsGateway.Admin.Application;
-using ThingsGateway.Gateway.Application;
 
 using TouchSocket.Core;
 
@@ -32,26 +31,41 @@ public partial class ThingsGatewayServer : StandardServer
     /// 自定义节点
     /// </summary>
     public ThingsGatewayNodeManager NodeManager;
-
-    private readonly BusinessBase _businessBase;
+    private MasterNodeManager masterNodeManager;
+    private readonly OpcUaServer _opcUaServer;
 
     private ICertificateValidator m_userCertificateValidator;
 
     /// <inheritdoc cref="ThingsGatewayServer"/>
-    public ThingsGatewayServer(BusinessBase businessBase)
+    public ThingsGatewayServer(OpcUaServer opcUaServer)
     {
-        _businessBase = businessBase;
+        _opcUaServer = opcUaServer;
+
     }
+
+
+    //public void AfterVariablesChanged()
+    //{
+    //    if(masterNodeManager!=null)
+    //    {
+    //        masterNodeManager?.Dispose();
+    //        masterNodeManager = CreateMasterNodeManager((ServerInternalData)NodeManager.Server, _opcUaServer.m_configuration);
+    //        ((ServerInternalData)NodeManager.Server).SetNodeManager(masterNodeManager);
+    //        // put the node manager into a state that allows it to be used by other objects.
+    //        masterNodeManager.Startup();
+    //    }
+
+    //}
 
     /// <inheritdoc/>
     protected override MasterNodeManager CreateMasterNodeManager(IServerInternal server, ApplicationConfiguration configuration)
     {
         List<INodeManager> nodeManagers = new List<INodeManager>();
         // 创建自定义节点管理器.
-        NodeManager = new ThingsGatewayNodeManager(_businessBase, server, configuration);
+        NodeManager = new ThingsGatewayNodeManager(_opcUaServer, server, configuration);
         nodeManagers.Add(NodeManager);
         // 创建主节点管理器.
-        var masterNodeManager = new MasterNodeManager(server, configuration, null, nodeManagers.ToArray());
+        masterNodeManager = new MasterNodeManager(server, configuration, null, nodeManagers.ToArray());
         return masterNodeManager;
     }
 
@@ -108,13 +122,13 @@ public partial class ThingsGatewayServer : StandardServer
         // 当用户身份改变时请求。
         server.SessionManager.ImpersonateUser += SessionManager_ImpersonateUser;
         base.OnServerStarted(server);
-        _businessBase.LogMessage.LogInformation("OPCUAServer Started");
+        _opcUaServer.LogMessage.LogInformation("OPCUAServer Started");
     }
 
     /// <inheritdoc/>
     protected override void OnServerStarting(ApplicationConfiguration configuration)
     {
-        _businessBase.LogMessage.LogInformation("OPCUAServer Starting");
+        _opcUaServer.LogMessage.LogInformation("OPCUAServer Starting");
         base.OnServerStarting(configuration);
 
         // 由应用程序决定如何验证用户身份令牌。
@@ -125,7 +139,7 @@ public partial class ThingsGatewayServer : StandardServer
     /// <inheritdoc/>
     protected override void OnServerStopping()
     {
-        _businessBase.LogMessage.LogInformation("OPCUAServer Stoping");
+        _opcUaServer.LogMessage.LogInformation("OPCUAServer Stoping");
         base.OnServerStopping();
     }
 

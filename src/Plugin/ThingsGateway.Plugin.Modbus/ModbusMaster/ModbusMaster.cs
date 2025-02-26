@@ -11,8 +11,6 @@
 using ThingsGateway.Debug;
 using ThingsGateway.Gateway.Application;
 
-using Yitter.IdGenerator;
-
 namespace ThingsGateway.Plugin.Modbus;
 
 /// <summary>

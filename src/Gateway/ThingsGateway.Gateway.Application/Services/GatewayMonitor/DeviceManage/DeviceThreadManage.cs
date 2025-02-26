@@ -224,7 +224,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
     public long ChannelId => CurrentChannel.Id;
 
-    internal IChannel? Channel { get; }
+    public IChannel? Channel { get; }
 
     public ChannelRuntime CurrentChannel { get; }
 

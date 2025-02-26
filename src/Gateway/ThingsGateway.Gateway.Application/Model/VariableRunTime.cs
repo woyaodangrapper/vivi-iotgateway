@@ -321,6 +321,14 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     #endregion 报警
     public void Init(DeviceRuntime deviceRuntime)
     {
+        GlobalData.AlarmEnableVariables.TryRemove(Id, out _);
+        if (GlobalData.RealAlarmVariables.TryRemove(Name, out var oldAlarm))
+        {
+            oldAlarm.EventType = EventTypeEnum.Finish;
+            oldAlarm.EventTime = DateTime.Now;
+            GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
+        }
+
         DeviceRuntime?.VariableRuntimes?.TryRemove(Id, out _);
 
         DeviceRuntime = deviceRuntime;
@@ -332,7 +340,6 @@ public class VariableRuntime : Variable, IVariable, IDisposable
         GlobalData.Variables.TryAdd(Name, this);
         if (AlarmEnable)
         {
-            GlobalData.AlarmEnableVariables.TryRemove(Id, out _);
             GlobalData.AlarmEnableVariables.TryAdd(Id, this);
         }
     }
@@ -340,12 +347,19 @@ public class VariableRuntime : Variable, IVariable, IDisposable
 
     public void Dispose()
     {
+
         DeviceRuntime?.VariableRuntimes?.TryRemove(Id, out _);
 
         GlobalData.IdVariables.TryRemove(Id, out _);
         GlobalData.Variables.TryRemove(Name, out _);
 
         GlobalData.AlarmEnableVariables.TryRemove(Id, out _);
+        if (GlobalData.RealAlarmVariables.TryRemove(Name, out var oldAlarm))
+        {
+            oldAlarm.EventType = EventTypeEnum.Finish;
+            oldAlarm.EventTime = DateTime.Now;
+            GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
+        }
 
         GC.SuppressFinalize(this);
     }

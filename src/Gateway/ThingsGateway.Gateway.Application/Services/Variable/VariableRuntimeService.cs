@@ -15,7 +15,6 @@ using Mapster;
 using Microsoft.AspNetCore.Components.Forms;
 
 using ThingsGateway.Extension.Generic;
-using ThingsGateway.NewLife;
 
 using TouchSocket.Core;
 
@@ -29,7 +28,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             await GlobalData.VariableService.AddBatchAsync(input).ConfigureAwait(false);
 
@@ -46,7 +45,14 @@ public class VariableRuntimeService : IVariableRuntimeService
                 foreach (var item in group)
                 {
                     //需要重启业务线程
-                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.Value.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a =>
+
+
+                 GlobalData.ContainsVariable(a.Key, item.Value)
+
+
+
+).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
                     {
                         if (deviceRuntime.Driver != null)
@@ -97,7 +103,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             models = models.Adapt<List<Variable>>();
             oldModel = oldModel.Adapt<Variable>();
@@ -119,7 +125,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 foreach (var item in group)
                 {
                     //需要重启业务线程
-                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.Value.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item.Value)).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
                     {
                         if (deviceRuntime.Driver != null)
@@ -172,7 +178,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
 
             ids = ids.ToHashSet();
@@ -195,7 +201,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 foreach (var item in group)
                 {
                     //需要重启业务线程
-                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item)).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
                     {
                         if (deviceRuntime.Driver != null)
@@ -238,7 +244,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.VariableService.ImportVariableAsync(input).ConfigureAwait(false);
 
@@ -257,7 +263,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 foreach (var item in group)
                 {
                     //需要重启业务线程
-                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.Value.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item.Value)).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
                     {
                         if (deviceRuntime.Driver != null)
@@ -312,7 +318,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
 
 
@@ -413,7 +419,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         try
         {
             input = input.Adapt<Variable>();
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
 
 
@@ -442,7 +448,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             }
 
             //需要重启业务线程
-            var deviceRuntimes = GlobalData.IdDevices.Where(a => newVariableRuntime.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+            var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, newVariableRuntime)).Select(a => a.Value);
             foreach (var businessDeviceRuntime in deviceRuntimes)
             {
                 if (businessDeviceRuntime.Driver != null)
@@ -491,7 +497,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         //动态变量不入配置数据库
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
 
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
             var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
@@ -504,7 +510,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 foreach (var item in group)
                 {
                     //需要重启业务线程
-                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.Value.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item.Value)).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
                     {
                         if (deviceRuntime.Driver != null)
@@ -558,7 +564,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         try
         {
-           // await WaitLock.WaitAsync().ConfigureAwait(false);
+            // await WaitLock.WaitAsync().ConfigureAwait(false);
             var ids = variableIds.ToHashSet();
 
             var variableRuntimes = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).Select(a => a.Value).Where(a => a.DynamicVariable).ToList();
@@ -577,7 +583,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 foreach (var item in group)
                 {
                     //需要重启业务线程
-                    var deviceRuntimes = GlobalData.IdDevices.Where(a => item.VariablePropertys?.ContainsKey(a.Key) == true).Select(a => a.Value);
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item)).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
                     {
                         if (deviceRuntime.Driver != null)
