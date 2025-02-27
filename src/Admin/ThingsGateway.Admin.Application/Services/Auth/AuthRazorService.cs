@@ -33,6 +33,7 @@ internal sealed class AuthRazorService : IAuthRazorService
         {
             Url = "/api/auth/login",
             Method = "POST",
+            ToJson = true,
             Data = input,
         };
         var str = await AjaxService.InvokeAsync(ajaxOption).ConfigureAwait(false);
@@ -56,6 +57,7 @@ internal sealed class AuthRazorService : IAuthRazorService
         {
             Url = "/api/auth/logout",
             Method = "POST",
+            ToJson = true,
         };
         using var str = await AjaxService.InvokeAsync(ajaxOption).ConfigureAwait(false);
         if (str != null)
