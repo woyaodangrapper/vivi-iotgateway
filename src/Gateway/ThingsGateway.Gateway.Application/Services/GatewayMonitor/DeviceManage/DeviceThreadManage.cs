@@ -772,7 +772,15 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
             {
                 if (businessDeviceRuntime.Driver != null)
                 {
-                    await businessDeviceRuntime.Driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    try
+                    {
+                        await businessDeviceRuntime.Driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogMessage?.LogWarning(ex);
+                    }
+
                 }
             }
         }

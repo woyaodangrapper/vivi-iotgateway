@@ -149,7 +149,7 @@ public partial class VariableRuntimeInfo : IDisposable
         {
              {nameof(VariableEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(()=> GlobalData. VariableRuntimeService.BatchEditAsync(variables,oldmodel,model));
+                await Task.Run(()=> GlobalData. VariableRuntimeService.BatchEditAsync(variables,oldmodel,model, AutoRestartThread));
 
                 await InvokeAsync(table.QueryAsync);
             }},
@@ -167,7 +167,7 @@ public partial class VariableRuntimeInfo : IDisposable
         {
             return await Task.Run(async () =>
             {
-                return await GlobalData.VariableRuntimeService.DeleteVariableAsync(devices.Select(a => a.Id));
+                return await GlobalData.VariableRuntimeService.DeleteVariableAsync(devices.Select(a => a.Id), AutoRestartThread);
             });
 
         }
@@ -196,7 +196,7 @@ public partial class VariableRuntimeInfo : IDisposable
             }
 
             variable.VariablePropertys = PluginServiceUtil.SetDict(variable.VariablePropertyModels);
-            return await Task.Run(() => GlobalData.VariableRuntimeService.SaveVariableAsync(variable, itemChangedType));
+            return await Task.Run(() => GlobalData.VariableRuntimeService.SaveVariableAsync(variable, itemChangedType, AutoRestartThread));
         }
         catch (Exception ex)
         {
@@ -262,7 +262,7 @@ public partial class VariableRuntimeInfo : IDisposable
         };
 
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.VariableRuntimeService.PreviewAsync(a));
-        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.VariableRuntimeService.ImportVariableAsync(value));
+        Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (value => GlobalData.VariableRuntimeService.ImportVariableAsync(value, AutoRestartThread));
         op.Component = BootstrapDynamicComponent.CreateComponent<ImportExcel>(new Dictionary<string, object?>
         {
              {nameof(ImportExcel.Import),import },
@@ -284,7 +284,7 @@ public partial class VariableRuntimeInfo : IDisposable
             await Task.Run(async () =>
             {
 
-                await GlobalData.VariableRuntimeService.DeleteVariableAsync(Items.Select(a => a.Id));
+                await GlobalData.VariableRuntimeService.DeleteVariableAsync(Items.Select(a => a.Id), AutoRestartThread);
                 await InvokeAsync(async () =>
                 {
                     await ToastService.Default();

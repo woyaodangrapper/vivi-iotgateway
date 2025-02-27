@@ -13,6 +13,7 @@ using BootstrapBlazor.Components;
 using Mapster;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
 
@@ -23,8 +24,12 @@ namespace ThingsGateway.Gateway.Application;
 public class VariableRuntimeService : IVariableRuntimeService
 {
     //private WaitLock WaitLock { get; set; } = new WaitLock();
-
-    public async Task AddBatchAsync(List<Variable> input)
+    private ILogger _logger;
+    public VariableRuntimeService(ILogger<VariableRuntimeService> logger)
+    {
+        _logger = logger;
+    }
+    public async Task AddBatchAsync(List<Variable> input, bool restart = true)
     {
         try
         {
@@ -85,11 +90,20 @@ public class VariableRuntimeService : IVariableRuntimeService
                     }
                 }
             }
-
-            //根据条件重启通道线程
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                //根据条件重启通道线程
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
             }
 
         }
@@ -99,7 +113,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public async Task<bool> BatchEditAsync(IEnumerable<Variable> models, Variable oldModel, Variable model)
+    public async Task<bool> BatchEditAsync(IEnumerable<Variable> models, Variable oldModel, Variable model, bool restart = true)
     {
         try
         {
@@ -158,11 +172,20 @@ public class VariableRuntimeService : IVariableRuntimeService
                     }
                 }
             }
-
-            //根据条件重启通道线程
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                //根据条件重启通道线程
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
             }
 
             return true;
@@ -174,7 +197,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         }
     }
 
-    public async Task<bool> DeleteVariableAsync(IEnumerable<long> ids)
+    public async Task<bool> DeleteVariableAsync(IEnumerable<long> ids, bool restart = true)
     {
         try
         {
@@ -220,10 +243,19 @@ public class VariableRuntimeService : IVariableRuntimeService
                     }
                 }
             }
-
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
             }
 
 
@@ -239,7 +271,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     }
     public Task<Dictionary<string, object>> ExportVariableAsync(ExportFilter exportFilter) => GlobalData.VariableService.ExportVariableAsync(exportFilter);
 
-    public async Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input)
+    public async Task ImportVariableAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)
     {
 
         try
@@ -296,12 +328,21 @@ public class VariableRuntimeService : IVariableRuntimeService
                     }
                 }
             }
-
-            //根据条件重启通道线程
-
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                //根据条件重启通道线程
+
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
             }
 
 
@@ -414,7 +455,7 @@ public class VariableRuntimeService : IVariableRuntimeService
         return GlobalData.VariableService.PreviewAsync(browserFile);
     }
 
-    public async Task<bool> SaveVariableAsync(Variable input, ItemChangedType type)
+    public async Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart = true)
     {
         try
         {
@@ -471,9 +512,19 @@ public class VariableRuntimeService : IVariableRuntimeService
             }
 
             //根据条件重启通道线程
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
             }
 
 
@@ -492,7 +543,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
 
 
-    public async Task AddDynamicVariable(IEnumerable<VariableRuntime> newVariableRuntimes)
+    public async Task AddDynamicVariable(IEnumerable<VariableRuntime> newVariableRuntimes, bool restart = true)
     {
         //动态变量不入配置数据库
         try
@@ -544,13 +595,22 @@ public class VariableRuntimeService : IVariableRuntimeService
                     }
                 }
             }
-
-            //根据条件重启通道线程
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
-            }
+                //根据条件重启通道线程
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
 
+            }
         }
         finally
         {
@@ -560,7 +620,7 @@ public class VariableRuntimeService : IVariableRuntimeService
     }
 
 
-    public async Task DeleteDynamicVariable(IEnumerable<long> variableIds)
+    public async Task DeleteDynamicVariable(IEnumerable<long> variableIds, bool restart = true)
     {
         try
         {
@@ -602,10 +662,19 @@ public class VariableRuntimeService : IVariableRuntimeService
                     }
                 }
             }
-
-            foreach (var driver in changedDriver)
+            if (restart)
             {
-                await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
             }
 
 

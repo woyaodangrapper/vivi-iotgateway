@@ -15,7 +15,6 @@
 			<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.LKSIS\ThingsGateway.Plugin.LKSIS.csproj" />
 			<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.Melsec\ThingsGateway.Plugin.Melsec.csproj" />
 			<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.ModbusC1\ThingsGateway.Plugin.ModbusC1.csproj" />
-		<!--依赖版本不同，需插件隔离-->
 			<!--<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.MqttSZJYZ\ThingsGateway.Plugin.MqttSZJYZ.csproj" />
 			<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.MqttYINGKE\ThingsGateway.Plugin.MqttYINGKE.csproj" />-->
 			<ProjectReference Include="..\PluginPro\ThingsGateway.Plugin.Omron\ThingsGateway.Plugin.Omron.csproj" />
