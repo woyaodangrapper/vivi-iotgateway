@@ -100,10 +100,14 @@
 
 
 .tgTree .dropdown-item:has(i.device) {
-    margin-top: 0.5rem;
+    margin-top: 0.1rem;
+    padding-top: 0.1rem;
     border-top: 1px solid var(--bs-dropdown-link-color);
 }
-
+.tgTree .dropdown-item{
+    margin-top: 0rem;
+    padding-top:0rem;
+}
 
 /*tab*/
 .toast-body {

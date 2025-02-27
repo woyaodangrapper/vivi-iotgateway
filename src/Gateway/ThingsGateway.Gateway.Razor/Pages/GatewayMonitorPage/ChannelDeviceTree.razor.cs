@@ -11,6 +11,7 @@
 using Mapster;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 
 using SqlSugar;
 
@@ -245,6 +246,50 @@ public partial class ChannelDeviceTree : IDisposable
 
     }
 
+    async Task DeleteChannel(ContextMenuItem item, object value)
+    {
+        var op = new DialogOption();
+        {
+            op.Size = Size.ExtraSmall;
+            op.ShowCloseButton = false;
+            op.ShowMaximizeButton = false;
+            op.ShowSaveButton = false;
+            op.Title = string.Empty;
+            op.BodyTemplate = new RenderFragment(builder =>
+             {
+                 builder.OpenElement(0, "div");
+                 builder.AddAttribute(1, "class", "swal2-actions");
+                 builder.OpenComponent<Button>(2);
+                 builder.AddComponentParameter(3, nameof(Button.Icon), "fa-solid fa-xmark");
+                 builder.AddComponentParameter(4, nameof(Button.OnClick),
+ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+ {
+     await op.CloseDialogAsync();
+     await DeleteCurrentChannel(item, value);
+ }));
+                 builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["DeleteCurrentChannel"].Value);
+
+                 builder.CloseComponent();
+
+                 builder.OpenComponent<Button>(12);
+                 builder.AddAttribute(13, "class", "ms-3");
+                 builder.AddComponentParameter(14, nameof(Button.Icon), "fa-solid fa-xmark");
+                 builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+                 {
+                     await op.CloseDialogAsync();
+                     await DeleteAllChannel(item, value);
+                 }));
+                 builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["DeleteAllChannel"].Value);
+
+                 builder.CloseComponent();
+
+                 builder.CloseElement();
+             });
+
+        }
+        ;
+        await DialogService.Show(op);
+    }
     async Task DeleteCurrentChannel(ContextMenuItem item, object value)
     {
         IEnumerable<ChannelRuntime> modelIds = null;
@@ -374,7 +419,50 @@ public partial class ChannelDeviceTree : IDisposable
 
     }
 
+    async Task ExportChannel(ContextMenuItem item, object value)
+    {
+        var op = new DialogOption();
+        {
+            op.Size = Size.ExtraSmall;
+            op.ShowCloseButton = false;
+            op.ShowMaximizeButton = false;
+            op.ShowSaveButton = false;
+            op.Title = string.Empty;
+            op.BodyTemplate = new RenderFragment(builder =>
+            {
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "swal2-actions");
+                builder.OpenComponent<Button>(2);
+                builder.AddComponentParameter(3, nameof(Button.Icon), "fa-solid fa-xmark");
+                builder.AddComponentParameter(4, nameof(Button.OnClick),
+EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+{
+    await op.CloseDialogAsync();
+    await ExportCurrentChannel(item, value);
+}));
+                builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["ExportCurrentChannel"].Value);
 
+                builder.CloseComponent();
+
+                builder.OpenComponent<Button>(12);
+                builder.AddAttribute(13, "class", "ms-3");
+                builder.AddComponentParameter(14, nameof(Button.Icon), "fa-solid fa-xmark");
+                builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+                {
+                    await op.CloseDialogAsync();
+                    await ExportAllChannel(item, value);
+                }));
+                builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["ExportAllChannel"].Value);
+
+                builder.CloseComponent();
+
+                builder.CloseElement();
+            });
+
+        }
+    ;
+        await DialogService.Show(op);
+    }
     async Task ExportCurrentChannel(ContextMenuItem item, object value)
     {
         if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
@@ -596,7 +684,52 @@ public partial class ChannelDeviceTree : IDisposable
         await DialogService.Show(op);
 
     }
+    async Task DeleteDevice(ContextMenuItem item, object value)
+    {
+        var op = new DialogOption();
+        {
+            op.Size = Size.ExtraSmall;
+            op.ShowCloseButton = false;
+            op.ShowMaximizeButton = false;
+            op.ShowSaveButton = false;
+            op.Title = string.Empty;
+            op.BodyTemplate = new RenderFragment(builder =>
+            {
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "swal2-actions");
+                builder.OpenComponent<Button>(2);
+                builder.AddComponentParameter(3, nameof(Button.Icon), "fa-solid fa-xmark");
+                builder.AddComponentParameter(4, nameof(Button.OnClick),
+EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+{
+    await op.CloseDialogAsync();
+    await DeleteCurrentDevice(item, value);
+}));
+                builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["DeleteCurrentDevice"].Value);
 
+                builder.CloseComponent();
+
+                builder.OpenComponent<Button>(12);
+                builder.AddAttribute(13, "class", "ms-3");
+                builder.AddComponentParameter(14, nameof(Button.Icon), "fa-solid fa-xmark");
+                builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+                {
+                    await op.CloseDialogAsync();
+                    await DeleteAllDevice(item, value);
+                }));
+                builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["DeleteAllDevice"].Value);
+
+                builder.CloseComponent();
+
+                builder.CloseElement();
+            });
+
+        }
+        ;
+        await DialogService.Show(op);
+    }
+
+    
     async Task DeleteCurrentDevice(ContextMenuItem item, object value)
     {
         IEnumerable<DeviceRuntime> modelIds = null;
@@ -730,6 +863,53 @@ public partial class ChannelDeviceTree : IDisposable
         }
 
     }
+
+
+    async Task ExportDevice(ContextMenuItem item, object value)
+    {
+        var op = new DialogOption();
+        {
+            op.Size = Size.ExtraSmall;
+            op.ShowCloseButton = false;
+            op.ShowMaximizeButton = false;
+            op.ShowSaveButton = false;
+            op.Title = string.Empty;
+            op.BodyTemplate = new RenderFragment(builder =>
+            {
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "swal2-actions");
+                builder.OpenComponent<Button>(2);
+                builder.AddComponentParameter(3, nameof(Button.Icon), "fa-solid fa-xmark");
+                builder.AddComponentParameter(4, nameof(Button.OnClick),
+EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+{
+    await op.CloseDialogAsync();
+    await ExportCurrentDevice(item, value);
+}));
+                builder.AddComponentParameter(5, nameof(Button.Text), GatewayLocalizer["ExportCurrentDevice"].Value);
+
+                builder.CloseComponent();
+
+                builder.OpenComponent<Button>(12);
+                builder.AddAttribute(13, "class", "ms-3");
+                builder.AddComponentParameter(14, nameof(Button.Icon), "fa-solid fa-xmark");
+                builder.AddComponentParameter(15, nameof(Button.OnClick), EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
+                {
+                    await op.CloseDialogAsync();
+                    await ExportAllDevice(item, value);
+                }));
+                builder.AddComponentParameter(16, nameof(Button.Text), GatewayLocalizer["ExportAllDevice"].Value);
+
+                builder.CloseComponent();
+
+                builder.CloseElement();
+            });
+
+        }
+        ;
+        await DialogService.Show(op);
+    }
+
 
     async Task ExportCurrentDevice(ContextMenuItem item, object value)
     {

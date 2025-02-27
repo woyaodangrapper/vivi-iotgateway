@@ -25,16 +25,11 @@
 
                 <ContextMenuItem Icon="fa-regular fa-pen-to-square" Disabled="(SelectModel.ChannelDevicePluginType !=ChannelDevicePluginTypeEnum.Channel||!AuthorizeButton(AdminOperConst.Edit))" Text="@GatewayLocalizer["UpdateChannel"]" OnClick=@((a,b)=>EditChannel(a,b,ItemChangedType.Update))></ContextMenuItem>
 
-                <ContextMenuItem Icon="fa-solid fa-xmark" Text="@GatewayLocalizer["DeleteCurrentChannel"]" Disabled="(SelectModel.ChannelDevicePluginType ==ChannelDevicePluginTypeEnum.Device||!AuthorizeButton(AdminOperConst.Delete))" OnClick="DeleteCurrentChannel"></ContextMenuItem>
+                <ContextMenuItem Icon="fa-solid fa-xmark" Text="@GatewayLocalizer["DeleteChannel"]" Disabled="(SelectModel.ChannelDevicePluginType ==ChannelDevicePluginTypeEnum.Device||!AuthorizeButton(AdminOperConst.Delete))" OnClick="DeleteChannel"></ContextMenuItem>
 
-                <ContextMenuItem Icon="fa-solid fa-xmark" Disabled="(!AuthorizeButton(AdminOperConst.Delete))" Text="@GatewayLocalizer["DeleteAllChannel"]" OnClick="DeleteAllChannel"></ContextMenuItem>
-
-                <ContextMenuItem Icon="fas fa-file-export" Text="@GatewayLocalizer["ExportCurrentChannel"]"
+                <ContextMenuItem Icon="fas fa-file-export" Text="@GatewayLocalizer["ExportChannel"]"
                                  Disabled=@(SelectModel.ChannelDevicePluginType ==ChannelDevicePluginTypeEnum.Device||!AuthorizeButton("导出"))
-                                 OnClick="ExportCurrentChannel"></ContextMenuItem>
-
-                <ContextMenuItem Icon="fas fa-file-export" Disabled=@(!AuthorizeButton("导出")) Text="@GatewayLocalizer["ExportAllChannel"]"
-                                 OnClick="ExportAllChannel"></ContextMenuItem>
+                                 OnClick="ExportChannel"></ContextMenuItem>
 
                 <ContextMenuItem Icon="fas fa-file-import" Disabled=@(!AuthorizeButton("导入")) Text="@GatewayLocalizer["ImportChannel"]" OnClick="ImportChannel"></ContextMenuItem>
 
@@ -44,13 +39,9 @@
 
                 <ContextMenuItem Disabled="(SelectModel.ChannelDevicePluginType !=ChannelDevicePluginTypeEnum.Device)||!AuthorizeButton(AdminOperConst.Edit)" Icon="fa-regular fa-pen-to-square" Text="@GatewayLocalizer["UpdateDevice"]" OnClick=@((a,b)=>EditDevice(a,b,ItemChangedType.Update))></ContextMenuItem>
 
-                <ContextMenuItem Icon="fa-solid fa-xmark" Disabled="(!AuthorizeButton(AdminOperConst.Delete))" Text="@GatewayLocalizer["DeleteCurrentDevice"]" OnClick="DeleteCurrentDevice"></ContextMenuItem>
+                <ContextMenuItem Icon="fa-solid fa-xmark" Disabled="(!AuthorizeButton(AdminOperConst.Delete))" Text="@GatewayLocalizer["DeleteDevice"]" OnClick="DeleteDevice"></ContextMenuItem>
 
-                <ContextMenuItem Icon="fa-solid fa-xmark" Disabled="(!AuthorizeButton(AdminOperConst.Delete))"  Text="@GatewayLocalizer["DeleteAllDevice"]" OnClick="DeleteAllDevice"></ContextMenuItem>
-
-                <ContextMenuItem Icon="fas fa-file-export" Disabled=@(!AuthorizeButton("导出")) Text="@GatewayLocalizer["ExportCurrentDevice"]" OnClick="ExportCurrentDevice"></ContextMenuItem>
-
-                <ContextMenuItem Icon="fas fa-file-export" Disabled=@(!AuthorizeButton("导出")) Text="@GatewayLocalizer["ExportAllDevice"]" OnClick="ExportAllDevice"></ContextMenuItem>
+                <ContextMenuItem Icon="fas fa-file-export" Disabled=@(!AuthorizeButton("导出")) Text="@GatewayLocalizer["ExportDevice"]" OnClick="ExportDevice"></ContextMenuItem>
 
                 <ContextMenuItem Icon="fas fa-file-import" Disabled=@(!AuthorizeButton("导入")) Text="@GatewayLocalizer["ImportDevice"]" OnClick="ImportDevice"></ContextMenuItem>
 
