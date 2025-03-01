@@ -173,11 +173,15 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         //必须为间隔上传
         if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
         {
-            var hisModel = CSharpScriptEngineExtension.Do<IDynamicSQL>(_driverPropertys.BigTextScriptHistoryTable);
-            if (_driverPropertys.IsHistoryDB)
+            var hisModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+            if (!hisModel.ManualUpload)
             {
-                var type = hisModel.GetModelType();
-                db.CodeFirst.InitTables(type);
+
+                if (_driverPropertys.IsHistoryDB)
+                {
+                    var type = hisModel.GetModelType();
+                    db.CodeFirst.InitTables(type);
+                }
             }
 
         }
@@ -188,11 +192,14 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
         }
         if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
         {
-            var realModel = CSharpScriptEngineExtension.Do<IDynamicSQL>(_driverPropertys.BigTextScriptRealTable);
-            if (_driverPropertys.IsReadDB)
+            var realModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
+            if (!realModel.ManualUpload)
             {
-                var type = realModel.GetModelType();
-                db.CodeFirst.InitTables(type);
+                if (_driverPropertys.IsReadDB)
+                {
+                    var type = realModel.GetModelType();
+                    db.CodeFirst.InitTables(type);
+                }
             }
         }
         else

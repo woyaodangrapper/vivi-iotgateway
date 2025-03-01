@@ -6,7 +6,15 @@
 
   "AppSettings": {
     "InjectSpecificationDocument": true, // 生产环境是否开启Swagger
-    "ExternalAssemblies": [ "Plugins" ] // 插件目录
+    "ExternalAssemblies": [ "Plugins" ], // 插件目录
+
+
+    // nuget动态加载的程序集
+    "SupportPackageNamePrefixs": [
+      "ThingsGateway.Admin.Application",
+      "ThingsGateway.Admin.Razor",
+      "ThingsGateway.Razor"
+    ]
   },
   "DynamicApiControllerSettings": {
     //"DefaultRoutePrefix": "api", // 默认路由前缀

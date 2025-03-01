@@ -62,12 +62,20 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
             db.Ado.CancellationToken = cancellationToken;
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
             {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicSQL>(_driverPropertys.BigTextScriptHistoryTable);
-                var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).ExecuteCommandAsync().ConfigureAwait(false);
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+                getDeviceModel.LogMessage = LogMessage;
+                if (getDeviceModel.ManualUpload)
                 {
-                    LogMessage.Trace($"HistoryTable Data Count：{result}");
+                    await getDeviceModel.DBInsertable(db, dbInserts, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).ExecuteCommandAsync().ConfigureAwait(false);
+                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    if (result > 0)
+                    {
+                        LogMessage.Trace($"HistoryTable Data Count：{result}");
+                    }
                 }
             }
             else

@@ -23,9 +23,9 @@ public class Program
 
     public static async Task Main(string[] args)
     {
+        await Task.Delay(2000).ConfigureAwait(false);
         //当前工作目录设为程序集的基目录
         System.IO.Directory.SetCurrentDirectory(AppContext.BaseDirectory);
-
         // 增加中文编码支持
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -34,6 +34,7 @@ public class Program
         Console.Write(Environment.NewLine);
         Console.ForegroundColor = ConsoleColor.Yellow;
         XTrace.WriteLine(string.Empty);
+        XTrace.UseConsole();
         Console.WriteLine(
             """
 
@@ -65,6 +66,7 @@ public class Program
 
         }).ConfigureBuilder(builder =>
         {
+
             if (!builder.Environment.IsDevelopment())
             {
                 builder.Services.AddResponseCompression(

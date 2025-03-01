@@ -27,6 +27,7 @@ using ThingsGateway.Admin.Application;
 using ThingsGateway.Admin.Razor;
 using ThingsGateway.Extension;
 using ThingsGateway.Logging;
+using ThingsGateway.NewLife.Caching;
 
 namespace ThingsGateway.AdminServer;
 
@@ -35,15 +36,16 @@ public class Startup : AppStartup
 {
     public void ConfigBlazorServer(IServiceCollection services)
     {
+
         // 增加中文编码支持网页源码显示汉字
         services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
-
         //并发启动/停止host
         services.Configure<HostOptions>(options =>
         {
             options.ServicesStartConcurrently = true;
             options.ServicesStopConcurrently = true;
         });
+
 
         // 事件总线
         services.AddEventBus(options =>
@@ -57,6 +59,8 @@ public class Startup : AppStartup
             options.AddPersistence<JobPersistence>();
         });
 
+        // 缓存
+        services.AddSingleton<ICache, MemoryCache>();
 
         // 允许跨域
         services.AddCorsAccessor();
@@ -92,9 +96,9 @@ public class Startup : AppStartup
 #if NET8_0_OR_GREATER
         services
          .AddRazorComponents(options =>
-     {
-         options.TemporaryRedirectionUrlValidityDuration = TimeSpan.FromMinutes(10);
-     })
+         {
+             options.TemporaryRedirectionUrlValidityDuration = TimeSpan.FromMinutes(10);
+         })
          .AddInteractiveServerComponents(options =>
          {
              options.RootComponents.MaxJSRootComponents = 500;
@@ -155,15 +159,6 @@ public class Startup : AppStartup
             options.WriteFilter = (logMsg) =>
             {
                 return true;
-                ////如果不是LoggingMonitor日志才格式化
-                //if (logMsg.LogName != "System.Logging.LoggingMonitor")
-                //{
-                //    return true;
-                //}
-                //else
-                //{
-                //    return false;
-                //}
             };
 
             options.MessageFormat = (logMsg) =>
@@ -273,10 +268,10 @@ public class Startup : AppStartup
         services.AddScoped<BlazorAppContext>(a =>
         {
             var appContext = new BlazorAppContext(
-        a.GetService<ISysResourceService>(),
-        a.GetService<IUserCenterService>(),
-        a.GetService<ISysUserService>());
-            appContext.TitleLocalizer = a.GetRequiredService<IStringLocalizer<ThingsGateway.AdminServer.MainLayout>>();
+             a.GetService<ISysResourceService>(),
+             a.GetService<IUserCenterService>(),
+             a.GetService<ISysUserService>());
+            appContext.TitleLocalizer = a.GetRequiredService<IStringLocalizer<MainLayout>>();
 
             return appContext;
         });
@@ -406,10 +401,7 @@ public class Startup : AppStartup
 #if NET8_0_OR_GREATER
         app.UseAntiforgery();
 #endif
-
         app.MapControllers();
-
-
 
     }
 

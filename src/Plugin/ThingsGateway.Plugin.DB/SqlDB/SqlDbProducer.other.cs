@@ -71,12 +71,21 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             db.Ado.CancellationToken = cancellationToken;
             if (!_driverPropertys.BigTextScriptHistoryTable.IsNullOrEmpty())
             {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicSQL>(_driverPropertys.BigTextScriptHistoryTable);
-                var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptHistoryTable);
+
+                getDeviceModel.LogMessage = LogMessage;
+                if (getDeviceModel.ManualUpload)
                 {
-                    LogMessage.Trace($"HistoryTable Data Count：{result}");
+                    await getDeviceModel.DBInsertable(db, dbInserts, cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    if (result > 0)
+                    {
+                        LogMessage.Trace($"HistoryTable Data Count：{result}");
+                    }
                 }
             }
             else
@@ -107,29 +116,39 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
             if (!_driverPropertys.BigTextScriptRealTable.IsNullOrEmpty())
             {
-                var getDeviceModel = CSharpScriptEngineExtension.Do<IDynamicSQL>(_driverPropertys.BigTextScriptRealTable);
-                if (!_initRealData)
+                var getDeviceModel = CSharpScriptEngineExtension.Do<DynamicSQLBase>(_driverPropertys.BigTextScriptRealTable);
+                getDeviceModel.LogMessage = LogMessage;
+                if (getDeviceModel.ManualUpload)
                 {
-                    if (datas?.Count > 0)
-                    {
-                        var result = db.StorageableByObject(getDeviceModel.GetList(datas)).ExecuteCommand();
-                        if (result > 0)
-                            LogMessage.Trace($"RealTable Data Count：{result}");
-                        _initRealData = true;
-                        return OperResult.Success;
-                    }
+                    await getDeviceModel.DBInsertable(db, datas, cancellationToken).ConfigureAwait(false);
                     return OperResult.Success;
                 }
                 else
                 {
-                    if (datas?.Count > 0)
+
+                    if (!_initRealData)
                     {
-                        var result = await db.UpdateableByObject(getDeviceModel.GetList(datas)).ExecuteCommandAsync().ConfigureAwait(false);
-                        if (result > 0)
-                            LogMessage.Trace($"RealTable Data Count：{result}");
+                        if (datas?.Count > 0)
+                        {
+                            var result = db.StorageableByObject(getDeviceModel.GetList(datas)).ExecuteCommand();
+                            if (result > 0)
+                                LogMessage.Trace($"RealTable Data Count：{result}");
+                            _initRealData = true;
+                            return OperResult.Success;
+                        }
                         return OperResult.Success;
                     }
-                    return OperResult.Success;
+                    else
+                    {
+                        if (datas?.Count > 0)
+                        {
+                            var result = await db.UpdateableByObject(getDeviceModel.GetList(datas)).ExecuteCommandAsync().ConfigureAwait(false);
+                            if (result > 0)
+                                LogMessage.Trace($"RealTable Data Count：{result}");
+                            return OperResult.Success;
+                        }
+                        return OperResult.Success;
+                    }
                 }
             }
             else

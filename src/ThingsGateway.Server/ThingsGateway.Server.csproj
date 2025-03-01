@@ -18,7 +18,7 @@
 	<Import Project="targets\GatewayOther.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
 
 	<!--nuget包解压复制文件，上下文动态加载-->
-	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' OR  '$(Configuration)' != 'Debug' " />
+	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
 	<!--直接引用-->
 	<Import Project="targets\PluginDebug.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug' " />
 
