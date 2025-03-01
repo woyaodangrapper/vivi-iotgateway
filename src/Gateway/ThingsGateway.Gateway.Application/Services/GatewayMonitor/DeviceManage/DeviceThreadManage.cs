@@ -389,7 +389,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     // 将当前通道线程分配给驱动程序对象
                     driver.DeviceThreadManage = this;
 
-
                     // 初始化驱动程序对象，并加载源读取
                     await driver.InitChannelAsync(Channel).ConfigureAwait(false);
 

@@ -165,7 +165,7 @@ public abstract class CollectBase : DriverBase
         DriverMethodInfos = GlobalData.PluginService.GetDriverMethodInfos(device.PluginName, this);
     }
 
-    internal protected virtual string GetAddressDescription()
+    public virtual string GetAddressDescription()
     {
         return FoundationDevice?.GetAddressDescription();
     }

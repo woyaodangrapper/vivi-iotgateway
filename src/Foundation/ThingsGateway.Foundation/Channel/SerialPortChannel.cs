@@ -71,7 +71,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
     /// <inheritdoc/>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
 
-    private readonly WaitLock _connectLock = new WaitLock();
+    //private readonly WaitLock _connectLock = new WaitLock();
     /// <inheritdoc/>
     public override async Task CloseAsync(string msg)
     {
@@ -79,14 +79,13 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         {
             try
             {
-                await _connectLock.WaitAsync().ConfigureAwait(false);
+                //await _connectLock.WaitAsync().ConfigureAwait(false);
                 if (Online)
                 {
                     await this.OnChannelEvent(Stoping).ConfigureAwait(false);
 
                     await base.CloseAsync(msg).ConfigureAwait(false);
                     Logger?.Debug($"{ToString()}  Closed{msg}");
-
                     await this.OnChannelEvent(Stoped).ConfigureAwait(false);
 
 
@@ -94,7 +93,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
             }
             finally
             {
-                _connectLock.Release();
+                //_connectLock.Release();
             }
         }
     }
@@ -106,7 +105,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
         {
             try
             {
-                await _connectLock.WaitAsync(token).ConfigureAwait(false);
+                //await _connectLock.WaitAsync(token).ConfigureAwait(false);
                 if (!Online)
                 {
                     //await SetupAsync(Config.Clone()).ConfigureAwait(false);
@@ -117,7 +116,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
             }
             finally
             {
-                _connectLock.Release();
+                //_connectLock.Release();
             }
         }
     }

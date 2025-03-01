@@ -68,7 +68,7 @@ public class OtherChannel : SetupConfigObject, IClientChannel
     /// <inheritdoc/>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
 
-    private readonly WaitLock _connectLock = new WaitLock();
+    //private readonly WaitLock _connectLock = new WaitLock();
 
     /// <inheritdoc/>
     public void SetDataHandlingAdapter(DataHandlingAdapter adapter)

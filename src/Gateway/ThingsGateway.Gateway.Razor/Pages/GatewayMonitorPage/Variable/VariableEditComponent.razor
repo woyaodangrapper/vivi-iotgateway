@@ -87,7 +87,14 @@
                         <EditTemplate Context="value">
                             <div class="col-12">
                                 <BootstrapInputGroup>
+                                    @if(GlobalData.ReadOnlyIdDevices.TryGetValue(value.DeviceId,out var device)&&device.Driver is CollectBase collectBase)
+                                {
+                                    <Textarea rows="1" title=@collectBase.GetAddressDescription() @bind-Value="value.RegisterAddress" ShowLabel="true"></Textarea>
+                                }
+                                else
+                                {
                                     <Textarea rows="1" @bind-Value="value.RegisterAddress" ShowLabel="true"></Textarea>
+                                }
                                     <Button IsDisabled=@(AddressUIType==null) Icon="fa-solid fa-bars" OnClick="ShowAddressUI"></Button>
                                 </BootstrapInputGroup>
                             </div>

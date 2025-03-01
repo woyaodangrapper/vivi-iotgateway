@@ -45,7 +45,7 @@ public partial class MqttCollect : CollectBase
         base.Dispose(disposing);
     }
 
-    protected override string GetAddressDescription()
+    public override string GetAddressDescription()
     {
         return """
                 变量地址：${mqtt_topic};${payload_item};${Condition}

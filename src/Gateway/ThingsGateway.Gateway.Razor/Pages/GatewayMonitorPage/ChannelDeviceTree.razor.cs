@@ -729,7 +729,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         await DialogService.Show(op);
     }
 
-    
+
     async Task DeleteCurrentDevice(ContextMenuItem item, object value)
     {
         IEnumerable<DeviceRuntime> modelIds = null;
@@ -1122,7 +1122,8 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             {
                 try
                 {
-                    await Notify();
+                    await OnClickSearch(SearchText);
+                    await InvokeAsync(StateHasChanged);
                 }
                 catch
                 {

@@ -69,7 +69,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
     /// <inheritdoc/>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
 
-    private readonly WaitLock _connectLock = new WaitLock();
+    //private readonly WaitLock _connectLock = new WaitLock();
     /// <inheritdoc/>
     public override async Task CloseAsync(string msg)
     {
@@ -77,7 +77,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
         {
             try
             {
-                await _connectLock.WaitAsync().ConfigureAwait(false);
+                //await _connectLock.WaitAsync().ConfigureAwait(false);
                 if (Online)
                 {
                     await base.CloseAsync(msg).ConfigureAwait(false);
@@ -87,7 +87,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
             }
             finally
             {
-                _connectLock.Release();
+                //_connectLock.Release();
             }
         }
     }
@@ -99,7 +99,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
         {
             try
             {
-                await _connectLock.WaitAsync(token).ConfigureAwait(false);
+                //await _connectLock.WaitAsync(token).ConfigureAwait(false);
                 if (!Online)
                 {
                     //await SetupAsync(Config.Clone()).ConfigureAwait(false);
@@ -111,7 +111,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
             }
             finally
             {
-                _connectLock.Release();
+                //_connectLock.Release();
             }
         }
     }

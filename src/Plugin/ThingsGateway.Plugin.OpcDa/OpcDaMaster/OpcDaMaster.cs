@@ -84,7 +84,7 @@ public class OpcDaMaster : CollectBase
         base.Dispose(disposing);
     }
 
-    protected override string GetAddressDescription()
+    public override string GetAddressDescription()
     {
         return _plc?.GetAddressDescription();
     }
