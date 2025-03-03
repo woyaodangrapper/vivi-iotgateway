@@ -99,6 +99,12 @@ public static class GlobalData
         return RealAlarmVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
     }
+    public static async Task<IEnumerable<KeyValuePair<long, VariableRuntime>>> GetCurrentUserAlarmEnableVariables()
+    {
+        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
+        return AlarmEnableVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
+    }
 
     public static bool ContainsVariable(long businessDeviceId, VariableRuntime a)
     {
@@ -161,6 +167,13 @@ public static class GlobalData
         }
         return false;
     }
+
+    
+    /// <summary>
+    /// 报警列表
+    /// </summary>
+    public static IReadOnlyDictionary<long, VariableRuntime> ReadOnlyAlarmEnableVariables => AlarmEnableVariables;
+
     /// <summary>
     /// 实时报警列表
     /// </summary>

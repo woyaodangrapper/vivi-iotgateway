@@ -1055,6 +1055,26 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     private TreeViewItem<ChannelDeviceTreeItem> BusinessTreeViewItem;
     protected override async Task OnInitializedAsync()
     {
+        _ = Task.Run(async () =>
+        {
+            while (!Disposed)
+            {
+                try
+                {
+                    await OnClickSearch(SearchText);
+                    await InvokeAsync(StateHasChanged);
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    await Task.Delay(5000);
+                }
+            }
+        });
+
         BusinessTreeViewItem = new TreeViewItem<ChannelDeviceTreeItem>(UnknownItem)
         {
             Text = GatewayLocalizer["Unknown"],
@@ -1114,29 +1134,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
     private WaitLock WaitLock = new();
 
-    protected override void OnInitialized()
-    {
-        _ = Task.Run(async () =>
-        {
-            while (!Disposed)
-            {
-                try
-                {
-                    await OnClickSearch(SearchText);
-                    await InvokeAsync(StateHasChanged);
-                }
-                catch
-                {
 
-                }
-                finally
-                {
-                    await Task.Delay(5000);
-                }
-            }
-        });
-        base.OnInitialized();
-    }
 
     private async Task Notify()
     {

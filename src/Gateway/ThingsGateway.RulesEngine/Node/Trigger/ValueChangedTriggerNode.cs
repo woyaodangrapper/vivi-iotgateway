@@ -7,7 +7,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.RulesEngine;
 
-[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(ValueChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(TextWidget))]
+[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(ValueChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(VariableWidget))]
 public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 {
     public ValueChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "ValueChangedTriggerNode"; Placeholder = "ValueChangedTriggerNode.Placeholder"; }

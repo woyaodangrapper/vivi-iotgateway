@@ -9,7 +9,7 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.RulesEngine;
 
-[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(AlarmChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(TextWidget))]
+[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(AlarmChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(AlarmVariableWidget))]
 public class AlarmChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 {
     public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; Placeholder = "AlarmChangedTriggerNode.Placeholder"; }
