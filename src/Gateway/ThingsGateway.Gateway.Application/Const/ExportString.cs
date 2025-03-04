@@ -23,7 +23,10 @@ public static class ExportString
     /// 设备名称
     /// </summary>
     public static string DeviceName = Localizer["DeviceName"];
-
+    /// <summary>
+    /// 设备名称
+    /// </summary>
+    public static string BusinessDeviceName = Localizer["BusinessDeviceName"];
     /// <summary>
     /// 冗余设备名称
     /// </summary>

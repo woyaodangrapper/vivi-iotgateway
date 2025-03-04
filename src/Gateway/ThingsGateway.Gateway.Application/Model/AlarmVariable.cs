@@ -33,6 +33,21 @@ public class AlarmVariable : PrimaryIdEntity, IDBHistoryAlarm
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string? Description { get; set; }
 
+    /// <inheritdoc  cref="IBaseDataEntity.CreateOrgId"/>
+    [SugarColumn(ColumnDescription = "组织Id", IsNullable = true)]
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
+    public long CreateOrgId { get; set; }
+
+    /// <inheritdoc  cref="IBaseEntity.CreateUserId"/>
+    [SugarColumn(ColumnDescription = "创建用户Id", IsNullable = true)]
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
+    public long CreateUserId { get; set; }
+
+    /// <inheritdoc  cref="Variable.DeviceId"/>
+    [SugarColumn(ColumnDescription = "设备Id", IsNullable = true)]
+    [AutoGenerateColumn(Visible = false, Filterable = true, Sortable = true)]
+    public long DeviceId { get; set; }
+
     /// <inheritdoc  cref="VariableRuntime.DeviceName"/>
     [SugarColumn(ColumnDescription = "设备名称", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]

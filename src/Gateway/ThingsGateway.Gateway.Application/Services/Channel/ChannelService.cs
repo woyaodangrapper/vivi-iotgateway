@@ -156,7 +156,7 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         if (channels == null)
         {
             db ??= GetDB();
-            channels = await db.Queryable<Channel>().ToListAsync().ConfigureAwait(false);
+            channels = await db.Queryable<Channel>().OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
             App.CacheService.Set(key, channels);
         }
         return channels;
@@ -301,8 +301,8 @@ internal sealed class ChannelService : BaseService<Channel>, IChannelService
         {
             if (item.Key == ExportString.ChannelName)
             {
-                var collectChannelImports = ((ImportPreviewOutput<Channel>)item.Value).Data;
-                channels = new List<Channel>(collectChannelImports.Values);
+                var channelImports = ((ImportPreviewOutput<Channel>)item.Value).Data;
+                channels = channelImports.Select(a => a.Value).ToList();
                 break;
             }
         }

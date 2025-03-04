@@ -53,10 +53,10 @@ public abstract class CollectBase : DriverBase
     {
         LogMessage?.LogInformation("Refresh variable");
         var currentDevice = CurrentDevice;
-        VariableRuntimes = currentDevice.VariableRuntimes.Where(a => a.Value.Enable).ToDictionary(a => a.Value.Name, a => a.Value);
+        IdVariableRuntimes = currentDevice.IdVariableRuntimes.Where(a => a.Value.Enable).ToDictionary();
 
         //预热脚本，加速编译
-        VariableRuntimes.Where(a => !string.IsNullOrWhiteSpace(a.Value.ReadExpressions))
+        IdVariableRuntimes.Where(a => !string.IsNullOrWhiteSpace(a.Value.ReadExpressions))
          .Select(b => b.Value.ReadExpressions).ToHashSet().ParallelForEach(script =>
          {
              try
@@ -72,7 +72,7 @@ public abstract class CollectBase : DriverBase
         {
             // 连读打包
             // 从收集的变量运行时信息中筛选需要读取的变量
-            var tags = VariableRuntimes.Select(a => a.Value)
+            var tags = IdVariableRuntimes.Select(a => a.Value)
                 .Where(it => it.ProtectType != ProtectTypeEnum.WriteOnly
                 && string.IsNullOrEmpty(it.OtherMethod)
                 && !string.IsNullOrEmpty(it.RegisterAddress));
@@ -109,7 +109,7 @@ public abstract class CollectBase : DriverBase
         try
         {
             // 初始化动态方法
-            var variablesMethod = VariableRuntimes.Select(a => a.Value).Where(it => !string.IsNullOrEmpty(it.OtherMethod));
+            var variablesMethod = IdVariableRuntimes.Select(a => a.Value).Where(it => !string.IsNullOrEmpty(it.OtherMethod));
 
             // 处理可读的动态方法
             {
@@ -472,7 +472,7 @@ public abstract class CollectBase : DriverBase
                 }
                 else if (variableRuntime.RegisterAddress.Equals("ScriptRead", StringComparison.OrdinalIgnoreCase))
                 {
-                    variableRuntime.SetValue(default, dateTime);
+                    variableRuntime.SetValue(variableRuntime, dateTime);
                 }
 
             }

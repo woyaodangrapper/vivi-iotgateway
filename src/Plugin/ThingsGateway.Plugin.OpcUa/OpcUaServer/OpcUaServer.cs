@@ -45,7 +45,7 @@ public partial class OpcUaServer : BusinessBase
     protected override BusinessPropertyBase _businessPropertyBase => _driverPropertys;
 
     protected IStringLocalizer Localizer { get; private set; }
-    private ConcurrentQueue<VariableData> CollectVariableRuntimes { get; set; } = new();
+    private ConcurrentQueue<VariableBasicData> CollectVariableRuntimes { get; set; } = new();
 
     private static readonly string[] separator = new string[] { ";" };
 
@@ -59,7 +59,6 @@ public partial class OpcUaServer : BusinessBase
 
             ApplicationInstance.MessageDlg = new ApplicationMessageDlg(LogMessage);//默认返回true
 
-            CollectVariableRuntimes?.Clear();
             //Utils.SetLogger(new OpcUaLogger(LogMessage)); //调试用途
             m_application = new ApplicationInstance();
             m_configuration = GetDefaultConfiguration();
@@ -83,7 +82,7 @@ public partial class OpcUaServer : BusinessBase
         if (_driverPropertys.IsAllVariable)
         {
             LogMessage?.LogInformation("Refresh variable");
-            VariableRuntimes = new(GlobalData.GetEnableVariables());
+            IdVariableRuntimes = new(GlobalData.GetEnableVariables());
 
             CollectDevices = GlobalData.GetEnableDevices().Where(a => a.Value.IsCollect == true).ToDictionary();
         }
@@ -91,9 +90,12 @@ public partial class OpcUaServer : BusinessBase
         {
             await base.AfterVariablesChangedAsync().ConfigureAwait(false);
         }
-        VariableRuntimes.ForEach(a =>
+
+        CollectVariableRuntimes.Clear();
+
+        IdVariableRuntimes.ForEach(a =>
         {
-            VariableValueChange(a.Value, a.Value.Adapt<VariableData>());
+            VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
         });
 
 
@@ -104,7 +106,6 @@ public partial class OpcUaServer : BusinessBase
     {
         ApplicationInstance.MessageDlg = new ApplicationMessageDlg(LogMessage);//默认返回true
 
-        CollectVariableRuntimes?.Clear();
         //Utils.SetLogger(new OpcUaLogger(LogMessage)); //调试用途
         m_application = new ApplicationInstance();
         m_configuration = GetDefaultConfiguration();
@@ -119,7 +120,6 @@ public partial class OpcUaServer : BusinessBase
         }
 
         m_server = new(this);
-        CollectVariableRuntimes.Clear();
 
 
         GlobalData.VariableValueChangeEvent += VariableValueChange;
@@ -151,7 +151,7 @@ public partial class OpcUaServer : BusinessBase
         m_application?.Stop();
         m_server?.SafeDispose();
         CollectVariableRuntimes?.Clear();
-        VariableRuntimes?.Clear();
+        IdVariableRuntimes?.Clear();
         base.Dispose(disposing);
     }
 
@@ -181,9 +181,9 @@ public partial class OpcUaServer : BusinessBase
                     await m_application.CheckApplicationInstanceCertificates(true, 1200, cancellationToken).ConfigureAwait(false);
                     await m_application.Start(m_server).ConfigureAwait(false);
                     success = true;
-                    VariableRuntimes.ForEach(a =>
+                    IdVariableRuntimes.ForEach(a =>
                     {
-                        VariableValueChange(a.Value, a.Value.Adapt<VariableData>());
+                        VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
                     });
                 }
                 catch (Exception ex)
@@ -195,32 +195,35 @@ public partial class OpcUaServer : BusinessBase
                 }
             }
             var data = CollectVariableRuntimes.ToListWithDequeue();
-            data.Reverse();
-            ////变化推送
-            var varList = data.DistinctBy(a => a.Name).ToList();
-
-            if (varList?.Count > 0)
+            if (data.Count > 0)
             {
-                foreach (var item in varList)
+                data.Reverse();
+                ////变化推送
+                var varList = data.DistinctBy(a => a.Id).ToList();
+
+                if (varList?.Count > 0)
                 {
-                    try
+                    foreach (var item in varList)
                     {
-                        if (!cancellationToken.IsCancellationRequested)
+                        try
                         {
-                            m_server?.NodeManager?.UpVariable(item);
+                            if (!cancellationToken.IsCancellationRequested)
+                            {
+                                m_server?.NodeManager?.UpVariable(item);
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            break;
+                            LogMessage.LogWarning(ex);
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogMessage.LogWarning(ex);
                     }
                 }
+                success = true;
             }
-            success = true;
         }
         catch (Exception ex)
         {
@@ -419,12 +422,16 @@ public partial class OpcUaServer : BusinessBase
         return config;
     }
 
-    private void VariableValueChange(VariableRuntime variableRuntime, VariableData variableData)
+    private void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variableData)
     {
         if (CurrentDevice.Pause)
             return;
         if (DisposedValue) return;
-        if (VariableRuntimes.ContainsKey(variableData.Name))
+        if (IdVariableRuntimes.ContainsKey(variableData.Id))
             CollectVariableRuntimes.Enqueue(variableData);
+        else
+        {
+
+        }
     }
 }

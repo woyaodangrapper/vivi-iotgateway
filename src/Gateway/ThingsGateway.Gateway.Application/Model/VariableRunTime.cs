@@ -12,6 +12,8 @@ using BootstrapBlazor.Components;
 
 using Mapster;
 
+using SqlSugar;
+
 using ThingsGateway.Gateway.Application.Extensions;
 using ThingsGateway.NewLife.Json.Extension;
 
@@ -22,9 +24,14 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class VariableRuntime : Variable, IVariable, IDisposable
 {
+    [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
+    [AutoGenerateColumn(Visible = false, DefaultSort = false, Sortable = true)]
+    [IgnoreExcel]
+    public override int? SortCode { get; set; }
     private bool _isOnline;
     private bool? _isOnlineChanged;
     protected object? _value;
+
     /// <summary>
     /// 动态变量
     /// </summary>
@@ -42,7 +49,6 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// </summary>
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    [AdaptIgnore]
     [AutoGenerateColumn(Ignore = true)]
     public DeviceRuntime? DeviceRuntime { get; set; }
 
@@ -321,26 +327,28 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     #endregion 报警
     public void Init(DeviceRuntime deviceRuntime)
     {
-        GlobalData.AlarmEnableVariables.TryRemove(Id, out _);
-        if (GlobalData.RealAlarmVariables.TryRemove(Name, out var oldAlarm))
+        GlobalData.AlarmEnableIdVariables.TryRemove(Id, out _);
+        if (GlobalData.RealAlarmIdVariables.TryRemove(Id, out var oldAlarm))
         {
             oldAlarm.EventType = EventTypeEnum.Finish;
             oldAlarm.EventTime = DateTime.Now;
             GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
         }
 
-        DeviceRuntime?.VariableRuntimes?.TryRemove(Id, out _);
+
+        DeviceRuntime?.VariableRuntimes?.TryRemove(Name, out _);
+
+        DeviceRuntime?.IdVariableRuntimes?.TryRemove(Id, out _);
 
         DeviceRuntime = deviceRuntime;
 
-        DeviceRuntime.VariableRuntimes.TryAdd(Id, this);
+        DeviceRuntime.IdVariableRuntimes.TryAdd(Id, this);
+        DeviceRuntime?.VariableRuntimes?.TryAdd(Name, this);
         GlobalData.IdVariables.TryRemove(Id, out _);
         GlobalData.IdVariables.TryAdd(Id, this);
-        GlobalData.Variables.TryRemove(Name, out _);
-        GlobalData.Variables.TryAdd(Name, this);
         if (AlarmEnable)
         {
-            GlobalData.AlarmEnableVariables.TryAdd(Id, this);
+            GlobalData.AlarmEnableIdVariables.TryAdd(Id, this);
         }
     }
 
@@ -348,13 +356,13 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     public void Dispose()
     {
 
-        DeviceRuntime?.VariableRuntimes?.TryRemove(Id, out _);
+        DeviceRuntime?.IdVariableRuntimes?.TryRemove(Id, out _);
+        DeviceRuntime?.VariableRuntimes?.TryRemove(Name, out _);
 
         GlobalData.IdVariables.TryRemove(Id, out _);
-        GlobalData.Variables.TryRemove(Name, out _);
 
-        GlobalData.AlarmEnableVariables.TryRemove(Id, out _);
-        if (GlobalData.RealAlarmVariables.TryRemove(Name, out var oldAlarm))
+        GlobalData.AlarmEnableIdVariables.TryRemove(Id, out _);
+        if (GlobalData.RealAlarmIdVariables.TryRemove(Id, out var oldAlarm))
         {
             oldAlarm.EventType = EventTypeEnum.Finish;
             oldAlarm.EventTime = DateTime.Now;
@@ -367,8 +375,11 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     /// <inheritdoc/>
     public async ValueTask<OperResult> RpcAsync(string value, string? executive = "brower", CancellationToken cancellationToken = default)
     {
-        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync(executive, new Dictionary<string, string>() { { Name, value } }, cancellationToken).ConfigureAwait(false);
-        return data.FirstOrDefault().Value;
+        var data = await GlobalData.RpcService.InvokeDeviceMethodAsync(executive, new Dictionary<string, Dictionary<string, string>>()
+        {
+            { DeviceName, new Dictionary<string, string>()  {   { Name,value} }  }
+        }, cancellationToken).ConfigureAwait(false);
+        return data.FirstOrDefault().Value.FirstOrDefault().Value;
     }
 
     public void SetErrorMessage(string? lastErrorMessage)

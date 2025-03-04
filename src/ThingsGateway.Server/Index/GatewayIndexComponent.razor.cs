@@ -95,12 +95,12 @@ public partial class GatewayIndexComponent : IDisposable
             AlarmChartDataSource.Labels = data.Select(a => Localizer["AlarmCount"].Value);
             AlarmChartDataSource.Data.Add(new ChartDataset()
             {
-                Data = new List<object>() { GlobalData.ReadOnlyRealAlarmVariables.Count }
+                Data = new List<object>() { GlobalData.ReadOnlyRealAlarmIdVariables.Count }
             });
         }
         else
         {
-            AlarmChartDataSource.Data[0].Data = new List<object>() { GlobalData.ReadOnlyRealAlarmVariables.Count };
+            AlarmChartDataSource.Data[0].Data = new List<object>() { GlobalData.ReadOnlyRealAlarmIdVariables.Count };
         }
         return Task.FromResult(AlarmChartDataSource!);
     }

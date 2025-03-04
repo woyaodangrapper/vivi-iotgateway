@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Mapster;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -76,7 +74,7 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpGet("realAlarmList")]
     [DisplayName("获取实时报警变量信息")]
-    public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList(VariablePageInput input)
+    public async Task<SqlSugarPagedList<AlarmVariable>> GetRealAlarmList(AlarmVariablePageInput input)
     {
         var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
 
@@ -85,13 +83,8 @@ public class RuntimeInfoController : ControllerBase
             .WhereIF(!input.RegisterAddress.IsNullOrEmpty(), a => a.RegisterAddress == input.RegisterAddress)
             .WhereIF(!input.Name.IsNullOrEmpty(), a => a.Name == input.Name)
             .WhereIF(!input.DeviceName.IsNullOrEmpty(), a => a.DeviceName == input.DeviceName)
-            .WhereIF(input.BusinessDeviceId > 0, a =>
-            {
-                return GlobalData.ContainsVariable(input.BusinessDeviceId, a);
-            }
-           )
             .ToPagedList(input);
-        return data.Adapt<SqlSugarPagedList<AlarmVariable>>();
+        return data;
     }
 
     /// <summary>
@@ -100,12 +93,12 @@ public class RuntimeInfoController : ControllerBase
     /// <returns></returns>
     [HttpPost("checkRealAlarm")]
     [DisplayName("确认实时报警")]
-    public async Task CheckRealAlarm(string variableName)
+    public async Task CheckRealAlarm(long variableId)
     {
-        if (GlobalData.ReadOnlyRealAlarmVariables.TryGetValue(variableName, out var variable))
+        if (GlobalData.ReadOnlyRealAlarmIdVariables.TryGetValue(variableId, out var variable))
         {
             await GlobalData.SysUserService.CheckApiDataScopeAsync(variable.CreateOrgId, variable.CreateUserId).ConfigureAwait(false);
-            GlobalData.AlarmHostedService.ConfirmAlarm(variableName);
+            GlobalData.AlarmHostedService.ConfirmAlarm(variableId);
         }
     }
 
@@ -163,7 +156,17 @@ public class DevicePageInput : BasePageInput
     public PluginTypeEnum? PluginType { get; set; }
 }
 
+public class AlarmVariablePageInput : BasePageInput
+{
+    /// <inheritdoc/>
+    public string? DeviceName { get; set; }
 
+    /// <inheritdoc/>
+    public string Name { get; set; }
+
+    /// <inheritdoc/>
+    public string RegisterAddress { get; set; }
+}
 
 public class VariablePageInput : BasePageInput
 {

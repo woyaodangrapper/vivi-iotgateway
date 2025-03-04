@@ -18,22 +18,24 @@ namespace ThingsGateway.Management;
 public partial class ReverseCallbackServer : RpcServer
 {
     [DmtpRpc(MethodInvoke = true)]
-    public void UpdateGatewayData(List<DeviceDataWithValue> deviceDatas, List<VariableDataWithValue> variableDatas)
+    public void UpdateGatewayData(List<DeviceDataWithValue> deviceDatas)
     {
 
         foreach (var deviceData in deviceDatas)
         {
-            if (GlobalData.ReadOnlyDevices.TryGetValue(deviceData.Name, out var value))
+            if (GlobalData.ReadOnlyDevices.TryGetValue(deviceData.Name, out var device))
             {
-                value.SetDeviceStatus(deviceData.ActiveTime, deviceData.DeviceStatus == DeviceStatusEnum.OnLine ? false : true, lastErrorMessage: deviceData.LastErrorMessage);
-            }
-        }
-        foreach (var variableData in variableDatas)
-        {
-            if (GlobalData.ReadOnlyVariables.TryGetValue(variableData.Name, out var value))
-            {
-                value.SetValue(variableData.RawValue, variableData.CollectTime, variableData.IsOnline);
-                value.SetErrorMessage(variableData.LastErrorMessage);
+                device.SetDeviceStatus(deviceData.ActiveTime, deviceData.DeviceStatus == DeviceStatusEnum.OnLine ? false : true, lastErrorMessage: deviceData.LastErrorMessage);
+
+                foreach (var variableData in deviceData.ReadOnlyVariableRuntimes)
+                {
+                    if (device.ReadOnlyVariableRuntimes.TryGetValue(variableData.Key, out var value))
+                    {
+                        value.SetValue(variableData.Value.RawValue, variableData.Value.CollectTime, variableData.Value.IsOnline);
+                        value.SetErrorMessage(variableData.Value.LastErrorMessage);
+                    }
+                }
+
             }
         }
     }

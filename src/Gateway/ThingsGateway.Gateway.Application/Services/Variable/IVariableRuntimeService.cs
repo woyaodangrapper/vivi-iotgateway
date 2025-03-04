@@ -28,11 +28,11 @@ namespace ThingsGateway.Gateway.Application
 
         Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
 
-        Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart );
+        Task<bool> SaveVariableAsync(Variable input, ItemChangedType type, bool restart);
         void PreheatCache();
 
         Task<MemoryStream> ExportMemoryStream(List<Variable> data, string devName);
-        Task AddDynamicVariable(IEnumerable<VariableRuntime> newVariableRuntimes, bool restart );
-        Task DeleteDynamicVariable(IEnumerable<long> variableIds, bool restart );
+        Task AddDynamicVariable(IEnumerable<VariableRuntime> newVariableRuntimes, bool restart);
+        Task DeleteDynamicVariable(IEnumerable<long> variableIds, bool restart);
     }
 }

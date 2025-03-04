@@ -91,7 +91,7 @@ public class DeviceRuntime : Device, IDisposable
     /// <summary>
     /// 设备变量数量
     /// </summary>
-    public int DeviceVariableCount { get => VariableRuntimes == null ? 0 : VariableRuntimes.Count; }
+    public int DeviceVariableCount { get => IdVariableRuntimes == null ? 0 : IdVariableRuntimes.Count; }
 
     /// <summary>
     /// 暂停
@@ -129,9 +129,16 @@ public class DeviceRuntime : Device, IDisposable
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    public IReadOnlyDictionary<long, VariableRuntime>? ReadVariableRuntimes => VariableRuntimes;
+    public IReadOnlyDictionary<long, VariableRuntime>? ReadOnlyIdVariableRuntimes => IdVariableRuntimes;
+
+    /// <summary>
+    /// 设备变量
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [AutoGenerateColumn(Ignore = true)]
+    public IReadOnlyDictionary<string, VariableRuntime>? ReadOnlyVariableRuntimes => VariableRuntimes;
 
     /// <summary>
     /// 设备变量
@@ -140,7 +147,17 @@ public class DeviceRuntime : Device, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [AdaptIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    internal ConcurrentDictionary<long, VariableRuntime>? VariableRuntimes { get; set; } = new(Environment.ProcessorCount, 1000);
+    internal ConcurrentDictionary<long, VariableRuntime>? IdVariableRuntimes { get; set; } = new(Environment.ProcessorCount, 1000);
+
+    /// <summary>
+    /// 设备变量
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [AdaptIgnore]
+    [AutoGenerateColumn(Ignore = true)]
+    internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; set; } = new(Environment.ProcessorCount, 1000);
+
 
     #region 采集
     /// <summary>

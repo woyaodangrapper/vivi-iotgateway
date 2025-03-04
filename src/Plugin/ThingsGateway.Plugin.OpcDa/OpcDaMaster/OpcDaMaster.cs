@@ -125,11 +125,8 @@ public class OpcDaMaster : CollectBase
     protected override async Task<List<VariableSourceRead>> ProtectedLoadSourceReadAsync(List<VariableRuntime> deviceVariables)
     {
         await Task.CompletedTask.ConfigureAwait(false);
-        _plc?.Disconnect();
         try
         {
-
-
             if (deviceVariables.Count > 0)
             {
                 var result = _plc.AddItemsWithSave(deviceVariables.Where(a => !string.IsNullOrEmpty(a.RegisterAddress)).Select(a => a.RegisterAddress!).ToList());
@@ -157,7 +154,6 @@ public class OpcDaMaster : CollectBase
         }
         finally
         {
-            _plc?.Connect();
         }
     }
 
@@ -204,9 +200,12 @@ public class OpcDaMaster : CollectBase
     }
     public override async Task AfterVariablesChangedAsync()
     {
+        _plc?.Disconnect();
         await base.AfterVariablesChangedAsync().ConfigureAwait(false);
 
-        VariableAddresDicts = VariableRuntimes.Select(a => a.Value).Where(it => !it.RegisterAddress.IsNullOrEmpty()).GroupBy(a => a.RegisterAddress).ToDictionary(a => a.Key!, b => b.ToList());
+        VariableAddresDicts = IdVariableRuntimes.Select(a => a.Value).Where(it => !it.RegisterAddress.IsNullOrEmpty()).GroupBy(a => a.RegisterAddress).ToDictionary(a => a.Key!, b => b.ToList());
+
+        _plc?.Connect();
     }
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();

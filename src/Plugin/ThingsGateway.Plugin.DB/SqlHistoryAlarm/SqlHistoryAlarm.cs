@@ -17,6 +17,8 @@ using SqlSugar;
 using ThingsGateway.Admin.Application;
 using ThingsGateway.Foundation;
 
+using TouchSocket.Core;
+
 namespace ThingsGateway.Plugin.SqlHistoryAlarm;
 
 /// <summary>
@@ -38,6 +40,11 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
     {
 
         _config.ForType<AlarmVariable, HistoryAlarm>().Map(dest => dest.Id, (src) => CommonUtils.GetSingleId());
+        GlobalData.AlarmChangedEvent -= AlarmWorker_OnAlarmChanged;
+        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
+        {
+            AlarmWorker_OnAlarmChanged(a.Value);
+        });
         GlobalData.AlarmChangedEvent += AlarmWorker_OnAlarmChanged;
 
         await base.InitChannelAsync(channel).ConfigureAwait(false);
@@ -45,10 +52,10 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
     public override async Task AfterVariablesChangedAsync()
     {
         await base.AfterVariablesChangedAsync().ConfigureAwait(false);
-        VariableRuntimes = GlobalData.ReadOnlyVariables.Where(a => a.Value.AlarmEnable).ToDictionary(a => a.Key, a => a.Value);
+        IdVariableRuntimes = GlobalData.ReadOnlyIdVariables.Where(a => a.Value.AlarmEnable).ToDictionary();
 
         CollectDevices = GlobalData.ReadOnlyIdDevices
-                                .Where(a => VariableRuntimes.Select(b => b.Value.DeviceId).Contains(a.Value.Id))
+                                .Where(a => IdVariableRuntimes.Select(b => b.Value.DeviceId).Contains(a.Value.Id))
                                 .ToDictionary(a => a.Key, a => a.Value);
     }
 

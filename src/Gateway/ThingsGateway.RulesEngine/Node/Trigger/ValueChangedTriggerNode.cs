@@ -8,7 +8,7 @@ using TouchSocket.Core;
 namespace ThingsGateway.RulesEngine;
 
 [CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(ValueChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(VariableWidget))]
-public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
+public class ValueChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 {
     public ValueChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "ValueChangedTriggerNode"; Placeholder = "ValueChangedTriggerNode.Placeholder"; }
 
@@ -16,21 +16,31 @@ public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
     {
         Func = func;
-        FuncDict.Add(this, func);
-        if (!ValueChangedTriggerNodeDict.TryGetValue(Text, out var list))
+        FuncDict.TryAdd(this, func);
+        if (ValueChangedTriggerNodeDict.TryGetValue(DeviceText, out var deviceVariableDict))
         {
-            var list1 = new ConcurrentList<ValueChangedTriggerNode>();
-            list1.Add(this);
-            ValueChangedTriggerNodeDict.Add(Text, list1);
+
+            if (deviceVariableDict.TryGetValue(Text, out var valueChangedTriggerNodes))
+            {
+                valueChangedTriggerNodes.Add(this);
+            }
+            else
+            {
+                deviceVariableDict.TryAdd(Text, new());
+                deviceVariableDict[Text].Add(this);
+            }
         }
         else
         {
-            list.Add(this);
+            ValueChangedTriggerNodeDict.TryAdd(DeviceText, new());
+            ValueChangedTriggerNodeDict[DeviceText].TryAdd(Text, new());
+            ValueChangedTriggerNodeDict[DeviceText][Text].Add(this);
+
         }
         return Task.CompletedTask;
     }
-    public static Dictionary<string, ConcurrentList<ValueChangedTriggerNode>> ValueChangedTriggerNodeDict = new();
-    public static Dictionary<ValueChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
+    public static ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentList<ValueChangedTriggerNode>>> ValueChangedTriggerNodeDict = new();
+    public static ConcurrentDictionary<ValueChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
 
     public static BlockingCollection<VariableBasicData> VariableBasicDatas = new();
     static ValueChangedTriggerNode()
@@ -40,7 +50,9 @@ public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     }
     private static void GlobalData_VariableValueChangeEvent(VariableRuntime variableRuntime, VariableBasicData variableData)
     {
-        if (ValueChangedTriggerNodeDict.TryGetValue(variableData.Name, out var list) && list?.Count > 0)
+        if (ValueChangedTriggerNodeDict.TryGetValue(variableRuntime.DeviceName, out var valueNodeDict) &&
+                valueNodeDict.TryGetValue(variableRuntime.Name, out var valueChangedTriggerNodes) &&
+                valueChangedTriggerNodes?.Count > 0)
         {
             if (!VariableBasicDatas.IsAddingCompleted)
             {
@@ -59,24 +71,25 @@ public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
         return VariableBasicDatas.GetConsumingEnumerable().ParallelForEachAsync((async (variableBasicData, token) =>
         {
 
-            if (ValueChangedTriggerNodeDict.TryGetValue(variableBasicData.Name, out var valueChangedTriggerNodes))
+            if (ValueChangedTriggerNodeDict.TryGetValue(variableBasicData.DeviceName, out var valueNodeDict) &&
+        valueNodeDict.TryGetValue(variableBasicData.Name, out var valueChangedTriggerNodes))
             {
-                foreach (var item in valueChangedTriggerNodes)
+                await valueChangedTriggerNodes.ParallelForEachAsync(async (item, token) =>
+            {
+                try
                 {
-                    try
+                    if (FuncDict.TryGetValue(item, out var func))
                     {
-                        if (FuncDict.TryGetValue(item, out var func))
-                        {
-                            item.LogMessage?.Trace($"Variable changed: {item.Text}");
-                            await func.Invoke(new NodeOutput() { Value = variableBasicData }).ConfigureAwait(false);
+                        item.LogMessage?.Trace($"Variable changed: {item.Text}");
+                        await func.Invoke(new NodeOutput() { Value = variableBasicData }).ConfigureAwait(false);
 
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        item.LogMessage?.LogWarning(ex);
                     }
                 }
+                catch (Exception ex)
+                {
+                    item.LogMessage?.LogWarning(ex);
+                }
+            }, Environment.ProcessorCount, token).ConfigureAwait(false);
             }
 
         }), Environment.ProcessorCount / 2 <= 1 ? 2 : Environment.ProcessorCount / 2, default);
@@ -85,44 +98,11 @@ public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 
     public void Dispose()
     {
-        FuncDict.Remove(this);
-        if (ValueChangedTriggerNodeDict.TryGetValue(Text, out var list))
+        FuncDict.TryRemove(this, out _);
+        if (ValueChangedTriggerNodeDict.TryGetValue(DeviceText, out var valueNodeDict) &&
+            valueNodeDict.TryGetValue(Text, out var valueChangedTriggerNodes))
         {
-            list.Remove(this);
+            valueChangedTriggerNodes.Remove(this);
         }
     }
 }
-//using ThingsGateway.Gateway.Application;
-
-//using TouchSocket.Core;
-
-//namespace ThingsGateway.RulesEngine;
-
-//[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(ValueChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(TextWidget))]
-//public class ValueChangedTriggerNode : TextNode, ITriggerNode, IDisposable
-//{
-//    public ValueChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "ValueChangedTriggerNode"; Placeholder = "ValueChangedTriggerNode.Placeholder"; }
-
-//    private Func<NodeOutput, Task> Func { get; set; }
-//    Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
-//    {
-//        Func = func;
-//        GlobalData.VariableValueChangeEvent += GlobalData_VariableValueChangeEvent; ;
-//        return Task.CompletedTask;
-//    }
-
-//    private void GlobalData_VariableValueChangeEvent(VariableRuntime variableRuntime, VariableBasicData variableData)
-//    {
-//        if (variableRuntime.Name == Text)
-//        {
-//            LogMessage?.Trace($"Variable changed: {Text}");
-//            _ = Func?.Invoke(new NodeOutput() { Value = variableRuntime });
-//        }
-//    }
-
-
-//    public void Dispose()
-//    {
-//        GlobalData.VariableValueChangeEvent -= GlobalData_VariableValueChangeEvent; ;
-//    }
-//}

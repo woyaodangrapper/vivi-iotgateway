@@ -41,6 +41,11 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
         _exT2TimerTick = new(_businessPropertyWithCacheInterval.BusinessInterval);
 
         GlobalData.AlarmChangedEvent -= AlarmValueChange;
+        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
+        {
+            AlarmValueChange(a.Value);
+        });
+
         GlobalData.AlarmChangedEvent += AlarmValueChange;
         // 解绑全局数据的事件
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
@@ -63,7 +68,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
         if (_businessPropertyWithCacheInterval.IsAllVariable)
         {
             LogMessage?.LogInformation("Refresh variable");
-            VariableRuntimes = new(GlobalData.GetEnableVariables());
+            IdVariableRuntimes = new(GlobalData.GetEnableVariables());
 
             CollectDevices = GlobalData.GetEnableDevices().Where(a => a.Value.IsCollect == true).ToDictionary();
         }
@@ -79,7 +84,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
             if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine)
                 DeviceStatusChange(a.Value, a.Value.Adapt<DeviceBasicData>());
         });
-        VariableRuntimes.ForEach(a =>
+        IdVariableRuntimes.ForEach(a =>
         {
             if (a.Value.IsOnline)
                 VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
@@ -151,7 +156,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
                     if (_exTTimerTick.IsTickHappen())
                     {
                         // 间隔推送全部变量
-                        foreach (var variableRuntime in VariableRuntimes.Select(a => a.Value))
+                        foreach (var variableRuntime in IdVariableRuntimes.Select(a => a.Value))
                         {
                             VariableTimeInterval(variableRuntime, variableRuntime.Adapt<VariableBasicData>());
                         }
@@ -226,7 +231,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
         {
             // 检查当前设备的变量是否包含此报警变量，如果包含，则触发报警变量的变化处理方法
-            if (VariableRuntimes.ContainsKey(alarmVariable.Name))
+            if (IdVariableRuntimes.ContainsKey(alarmVariable.Id))
                 AlarmChange(alarmVariable);
         }
     }
@@ -262,7 +267,7 @@ public abstract class BusinessBaseWithCacheIntervalAlarmModel<VarModel, DevModel
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
         {
             // 检查当前设备的变量是否包含此变量，如果包含，则触发变量的变化处理方法
-            if (VariableRuntimes.ContainsKey(variable.Name))
+            if (IdVariableRuntimes.ContainsKey(variable.Id))
                 VariableChange(variableRuntime, variable);
         }
     }

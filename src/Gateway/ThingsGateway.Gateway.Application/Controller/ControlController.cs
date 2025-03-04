@@ -117,13 +117,17 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("writeVariables")]
     [DisplayName("写入变量")]
-    public async Task<Dictionary<string, OperResult>> WriteVariablesAsync(Dictionary<string, string> objs)
+    public async Task<Dictionary<string, Dictionary<string, OperResult>>> WriteVariablesAsync(Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
-        var data = GlobalData.ReadOnlyVariables.Where(a => objs.ContainsKey(a.Key));
-        if (data != null)
-            await GlobalData.SysUserService.CheckApiDataScopeAsync(data.Select(a => a.Value.CreateOrgId), data.Select(a => a.Value.CreateUserId)).ConfigureAwait(false);
+        foreach (var deviceData in deviceDatas)
+        {
+            if (GlobalData.Devices.TryGetValue(deviceData.Key, out var device))
+            {
+                await GlobalData.SysUserService.CheckApiDataScopeAsync(device.IdVariableRuntimes.Select(a => a.Value.CreateOrgId), device.IdVariableRuntimes.Select(a => a.Value.CreateUserId)).ConfigureAwait(false);
+            }
+        }
 
-        return await GlobalData.RpcService.InvokeDeviceMethodAsync($"WebApi-{UserManager.UserAccount}-{App.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}", objs).ConfigureAwait(false);
+        return await GlobalData.RpcService.InvokeDeviceMethodAsync($"WebApi-{UserManager.UserAccount}-{App.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}", deviceDatas).ConfigureAwait(false);
 
     }
 }

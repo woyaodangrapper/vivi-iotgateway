@@ -17,11 +17,11 @@ using Microsoft.Extensions.Localization;
 
 using System.Collections.Concurrent;
 
-using ThingsGateway.NewLife;
 using ThingsGateway.Gateway.Application.Extensions;
+using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Extension;
 
 using TouchSocket.Core;
-using ThingsGateway.NewLife.Extension;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -507,7 +507,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
 
                 if (IsCollectChannel == true)
                 {
-                    saveDevices.AddRange(driver.VariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
+                    saveDevices.AddRange(driver.IdVariableRuntimes.Where(a => a.Value.SaveValue && !a.Value.DynamicVariable).Select(a => a.Value));
                 }
 
                 // 取消驱动程序的操作
@@ -685,7 +685,7 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
     {
         //传入变量
         //newDeviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.SafeDispose());
-        deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+        deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
     }
 
     /// <inheritdoc/>

@@ -57,7 +57,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<T> : BusinessBa
         if (_businessPropertyWithCacheInterval.IsAllVariable)
         {
             LogMessage?.LogInformation("Refresh variable");
-            VariableRuntimes = new(GlobalData.GetEnableVariables());
+            IdVariableRuntimes = new(GlobalData.GetEnableVariables());
             CollectDevices = GlobalData.GetEnableDevices().Where(a => a.Value.IsCollect == true).ToDictionary();
         }
         else
@@ -66,7 +66,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<T> : BusinessBa
         }
 
         // 触发一次变量值变化事件
-        VariableRuntimes.ForEach(a =>
+        IdVariableRuntimes.ForEach(a =>
         {
             if (a.Value.IsOnline)
                 VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
@@ -105,7 +105,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<T> : BusinessBa
                     if (_exTTimerTick.IsTickHappen())
                     {
                         //间隔推送全部变量
-                        foreach (var variableRuntime in VariableRuntimes.Select(a => a.Value))
+                        foreach (var variableRuntime in IdVariableRuntimes.Select(a => a.Value))
                         {
                             VariableTimeInterval(variableRuntime, variableRuntime.Adapt<VariableBasicData>());
                         }
@@ -165,7 +165,7 @@ public abstract class BusinessBaseWithCacheIntervalVariableModel<T> : BusinessBa
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
         {
             //筛选
-            if (VariableRuntimes.ContainsKey(variableRuntime.Name))
+            if (IdVariableRuntimes.ContainsKey(variableRuntime.Id))
                 VariableChange(variableRuntime, variable);
         }
     }

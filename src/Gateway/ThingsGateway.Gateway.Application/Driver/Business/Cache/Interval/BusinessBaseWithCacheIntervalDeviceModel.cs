@@ -69,7 +69,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
         if (_businessPropertyWithCacheInterval.IsAllVariable)
         {
             LogMessage?.LogInformation("Refresh variable");
-            VariableRuntimes = new(GlobalData.GetEnableVariables());
+            IdVariableRuntimes = GlobalData.GetEnableVariables().ToDictionary();
             CollectDevices = GlobalData.GetEnableDevices().Where(a => a.Value.IsCollect == true).ToDictionary();
         }
         else
@@ -83,7 +83,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
             if (a.Value.DeviceStatus == DeviceStatusEnum.OnLine)
                 DeviceStatusChange(a.Value, a.Value.Adapt<DeviceBasicData>());
         });
-        VariableRuntimes.ForEach(a =>
+        IdVariableRuntimes.ForEach(a =>
         {
             if (a.Value.IsOnline)
                 VariableValueChange(a.Value, a.Value.Adapt<VariableBasicData>());
@@ -147,7 +147,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
                     if (_exTTimerTick.IsTickHappen())
                     {
                         // 上传所有变量信息
-                        foreach (var variableRuntime in VariableRuntimes.Select(a => a.Value))
+                        foreach (var variableRuntime in IdVariableRuntimes.Select(a => a.Value))
                         {
                             VariableTimeInterval(variableRuntime, variableRuntime.Adapt<VariableBasicData>());
                         }
@@ -198,7 +198,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
     /// </summary>
     /// <param name="variableRuntime">变量运行时对象</param>
     /// <param name="variable">变量数据对象</param>
-    protected virtual void VariableChange(VariableRuntime variableRuntime, VariableData variable)
+    protected virtual void VariableChange(VariableRuntime variableRuntime, VariableBasicData variable)
     {
     }
     /// <summary>
@@ -245,7 +245,7 @@ public abstract class BusinessBaseWithCacheIntervalDeviceModel<VarModel, DevMode
         //if (_businessPropertyWithCacheInterval?.IsInterval != true)
         {
             // 检查当前设备是否包含该变量，并进行相应处理
-            if (VariableRuntimes.ContainsKey(variableRuntime.Name))
+            if (IdVariableRuntimes.ContainsKey(variableRuntime.Id))
                 VariableChange(variableRuntime, variable);
         }
     }

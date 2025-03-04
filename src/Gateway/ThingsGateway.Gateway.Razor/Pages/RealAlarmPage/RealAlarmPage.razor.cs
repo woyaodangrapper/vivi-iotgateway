@@ -15,11 +15,11 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class RealAlarmPage
 {
-    private VariableRuntime? SearchModel { get; set; } = new();
+    private AlarmVariable? SearchModel { get; set; } = new();
 
     #region 查询
 
-    private static async Task<QueryData<VariableRuntime>> OnQueryAsync(QueryPageOptions options)
+    private static async Task<QueryData<AlarmVariable>> OnQueryAsync(QueryPageOptions options)
     {
         var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
         var data = realAlarmVariables

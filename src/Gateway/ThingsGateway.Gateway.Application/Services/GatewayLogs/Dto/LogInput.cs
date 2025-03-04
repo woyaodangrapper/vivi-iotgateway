@@ -59,6 +59,10 @@ public class RpcLogPageInput : ITableSearchModel
     /// 操作对象
     /// </summary>
     public string? OperateObject { get; set; }
+    /// <summary>
+    /// 操作设备
+    /// </summary>
+    public string? OperateDevice { get; set; }
 
     /// <summary>
     /// 操作源
@@ -70,11 +74,14 @@ public class RpcLogPageInput : ITableSearchModel
     /// </summary>
     public DateTimeRangeValue? SearchDate { get; set; }
 
+
     /// <inheritdoc/>
     public IEnumerable<IFilterAction> GetSearches()
     {
         var ret = new List<IFilterAction>();
         ret.AddIF(!string.IsNullOrEmpty(OperateSource), () => new SearchFilterAction(nameof(RpcLog.OperateSource), OperateSource));
+
+        ret.AddIF(!string.IsNullOrEmpty(OperateDevice), () => new SearchFilterAction(nameof(RpcLog.OperateDevice), OperateDevice));
         ret.AddIF(!string.IsNullOrEmpty(OperateObject), () => new SearchFilterAction(nameof(RpcLog.OperateObject), OperateObject));
         ret.AddIF(SearchDate != null, () => new SearchFilterAction(nameof(RpcLog.LogTime), SearchDate!.Start, FilterAction.GreaterThanOrEqual));
         ret.AddIF(SearchDate != null, () => new SearchFilterAction(nameof(RpcLog.LogTime), SearchDate!.End, FilterAction.LessThanOrEqual));

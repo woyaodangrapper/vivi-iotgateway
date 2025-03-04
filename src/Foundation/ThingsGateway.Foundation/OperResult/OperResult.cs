@@ -363,7 +363,6 @@ public struct OperResult : IOperResult
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonIgnore]
 #endif
-
     [JsonIgnore]
     public Exception? Exception { get; set; }
 
@@ -433,7 +432,6 @@ public struct OperResult : IOperResult
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
 #endif
-
     [JsonConverter(typeof(StringEnumConverter))]
     public ErrorTypeEnum? ErrorType { get; set; }
 

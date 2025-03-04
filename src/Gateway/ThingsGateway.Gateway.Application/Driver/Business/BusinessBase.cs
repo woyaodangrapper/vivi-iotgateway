@@ -70,7 +70,7 @@ public abstract class BusinessBase : DriverBase
     {
         LogMessage?.LogInformation("Refresh variable");
         // 获取与当前设备相关的变量,CurrentDevice.VariableRuntimes并不适用于业务插件
-        var variableRuntimes = GlobalData.Variables.Where(a =>
+        var variableRuntimes = GlobalData.IdVariables.Where(a =>
         {
             if (!a.Value.Enable) return false;
             if (a.Value.VariablePropertys?.TryGetValue(DeviceId, out var values) == true)
@@ -95,10 +95,10 @@ public abstract class BusinessBase : DriverBase
         }
         );
 
-        VariableRuntimes = variableRuntimes.ToDictionary();
+        IdVariableRuntimes = variableRuntimes.ToDictionary();
 
         // 获取当前设备需要采集的设备
-        CollectDevices = GlobalData.GetEnableDevices().Where(a => VariableRuntimes.Select(b => b.Value.DeviceId).ToHashSet().Contains(a.Key)).ToDictionary(a => a.Key, a => a.Value);
+        CollectDevices = GlobalData.GetEnableDevices().Where(a => IdVariableRuntimes.Select(b => b.Value.DeviceId).ToHashSet().Contains(a.Key)).ToDictionary(a => a.Key, a => a.Value);
 
         return Task.CompletedTask;
     }

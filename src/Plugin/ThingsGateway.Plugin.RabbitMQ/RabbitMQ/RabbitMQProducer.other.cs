@@ -26,7 +26,7 @@ namespace ThingsGateway.Plugin.RabbitMQ;
 /// <summary>
 /// RabbitMQProducer
 /// </summary>
-public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<VariableData, DeviceData, AlarmVariable>
+public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
 {
     private IConnection _connection;
     private ConnectionFactory _connectionFactory;
@@ -55,17 +55,17 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
 
     protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
-        return UpdateAlarmModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
-        return UpdateDevModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateDevModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
-        return UpdateVarModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
     protected override void VariableTimeInterval(VariableRuntime variableRuntime, VariableBasicData variable)
     {
@@ -110,15 +110,15 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 
-    private ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateDevModel(IEnumerable<DeviceBasicData> item, CancellationToken cancellationToken)
     {
         List<TopicJson> topicJsonList = GetDeviceData(item);
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 
-    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
-        List<TopicJson> topicJsonList = GetVariable(item);
+        List<TopicJson> topicJsonList = GetVariableBasicData(item);
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 
@@ -130,9 +130,9 @@ public partial class RabbitMQProducer : BusinessBaseWithCacheIntervalScript<Vari
     {
         //保留消息
         //分解List，避免超出字节大小限制
-        var varData = VariableRuntimes.Select(a => a.Value).Adapt<List<VariableData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var devData = CollectDevices?.Select(a => a.Value).Adapt<List<DeviceData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var alramData = GlobalData.ReadOnlyRealAlarmVariables.Select(a => a.Value).Adapt<List<AlarmVariable>>().ChunkBetter(_driverPropertys.SplitSize);
+        var varData = IdVariableRuntimes.Select(a => a.Value).Adapt<List<VariableBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
+        var devData = CollectDevices?.Select(a => a.Value).Adapt<List<DeviceBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
+        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).Adapt<List<AlarmVariable>>().ChunkBetter(_driverPropertys.SplitSize);
         foreach (var item in varData)
         {
             if (!success)

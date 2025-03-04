@@ -169,7 +169,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         if (devices == null)
         {
             db ??= GetDB();
-            devices = await db.Queryable<Device>().ToListAsync().ConfigureAwait(false);
+            devices = await db.Queryable<Device>().OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
             App.CacheService.Set(key, devices);
         }
         return devices;
@@ -437,8 +437,8 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         {
             if (item.Key == ExportString.DeviceName)
             {
-                var collectDeviceImports = ((ImportPreviewOutput<Device>)item.Value).Data;
-                devices = new List<Device>(collectDeviceImports.Values);
+                var deviceImports = ((ImportPreviewOutput<Device>)item.Value).Data;
+                devices = deviceImports.Select(a => a.Value).ToList();
                 break;
             }
         }

@@ -403,7 +403,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                         }
                         if (deviceRuntime != null)
                         {
-                            deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                            deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
                         }
                     }
 

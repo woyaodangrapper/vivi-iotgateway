@@ -74,7 +74,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             AddRootNotifier(rootFolder);
 
             //创建设备树
-            var _geviceGroup = _businessBase.VariableRuntimes.Select(a => a.Value)
+            var _geviceGroup = _businessBase.IdVariableRuntimes.Select(a => a.Value)
                 .GroupBy(a => a.DeviceName);
             // 开始寻找设备信息，并计算一些节点信息
             foreach (var item in _geviceGroup)
@@ -124,7 +124,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             var historyRead = nodesToRead[i];
             if (NodeIdTags.TryGetValue(historyRead.NodeId.Identifier.ToString(), out OpcUaTag tag))
             {
-                if (!GlobalData.ReadOnlyVariables.TryGetValue(tag.SymbolicName, out var variableRuntime))
+                if (!GlobalData.ReadOnlyIdVariables.TryGetValue(tag.Id, out var variableRuntime))
                 {
                     results[i] = new HistoryReadResult()
                     {
@@ -186,28 +186,13 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
 
     }
 
-    /// <inheritdoc/>
-    public override NodeId New(ISystemContext context, NodeState node)
-    {
-        if (node is BaseInstanceState instance && instance.Parent != null)
-        {
-            string id = instance.Parent.NodeId.Identifier?.ToString();
-            if (id != null)
-            {
-                //用下划线分割
-                return new NodeId(id + "_" + instance.SymbolicName, instance.Parent.NodeId.NamespaceIndex);
-            }
-        }
-        return node.NodeId;
-    }
-
     /// <summary>
     /// 更新变量
     /// </summary>
     /// <param name="variable"></param>
-    public void UpVariable(VariableData variable)
+    public void UpVariable(VariableBasicData variable)
     {
-        if (!NodeIdTags.TryGetValue(variable.Name, out var uaTag))
+        if (!NodeIdTags.TryGetValue($"{variable.DeviceName}.{variable.Name}", out var uaTag))
             return;
         object initialItemValue = null;
         initialItemValue = variable.Value;
@@ -389,7 +374,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             SymbolicName = variableRuntime.Name,
             ReferenceTypeId = ReferenceTypes.Organizes,
             TypeDefinitionId = VariableTypeIds.BaseDataVariableType,
-            NodeId = new NodeId(variableRuntime.Name, NamespaceIndex),
+            NodeId = new NodeId($"{variableRuntime.DeviceName}.{variableRuntime.Name}", NamespaceIndex),
             Description = variableRuntime.Description,
             BrowseName = new QualifiedName(variableRuntime.Name, NamespaceIndex),
             DisplayName = new LocalizedText(variableRuntime.Name),
@@ -411,7 +396,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         variable.Timestamp = variableRuntime.CollectTime ?? DateTime.MinValue;
         variable.OnWriteValue = OnWriteDataValue;
         parent?.AddChild(variable);
-        NodeIdTags.AddOrUpdate(variable.SymbolicName, variable);
+        NodeIdTags.AddOrUpdate($"{variableRuntime.DeviceName}.{variableRuntime.Name}", variable);
         return variable;
     }
 
@@ -447,28 +432,29 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             //{
             //    return StatusCodes.BadUserAccessDenied;
             //}
-            OpcUaTag variable = node as OpcUaTag;
-            if (NodeIdTags.TryGetValue(variable.SymbolicName, out OpcUaTag tag))
+            OpcUaTag opcuaTag = node as OpcUaTag;
+            if (NodeIdTags.TryGetValue(opcuaTag.NodeId.Identifier.ToString(), out OpcUaTag tag) && GlobalData.ReadOnlyIdVariables.TryGetValue(tag.Id, out var variableRuntime))
             {
-                if (StatusCode.IsGood(variable.StatusCode))
+                if (StatusCode.IsGood(opcuaTag.StatusCode))
                 {
                     //仅当指定了值时才将值写入
-                    if (variable.Value != null)
+                    if (opcuaTag.Value != null)
                     {
-                        var result = GlobalData.RpcService.InvokeDeviceMethodAsync("OpcUaSlave - " + context1?.OperationContext?.Session?.Identity?.DisplayName,
+                        var result = GlobalData.RpcService.InvokeDeviceMethodAsync("OpcUaServer - " + context1?.OperationContext?.Session?.Identity?.DisplayName,
                             new()
                             {
-                                { variable.SymbolicName, value?.ToString() }
+                                {
+                                    variableRuntime.DeviceName,   new Dictionary<string, string>() { {opcuaTag.SymbolicName, value?.ToString() } }
+                                }
                             }
-
                             ).ConfigureAwait(true).GetAwaiter().GetResult();
-                        if (result.Values.FirstOrDefault().IsSuccess)
+                        if (result.Values.FirstOrDefault()?.FirstOrDefault().Value.IsSuccess == true)
                         {
                             return StatusCodes.Good;
                         }
                         else
                         {
-                            return new(StatusCodes.BadWaitingForResponse, result.Values.FirstOrDefault().ErrorMessage);
+                            return new(StatusCodes.BadWaitingForResponse, result.Values.FirstOrDefault()?.FirstOrDefault().Value.ToString());
                         }
                     }
                 }

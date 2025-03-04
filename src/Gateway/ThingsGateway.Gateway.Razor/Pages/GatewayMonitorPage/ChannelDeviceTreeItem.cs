@@ -23,6 +23,8 @@ public enum ChannelDevicePluginTypeEnum
 }
 public class ChannelDeviceTreeItem : IEqualityComparer<ChannelDeviceTreeItem>
 {
+
+    public long Id { get; set; }
     public ChannelDevicePluginTypeEnum ChannelDevicePluginType { get; set; }
 
     public DeviceRuntime DeviceRuntime { get; set; }

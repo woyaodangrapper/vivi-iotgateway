@@ -120,7 +120,7 @@ public static class ResourceUtil
             {
 
 
-                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntime = channelRuntime };
+                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntime = channelRuntime, Id = channelRuntime.Id };
                 var channelTreeItemItem = new TreeViewItem<ChannelDeviceTreeItem>(channelRuntimeTreeItem)
                 {
                     Text = channelRuntime.ToString(),
@@ -145,7 +145,7 @@ public static class ResourceUtil
                 foreach (var keyValue in channelRuntime.ReadDeviceRuntimes.OrderBy(a => a.Value.DeviceStatus))
                 {
                     var deviceRuntime = keyValue.Value;
-                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntime = deviceRuntime };
+                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntime = deviceRuntime, Id = deviceRuntime.Id };
                     var deviceTreeItemItem = new TreeViewItem<ChannelDeviceTreeItem>(deviceRuntimeTreeItem)
                     {
                         Text = keyValue.Value.Name,
@@ -165,10 +165,10 @@ public static class ResourceUtil
                     channelTreeItemItem.Items.Add(deviceTreeItemItem);
                 }
 
-
+                channelTreeItemItem.Items = channelTreeItemItem.Items.OrderBy(a => a.Value.Id).ToList();
                 pluginItem.Items.Add(channelTreeItemItem);
             }
-
+            pluginItem.Items = pluginItem.Items.OrderBy(a => a.Value.Id).ToList();
             trees.Add(pluginItem);
         }
 
@@ -208,7 +208,7 @@ public static class ResourceUtil
 
             foreach (var channelRuntime in dict.Where(a => a.Key.PluginName == pluginName))
             {
-                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntime = channelRuntime.Key };
+                var channelRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Channel, ChannelRuntime = channelRuntime.Key, Id = channelRuntime.Key.Id };
                 var channelTreeItemItem = new TreeViewItem<ChannelDeviceTreeItem>(channelRuntimeTreeItem)
                 {
                     Text = channelRuntime.ToString(),
@@ -230,7 +230,7 @@ public static class ResourceUtil
 
                 foreach (var deviceRuntime in channelRuntime.Value.OrderBy(a => a.DeviceStatus))
                 {
-                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntime = deviceRuntime };
+                    var deviceRuntimeTreeItem = new ChannelDeviceTreeItem() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.Device, DeviceRuntime = deviceRuntime, Id = deviceRuntime.Id };
                     var deviceTreeItemItem = new TreeViewItem<ChannelDeviceTreeItem>(deviceRuntimeTreeItem)
                     {
                         Text = deviceRuntime.Name,
@@ -251,10 +251,11 @@ public static class ResourceUtil
                     channelTreeItemItem.Items.Add(deviceTreeItemItem);
                 }
 
-
+                channelTreeItemItem.Items = channelTreeItemItem.Items.OrderBy(a => a.Value.Id).ToList();
                 pluginItem.Items.Add(channelTreeItemItem);
             }
 
+            pluginItem.Items = pluginItem.Items.OrderBy(a => a.Value.Id).ToList();
             trees.Add(pluginItem);
         }
 

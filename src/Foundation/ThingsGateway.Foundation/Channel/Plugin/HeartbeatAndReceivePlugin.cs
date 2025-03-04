@@ -13,7 +13,7 @@ using System.Text;
 namespace ThingsGateway.Foundation;
 
 [PluginOption(Singleton = true)]
-internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugin, ITcpReceivingPlugin
+internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugin, ITcpReceivingPlugin, ITcpClosingPlugin
 {
     public string DtuId
     {
@@ -48,8 +48,9 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
     private string _heartbeat;
     private ArraySegment<byte> HeartbeatByte;
 
-
-    public int HeartbeatTime { get; set; } = 3;
+    private Task Task;
+    private bool SendHeartbeat;
+    public int HeartbeatTime { get; set; } = 3000;
 
     public async Task OnTcpConnected(ITcpSession client, ConnectedEventArgs e)
     {
@@ -62,40 +63,46 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
 
         if (client is ITcpClient tcpClient)
         {
+            SendHeartbeat = true;
             await tcpClient.SendAsync(DtuIdByte).ConfigureAwait(false);
 
-            _ = Task.Factory.StartNew(async () =>
-             {
-                 var failedCount = 0;
-                 while (client.Online)
+            if (Task == null)
+            {
+                Task = Task.Factory.StartNew(async () =>
                  {
-                     await Task.Delay(HeartbeatTime).ConfigureAwait(false);
-                     if (!client.Online)
+                     var failedCount = 0;
+                     while (SendHeartbeat)
                      {
-                         return;
-                     }
-
-                     try
-                     {
-                         if (DateTime.UtcNow - tcpClient.LastSentTime.ToUniversalTime() < TimeSpan.FromMilliseconds(200))
+                         await Task.Delay(HeartbeatTime).ConfigureAwait(false);
+                         if (!client.Online)
                          {
-                             await Task.Delay(200).ConfigureAwait(false);
+                             continue;
                          }
 
-                         await tcpClient.SendAsync(HeartbeatByte).ConfigureAwait(false);
-                         tcpClient.Logger?.Trace($"{tcpClient}- Heartbeat");
-                         failedCount = 0;
+                         try
+                         {
+                             if (DateTime.UtcNow - tcpClient.LastSentTime.ToUniversalTime() < TimeSpan.FromMilliseconds(200))
+                             {
+                                 await Task.Delay(200).ConfigureAwait(false);
+                             }
+
+                             await tcpClient.SendAsync(HeartbeatByte).ConfigureAwait(false);
+                             tcpClient.Logger?.Trace($"{tcpClient}- Heartbeat");
+                             failedCount = 0;
+                         }
+                         catch
+                         {
+                             failedCount++;
+                         }
+                         if (failedCount > 3)
+                         {
+                             await client.CloseAsync("The automatic heartbeat has failed more than 3 times and has been disconnected.").ConfigureAwait(false);
+                         }
                      }
-                     catch
-                     {
-                         failedCount++;
-                     }
-                     if (failedCount > 3)
-                     {
-                         await client.CloseAsync("The automatic heartbeat has failed more than 3 times and has been disconnected.").ConfigureAwait(false);
-                     }
-                 }
-             });
+
+                     Task = null;
+                 });
+            }
         }
 
         await e.InvokeNext().ConfigureAwait(false);
@@ -122,5 +129,11 @@ internal sealed class HeartbeatAndReceivePlugin : PluginBase, ITcpConnectedPlugi
             }
             await e.InvokeNext().ConfigureAwait(false);//如果本插件无法处理当前数据，请将数据转至下一个插件。
         }
+    }
+
+    public Task OnTcpClosing(ITcpSession client, ClosingEventArgs e)
+    {
+        SendHeartbeat = false;
+        return EasyTask.CompletedTask;
     }
 }

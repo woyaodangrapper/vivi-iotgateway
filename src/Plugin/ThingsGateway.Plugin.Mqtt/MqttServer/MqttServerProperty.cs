@@ -49,7 +49,7 @@ public class MqttServerProperty : BusinessPropertyWithCacheIntervalScript
     /// 允许匿名登录
     /// </summary>
     [DynamicProperty]
-    public bool AnonymousEnable { get; set; } = false;
+    public bool AnonymousEnable { get; set; } = true;
 
     /// <summary>
     /// 允许Rpc写入

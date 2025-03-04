@@ -20,7 +20,7 @@ namespace ThingsGateway.Plugin.Webhook;
 /// <summary>
 /// WebhookClient
 /// </summary>
-public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableData, DeviceBasicData, AlarmVariable>
+public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
 {
 
     protected override void AlarmChange(AlarmVariable alarmVariable)
@@ -52,19 +52,19 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableData,
 
     protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
-        return UpdateAlarmModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
     protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
 
 
-        return UpdateDevModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateDevModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
-        return UpdateVarModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
     protected override void VariableTimeInterval(VariableRuntime variableRuntime, VariableBasicData variable)
@@ -160,9 +160,9 @@ public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableData,
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 
-    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
-        List<TopicJson> topicJsonList = GetVariable(item);
+        List<TopicJson> topicJsonList = GetVariableBasicData(item);
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 

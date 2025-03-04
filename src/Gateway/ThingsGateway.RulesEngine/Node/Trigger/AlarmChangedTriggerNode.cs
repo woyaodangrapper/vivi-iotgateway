@@ -9,8 +9,8 @@ using TouchSocket.Core;
 
 namespace ThingsGateway.RulesEngine;
 
-[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(AlarmChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(AlarmVariableWidget))]
-public class AlarmChangedTriggerNode : TextNode, ITriggerNode, IDisposable
+[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(AlarmChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(VariableWidget))]
+public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 {
     public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; Placeholder = "AlarmChangedTriggerNode.Placeholder"; }
 
@@ -19,31 +19,50 @@ public class AlarmChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
     {
         Func = func;
-        FuncDict.Add(this, func);
-        if (!AlarmChangedTriggerNodeDict.TryGetValue(Text, out var list))
+        FuncDict.TryAdd(this, func);
+        if (AlarmChangedTriggerNodeDict.TryGetValue(DeviceText, out var deviceVariableDict))
         {
-            var list1 = new ConcurrentList<AlarmChangedTriggerNode>();
-            list1.Add(this);
-            AlarmChangedTriggerNodeDict.Add(Text, list1);
+
+            if (deviceVariableDict.TryGetValue(Text, out var alarmChangedTriggerNodes))
+            {
+                alarmChangedTriggerNodes.Add(this);
+            }
+            else
+            {
+                deviceVariableDict.TryAdd(Text, new());
+                deviceVariableDict[Text].Add(this);
+            }
         }
         else
         {
-            list.Add(this);
+            AlarmChangedTriggerNodeDict.TryAdd(DeviceText, new());
+            AlarmChangedTriggerNodeDict[DeviceText].TryAdd(Text, new());
+            AlarmChangedTriggerNodeDict[DeviceText][Text].Add(this);
+
         }
         return Task.CompletedTask;
     }
-    public static Dictionary<string, ConcurrentList<AlarmChangedTriggerNode>> AlarmChangedTriggerNodeDict = new();
-    public static Dictionary<AlarmChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
+
+    public static ConcurrentDictionary<string, ConcurrentDictionary<string, ConcurrentList<AlarmChangedTriggerNode>>> AlarmChangedTriggerNodeDict = new();
+
+    public static ConcurrentDictionary<AlarmChangedTriggerNode, Func<NodeOutput, Task>> FuncDict = new();
 
     public static BlockingCollection<AlarmVariable> AlarmVariables = new();
     static AlarmChangedTriggerNode()
     {
         _ = RunAsync();
+        GlobalData.AlarmChangedEvent -= AlarmHostedService_OnAlarmChanged;
+        GlobalData.ReadOnlyRealAlarmIdVariables?.ForEach(a =>
+        {
+            AlarmHostedService_OnAlarmChanged(a.Value);
+        });
         GlobalData.AlarmChangedEvent += AlarmHostedService_OnAlarmChanged;
     }
     private static void AlarmHostedService_OnAlarmChanged(AlarmVariable alarmVariable)
     {
-        if (AlarmChangedTriggerNodeDict.TryGetValue(alarmVariable.Name, out var list) && list?.Count > 0)
+        if (AlarmChangedTriggerNodeDict.TryGetValue(alarmVariable.DeviceName, out var alarmNodeDict) &&
+            alarmNodeDict.TryGetValue(alarmVariable.Name, out var alarmChangedTriggerNodes) &&
+            alarmChangedTriggerNodes?.Count > 0)
         {
             if (!AlarmVariables.IsAddingCompleted)
             {
@@ -59,27 +78,26 @@ public class AlarmChangedTriggerNode : TextNode, ITriggerNode, IDisposable
     }
     static Task RunAsync()
     {
-        return AlarmVariables.GetConsumingEnumerable().ParallelForEachAsync((async (alarmVariables, token) =>
+        return AlarmVariables.GetConsumingEnumerable().ParallelForEachAsync((async (alarmVariable, token) =>
             {
-
-                if (AlarmChangedTriggerNodeDict.TryGetValue(alarmVariables.Name, out var valueChangedTriggerNodes))
+                if (AlarmChangedTriggerNodeDict.TryGetValue(alarmVariable.DeviceName, out var alarmNodeDict) &&
+            alarmNodeDict.TryGetValue(alarmVariable.Name, out var alarmChangedTriggerNodes))
                 {
-                    foreach (var item in valueChangedTriggerNodes)
-                    {
-                        try
-                        {
-                            if (FuncDict.TryGetValue(item, out var func))
-                            {
-                                item.LogMessage?.Trace($"Alarm changed: {item.Text}");
-                                await func.Invoke(new NodeOutput() { Value = alarmVariables }).ConfigureAwait(false);
-
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            item.LogMessage?.LogWarning(ex);
-                        }
-                    }
+                    await alarmChangedTriggerNodes.ParallelForEachAsync(async (item, token) =>
+                       {
+                           try
+                           {
+                               if (FuncDict.TryGetValue(item, out var func))
+                               {
+                                   item.LogMessage?.Trace($"Alarm changed: {item.Text}");
+                                   await func.Invoke(new NodeOutput() { Value = alarmVariable }).ConfigureAwait(false);
+                               }
+                           }
+                           catch (Exception ex)
+                           {
+                               item.LogMessage?.LogWarning(ex);
+                           }
+                       }, Environment.ProcessorCount, token).ConfigureAwait(false);
                 }
 
             }), Environment.ProcessorCount / 2 <= 1 ? 2 : Environment.ProcessorCount / 2, default);
@@ -87,45 +105,11 @@ public class AlarmChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 
     public void Dispose()
     {
-        FuncDict.Remove(this);
-        if (AlarmChangedTriggerNodeDict.TryGetValue(Text, out var list))
+        FuncDict.TryRemove(this, out _);
+        if (AlarmChangedTriggerNodeDict.TryGetValue(DeviceText, out var alarmNodeDict) &&
+            alarmNodeDict.TryGetValue(Text, out var alarmChangedTriggerNodes))
         {
-            list.Remove(this);
+            alarmChangedTriggerNodes.Remove(this);
         }
     }
 }
-
-
-//using ThingsGateway.Gateway.Application;
-
-//using TouchSocket.Core;
-
-//namespace ThingsGateway.RulesEngine;
-
-//[CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(AlarmChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(TextWidget))]
-//public class AlarmChangedTriggerNode : TextNode, ITriggerNode, IDisposable
-//{
-//    public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; Placeholder = "AlarmChangedTriggerNode.Placeholder"; }
-
-//    private Func<NodeOutput, Task> Func { get; set; }
-//    Task ITriggerNode.StartAsync(Func<NodeOutput, Task> func)
-//    {
-//        Func = func;
-//        GlobalData.AlarmHostedService.OnAlarmChanged += AlarmHostedService_OnAlarmChanged;
-//        return Task.CompletedTask;
-//    }
-
-//    private void AlarmHostedService_OnAlarmChanged(AlarmVariable alarmVariable)
-//    {
-//        if (alarmVariable.Name == Text)
-//        {
-//            LogMessage?.Trace($"Alarm changed: {Text}");
-//            _ = Func?.Invoke(new NodeOutput() { Value = alarmVariable });
-//        }
-//    }
-
-//    public void Dispose()
-//    {
-//        GlobalData.AlarmHostedService.OnAlarmChanged -= AlarmHostedService_OnAlarmChanged;
-//    }
-//}

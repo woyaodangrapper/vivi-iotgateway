@@ -249,7 +249,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
         {
             // 如果是需恢复报警事件
             // 如果实时报警列表中不存在该变量，则直接返回
-            if (!GlobalData.RealAlarmVariables.ContainsKey(item.Name))
+            if (!GlobalData.RealAlarmIdVariables.ContainsKey(item.Id))
             {
                 return;
             }
@@ -258,7 +258,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
         {
             // 如果是触发报警事件
             // 在实时报警列表中查找该变量
-            if (GlobalData.RealAlarmVariables.TryGetValue(item.Name, out var variable))
+            if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var variable))
             {
                 // 如果变量已经处于相同的报警类型，则直接返回
                 if (item.AlarmType == alarmEnum)
@@ -342,7 +342,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
         {
             // 如果是需恢复报警事件
             // 获取旧的报警信息
-            if (GlobalData.RealAlarmVariables.TryGetValue(item.Name, out var oldAlarm))
+            if (GlobalData.RealAlarmIdVariables.TryGetValue(item.Id, out var oldAlarm))
             {
                 item.AlarmType = oldAlarm.AlarmType;
                 item.EventType = eventEnum;
@@ -363,23 +363,23 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
                 //lock (GlobalData. RealAlarmVariables)
                 {
                     // 从实时报警列表中移除旧的报警信息，并添加新的报警信息
-                    GlobalData.RealAlarmVariables.AddOrUpdate(item.Name, a => item, (a, b) => item);
+                    GlobalData.RealAlarmIdVariables.AddOrUpdate(item.Id, a => item.Adapt<AlarmVariable>(), (a, b) => item.Adapt<AlarmVariable>());
                 }
             }
             else if (item.EventType == EventTypeEnum.Finish)
             {
                 // 如果是需恢复报警事件，则从实时报警列表中移除该变量
-                GlobalData.RealAlarmVariables.TryRemove(item.Name, out _);
+                GlobalData.RealAlarmIdVariables.TryRemove(item.Id, out _);
             }
             GlobalData.AlarmChange(item.Adapt<AlarmVariable>());
         }
 
     }
 
-    public void ConfirmAlarm(string variableName)
+    public void ConfirmAlarm(long variableId)
     {
         // 如果是确认报警事件
-        if (GlobalData.RealAlarmVariables.TryGetValue(variableName, out var variableRuntime))
+        if (GlobalData.RealAlarmIdVariables.TryGetValue(variableId, out var variableRuntime))
         {
             variableRuntime.EventType = EventTypeEnum.Confirm;
             variableRuntime.EventTime = DateTime.Now;
@@ -403,7 +403,7 @@ internal sealed class AlarmHostedService : BackgroundService, IAlarmHostedServic
             //Stopwatch stopwatch = Stopwatch.StartNew();
             // 遍历设备变量列表
 
-            GlobalData.AlarmEnableVariables.ParallelForEach((kv, state, index) =>
+            GlobalData.AlarmEnableIdVariables.ParallelForEach((kv, state, index) =>
             {
                 {
                     // 如果取消请求已经被触发，则结束任务

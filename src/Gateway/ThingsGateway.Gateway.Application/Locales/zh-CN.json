@@ -228,6 +228,7 @@
     "LogTime": "时间",
     "OperateSource": "操作源",
     "OperateObject": "操作对象",
+    "OperateDevice": "操作设备",
     "OperateMethod": "RPC方法",
     "IsSuccess": "操作结果",
     "ParamJson": "请求参数",
@@ -444,6 +445,7 @@
   "ThingsGateway.Gateway.Application.RpcLogPageInput": {
     "SearchDate": "时间区间",
     "OperateObject": "操作对象",
+    "OperateDevice": "操作设备",
     "OperateSource": "操作源"
   },
   "ThingsGateway.Gateway.Application.BackendLogPageInput": {
@@ -452,6 +454,7 @@
     "LogSource": "日志源"
   },
   "ThingsGateway.Gateway.Application.RpcService": {
+    "DeviceNotNull": "设备名称不存在",
     "VariableNotNull": " {0} 变量不存在",
     "VariableReadOnly": " {0} 变量只读",
     "VariableWriteDisable": " {0} 变量不允许写入",
@@ -463,7 +466,8 @@
     "VariableName": "变量",
     "RedundantDeviceName": "冗余设备",
     "ChannelName": "通道",
-    "DeviceName": "设备"
+    "DeviceName": "设备",
+    "BusinessDeviceName": "业务设备"
   },
 
   "ThingsGateway.Gateway.Application.ProtectTypeEnum": {

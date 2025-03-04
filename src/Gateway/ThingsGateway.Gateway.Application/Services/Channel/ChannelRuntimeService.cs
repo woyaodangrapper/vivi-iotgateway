@@ -92,7 +92,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
                     channelRuntime.DeviceRuntimes.ParallelForEach(a =>
                     {
 
-                        a.Value.VariableRuntimes.ParallelForEach(v => v.Value.Dispose());
+                        a.Value.IdVariableRuntimes.ParallelForEach(v => v.Value.Dispose());
                         a.Value.Dispose();
 
                     });
@@ -197,7 +197,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
     public async Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes)
     {
-        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes.SelectMany(a => a.Value.VariableRuntimes)).ParallelForEach(a => a.Value.SafeDispose());
+        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes.SelectMany(a => a.Value.IdVariableRuntimes)).ParallelForEach(a => a.Value.SafeDispose());
         oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).ParallelForEach(a => a.Value.SafeDispose());
         oldChannelRuntimes.ParallelForEach(a => a.SafeDispose());
         var ids = oldChannelRuntimes.Select(a => a.Id).ToHashSet();

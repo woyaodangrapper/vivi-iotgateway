@@ -8,9 +8,14 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using BootstrapBlazor.Components;
+
+using CSScripting;
+
 using Mapster;
 
 using MQTTnet;
+
 
 #if NET6_0
 using MQTTnet.Client;
@@ -21,7 +26,6 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Text;
 
-using ThingsGateway.Extension.Generic;
 using ThingsGateway.Foundation;
 using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.NewLife;
@@ -33,7 +37,7 @@ namespace ThingsGateway.Plugin.Mqtt;
 /// <summary>
 /// MqttClient
 /// </summary>
-public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableData, DeviceBasicData, AlarmVariable>
+public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
 {
     private static readonly CompositeFormat RpcTopic = CompositeFormat.Parse("{0}/+");
     public const string ThingsBoardRpcTopic = "v1/gateway/rpc";
@@ -120,19 +124,19 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
 
     protected override ValueTask<OperResult> UpdateAlarmModel(IEnumerable<CacheDBItem<AlarmVariable>> item, CancellationToken cancellationToken)
     {
-        return UpdateAlarmModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateAlarmModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
     protected override ValueTask<OperResult> UpdateDevModel(IEnumerable<CacheDBItem<DeviceBasicData>> item, CancellationToken cancellationToken)
     {
 
 
-        return UpdateDevModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateDevModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
 
-    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableData>> item, CancellationToken cancellationToken)
+    protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<VariableBasicData>> item, CancellationToken cancellationToken)
     {
-        return UpdateVarModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
     protected override void VariableTimeInterval(VariableRuntime variableRuntime, VariableBasicData variable)
     {
@@ -187,9 +191,9 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 
-    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableData> item, CancellationToken cancellationToken)
+    private ValueTask<OperResult> UpdateVarModel(IEnumerable<VariableBasicData> item, CancellationToken cancellationToken)
     {
-        List<TopicJson> topicJsonList = GetVariable(item);
+        List<TopicJson> topicJsonList = GetVariableBasicData(item);
         return Update(topicJsonList, item.Count(), cancellationToken);
     }
 
@@ -199,9 +203,9 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
     {
         //保留消息
         //分解List，避免超出mqtt字节大小限制
-        var varData = VariableRuntimes.Select(a => a.Value).Adapt<List<VariableData>>().ChunkBetter(_driverPropertys.SplitSize);
+        var varData = IdVariableRuntimes.Select(a => a.Value).Adapt<List<VariableBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
         var devData = CollectDevices?.Select(a => a.Value).Adapt<List<DeviceBasicData>>().ChunkBetter(_driverPropertys.SplitSize);
-        var alramData = GlobalData.ReadOnlyRealAlarmVariables.Select(a => a.Value).Adapt<List<AlarmVariable>>().ChunkBetter(_driverPropertys.SplitSize);
+        var alramData = GlobalData.ReadOnlyRealAlarmIdVariables.Select(a => a.Value).Adapt<List<AlarmVariable>>().ChunkBetter(_driverPropertys.SplitSize);
         foreach (var item in varData)
         {
             if (!success)
@@ -226,33 +230,62 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
         }
     }
 
-    private async ValueTask<Dictionary<string, OperResult>> GetResult(MqttApplicationMessageReceivedEventArgs args, Dictionary<string, JToken> rpcDatas)
+    private async ValueTask<Dictionary<string, Dictionary<string, OperResult>>> GetResult(MqttApplicationMessageReceivedEventArgs args, Dictionary<string, Dictionary<string, JToken>> rpcDatas)
     {
-        var mqttRpcResult = new Dictionary<string, OperResult>();
+        var mqttRpcResult = new Dictionary<string, Dictionary<string, OperResult>>();
+        rpcDatas.ForEach(a => mqttRpcResult.Add(a.Key, new()));
         try
         {
             foreach (var rpcData in rpcDatas)
             {
-                VariableRuntimes.TryGetValue(rpcData.Key, out var tag);
-                if (tag != null)
+                if (GlobalData.ReadOnlyDevices.TryGetValue(rpcData.Key, out var device))
                 {
-                    var rpcEnable = tag.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
-                    if (rpcEnable == false)
+                    foreach (var item in rpcData.Value)
                     {
-                        mqttRpcResult.Add(rpcData.Key, new OperResult("RPCEnable is False"));
+
+                        if (device.ReadOnlyVariableRuntimes.TryGetValue(item.Key, out var variable) && IdVariableRuntimes.TryGetValue(variable.Id, out var tag))
+                        {
+                            var rpcEnable = tag.GetPropertyValue(DeviceId, nameof(_variablePropertys.VariableRpcEnable))?.ToBoolean();
+                            if (rpcEnable == false)
+                            {
+                                mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("RPCEnable is False"));
+                            }
+                        }
+                        else
+                        {
+                            mqttRpcResult[rpcData.Key].Add(item.Key, new OperResult("The variable does not exist"));
+                        }
                     }
-                }
-                else
-                {
-                    mqttRpcResult.Add(rpcData.Key, new OperResult("The variable does not exist"));
                 }
             }
 
-            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + args.ClientId,
-                rpcDatas.Where(
-                a => !mqttRpcResult.Any(b => b.Key == a.Key)).ToDictionary(a => a.Key, a => a.Value.ToString())).ConfigureAwait(false);
+            Dictionary<string, Dictionary<string, string>> writeData = new();
+            foreach (var item in rpcDatas)
+            {
+                writeData.Add(item.Key, new());
 
-            mqttRpcResult.AddRange(result);
+                foreach (var kv in item.Value)
+                {
+
+                    if (!mqttRpcResult[item.Key].ContainsKey(kv.Key))
+                    {
+                        writeData[item.Key].Add(kv.Key, kv.Value?.ToString());
+                    }
+                }
+            }
+
+
+            var result = await GlobalData.RpcService.InvokeDeviceMethodAsync(ToString() + "-" + args.ClientId,
+                writeData).ConfigureAwait(false);
+
+            foreach (var dictKv in result)
+            {
+                foreach (var item in dictKv.Value)
+                {
+                    mqttRpcResult[dictKv.Key].TryAdd(item.Key, item.Value);
+                }
+
+            }
         }
         catch (Exception ex)
         {
@@ -285,7 +318,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
         if (!_driverPropertys.DeviceRpcEnable)
             return;
 
-        Dictionary<string, JToken> rpcDatas = null;
+        Dictionary<string, Dictionary<string, JToken>> rpcDatas = new();
 
         //适配 ThingsBoardRp
         if (args.ApplicationMessage.Topic == ThingsBoardRpcTopic)
@@ -293,11 +326,12 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
             var thingsBoardRpcData = Encoding.UTF8.GetString(payload).FromJsonNetString<ThingsBoardRpcData>();
             if (thingsBoardRpcData == null)
                 return;
-            rpcDatas = thingsBoardRpcData.data.@params.ToDictionary(a => a.Key, a => JToken.Parse(a.Value));
+            rpcDatas.Add(thingsBoardRpcData.device, thingsBoardRpcData.data.@params.ToDictionary(a => a.Key, a => JToken.Parse(a.Value)));
+
             if (rpcDatas == null)
                 return;
 
-            Dictionary<string, OperResult> mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
+            var mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
             try
             {
                 var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);
@@ -306,8 +340,8 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
                     ThingsBoardRpcResponseData thingsBoardRpcResponseData = new();
                     thingsBoardRpcResponseData.device = thingsBoardRpcData.device;
                     thingsBoardRpcResponseData.id = thingsBoardRpcData.data.id;
-                    thingsBoardRpcResponseData.data.success = mqttRpcResult.All(a => a.Value.IsSuccess);
-                    thingsBoardRpcResponseData.data.message = mqttRpcResult.Select(a => a.Value.ErrorMessage).ToJsonNetString();
+                    thingsBoardRpcResponseData.data.success = mqttRpcResult[thingsBoardRpcResponseData.device].All(b => b.Value.IsSuccess);
+                    thingsBoardRpcResponseData.data.message = mqttRpcResult[thingsBoardRpcResponseData.device].Select(a => a.Value.ErrorMessage).ToJsonNetString();
 
                     var variableMessage = new MqttApplicationMessageBuilder()
 .WithTopic($"{args.ApplicationMessage.Topic}")
@@ -326,11 +360,11 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableDa
             var t = string.Format(null, RpcTopic, _driverPropertys.RpcWriteTopic);
             if (MqttTopicFilterComparer.Compare(args.ApplicationMessage.Topic, t) != MqttTopicFilterCompareResult.IsMatch)
                 return;
-            rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, JToken>>();
+            rpcDatas = Encoding.UTF8.GetString(payload).FromJsonNetString<Dictionary<string, Dictionary<string, JToken>>>();
             if (rpcDatas == null)
                 return;
 
-            Dictionary<string, OperResult> mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
+            var mqttRpcResult = await GetResult(args, rpcDatas).ConfigureAwait(false);
             try
             {
                 var isConnect = await TryMqttClientAsync(CancellationToken.None).ConfigureAwait(false);

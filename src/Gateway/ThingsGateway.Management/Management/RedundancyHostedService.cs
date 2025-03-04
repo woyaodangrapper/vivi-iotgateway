@@ -13,7 +13,6 @@ using Mapster;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife;
 
@@ -23,9 +22,7 @@ using TouchSocket.Dmtp.Rpc;
 using TouchSocket.Rpc;
 using TouchSocket.Sockets;
 
-
 namespace ThingsGateway.Management;
-
 
 internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHostedService
 {
@@ -158,30 +155,11 @@ internal sealed class RedundancyHostedService : BackgroundService, IRedundancyHo
                 // 如果 online 为 true，表示设备在线
                 if (online)
                 {
-                    var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Select(a => a.Value).Where(a => a.IsCollect == true).Adapt<List<DeviceDataWithValue>>();
-                    var variableRuntimes = GlobalData.ReadOnlyVariables.Select(a => a.Value).Adapt<List<VariableDataWithValue>>();
-                    var variableRuntimes1 = variableRuntimes.ChunkBetter(80000);
-                    var variableRuntimes1Count = variableRuntimes1.Count();
-                    int itemsPerList = (int)Math.Ceiling((double)deviceRunTimes.Count / variableRuntimes1Count);
-                    var deviceRunTimes1 = deviceRunTimes.ChunkBetter(itemsPerList, true).ToList();
+                    var deviceRunTimes = GlobalData.ReadOnlyIdDevices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).Adapt<List<DeviceDataWithValue>>();
 
-                    int i = 0;
-                    List<Task> tasks = new List<Task>();
-                    foreach (var item in variableRuntimes1)
-                    {
-                        List<DeviceDataWithValue> devices = new();
-                        if (deviceRunTimes1.Count >= i + 1)
-                        {
-                            devices = deviceRunTimes1[i].ToList();
-                        }
-                        var variables = item.ToList();
-                        // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
-                        Task task = tcpDmtpService.Clients.FirstOrDefault().GetDmtpRpcActor().InvokeAsync(
-                                         nameof(ReverseCallbackServer.UpdateGatewayData), null, waitInvoke, devices, variables);
-                        tasks.Add(task);
-                        i++;
-                    }
-                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                    // 将 GlobalData.CollectDevices 和 GlobalData.Variables 同步到从站
+                    await tcpDmtpService.Clients.FirstOrDefault().GetDmtpRpcActor().InvokeAsync(
+                                     nameof(ReverseCallbackServer.UpdateGatewayData), null, waitInvoke, deviceRunTimes).ConfigureAwait(false);
                     _log?.LogTrace($"Update StandbyStation data success");
                 }
             }

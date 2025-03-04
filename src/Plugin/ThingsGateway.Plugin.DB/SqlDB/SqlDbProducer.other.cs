@@ -29,7 +29,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<SQLHistoryValue>> item, CancellationToken cancellationToken)
     {
-        return UpdateVarModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
     protected override void VariableTimeInterval(VariableRuntime variableRuntime, VariableBasicData variable)
     {

@@ -30,4 +30,7 @@ public class DeviceDataWithValue
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public string LastErrorMessage { get; set; }
+
+    /// <inheritdoc cref="DeviceRuntime.ReadOnlyVariableRuntimes"/>
+    public Dictionary<string, VariableDataWithValue> ReadOnlyVariableRuntimes { get; set; }
 }

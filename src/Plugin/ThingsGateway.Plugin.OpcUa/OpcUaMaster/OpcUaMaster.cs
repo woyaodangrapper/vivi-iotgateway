@@ -155,7 +155,7 @@ public class OpcUaMaster : CollectBase
                         {
                             await _plc.AddSubscriptionAsync(variableSourceRead.RegisterAddress, variableSourceRead.VariableRuntimes.Where(a => !a.RegisterAddress.IsNullOrEmpty()).Select(a => a.RegisterAddress!).ToHashSet().ToArray(), _plc.OpcUaProperty.LoadType, cancellationToken).ConfigureAwait(false);
 
-                            LogMessage?.LogInformation($"AddSubscription {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
+                            LogMessage?.LogInformation($"AddSubscription index  {CurrentDevice.VariableSourceReads.IndexOf(variableSourceRead)}  done");
 
                         }
                     }
@@ -309,7 +309,7 @@ public class OpcUaMaster : CollectBase
         }
         finally
         {
-            VariableAddresDicts = VariableRuntimes.Select(a => a.Value).Where(it => !it.RegisterAddress.IsNullOrEmpty()).GroupBy(a => a.RegisterAddress).ToDictionary(a => a.Key!, b => b.ToList());
+            VariableAddresDicts = IdVariableRuntimes.Select(a => a.Value).Where(it => !it.RegisterAddress.IsNullOrEmpty()).GroupBy(a => a.RegisterAddress).ToDictionary(a => a.Key!, b => b.ToList());
             await _plc.ConnectAsync(default).ConfigureAwait(false);
         }
 

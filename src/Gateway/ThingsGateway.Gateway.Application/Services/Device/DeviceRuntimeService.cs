@@ -58,7 +58,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                 }
                 if (deviceRuntime != null)
                 {
-                    deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                    deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
                 }
             }
 
@@ -100,7 +100,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             foreach (var deviceRuntime in deviceRuntimes)
             {
                 //也需要删除变量
-                deviceRuntime.VariableRuntimes.ParallelForEach(a =>
+                deviceRuntime.IdVariableRuntimes.ParallelForEach(a =>
                 {
                     a.Value.Dispose();
                 });
@@ -165,7 +165,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                 }
                 if (deviceRuntime != null)
                 {
-                    deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                    deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
                 }
             }
 
@@ -213,7 +213,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                         await deviceThreadManage.RemoveDeviceAsync(deviceRuntime.Id).ConfigureAwait(false);
                 }
                 deviceRuntime.Dispose();
-                deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
             }
 
             if (GlobalData.Channels.TryGetValue(newDeviceRuntime.ChannelId, out var channelRuntime))

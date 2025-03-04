@@ -64,10 +64,6 @@ public static class GlobalData
     /// </summary>
     public static event VariableAlarmEventHandler? AlarmChangedEvent;
 
-    /// <summary>
-    /// 只读的通道字典，提供对通道的只读访问
-    /// </summary>
-    public static IReadOnlyDictionary<long, ChannelRuntime> ReadOnlyChannels => Channels;
 
     public static async Task<IEnumerable<KeyValuePair<long, ChannelRuntime>>> GetCurrentUserChannels()
     {
@@ -87,22 +83,19 @@ public static class GlobalData
         return IdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
     }
-    public static async Task<IEnumerable<KeyValuePair<string, VariableRuntime>>> GetCurrentUserVariables()
+
+    public static async Task<IEnumerable<KeyValuePair<long, AlarmVariable>>> GetCurrentUserRealAlarmVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return Variables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+        return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
     }
-    public static async Task<IEnumerable<KeyValuePair<string, VariableRuntime>>> GetCurrentUserRealAlarmVariables()
-    {
-        var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return RealAlarmVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
-    }
+
+
     public static async Task<IEnumerable<KeyValuePair<long, VariableRuntime>>> GetCurrentUserAlarmEnableVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
-        return AlarmEnableVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
+        return AlarmEnableIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
           .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
     }
 
@@ -130,15 +123,17 @@ public static class GlobalData
         return Channels.Where(a => a.Value.Enable);
     }
 
-    /// <summary>
-    /// 只读的设备字典，提供对设备的只读访问
-    /// </summary>
-    public static IReadOnlyDictionary<long, DeviceRuntime> ReadOnlyIdDevices => IdDevices;
-
-    /// <summary>
-    /// 只读的设备字典，提供对设备的只读访问
-    /// </summary>
-    public static IReadOnlyDictionary<string, DeviceRuntime> ReadOnlyDevices => Devices;
+    public static VariableRuntime GetVariable(string deviceName, string variableName)
+    {
+        if (Devices.TryGetValue(deviceName, out var device))
+        {
+            if (device.VariableRuntimes.TryGetValue(variableName, out var variable))
+            {
+                return variable;
+            }
+        }
+        return null;
+    }
 
     /// <summary>
     /// 只读的通道字典，提供对通道的只读访问
@@ -168,28 +163,10 @@ public static class GlobalData
         return false;
     }
 
-    
-    /// <summary>
-    /// 报警列表
-    /// </summary>
-    public static IReadOnlyDictionary<long, VariableRuntime> ReadOnlyAlarmEnableVariables => AlarmEnableVariables;
 
-    /// <summary>
-    /// 实时报警列表
-    /// </summary>
-    public static IReadOnlyDictionary<string, VariableRuntime> ReadOnlyRealAlarmVariables => RealAlarmVariables;
-    /// <summary>
-    /// 只读的变量字典
-    /// </summary>
-    public static IReadOnlyDictionary<string, VariableRuntime> ReadOnlyVariables => Variables;
-    /// <summary>
-    /// 只读的变量字典
-    /// </summary>
-    public static IReadOnlyDictionary<long, VariableRuntime> ReadOnlyIdVariables => IdVariables;
-
-    public static IEnumerable<KeyValuePair<string, VariableRuntime>> GetEnableVariables()
+    public static IEnumerable<KeyValuePair<long, VariableRuntime>> GetEnableVariables()
     {
-        return Variables.Where(a => a.Value.Enable);
+        return IdDevices.SelectMany(a => a.Value.IdVariableRuntimes).Where(a => a.Value.Enable);
     }
 
 
@@ -407,12 +384,28 @@ public static class GlobalData
     public static bool StartBusinessChannelEnable => GatewayRedundantSerivce?.StartBusinessChannelEnable ?? true;
     #endregion
 
-
+    /// <summary>
+    /// 只读的通道字典，提供对通道的只读访问
+    /// </summary>
+    public static IReadOnlyDictionary<long, ChannelRuntime> ReadOnlyChannels => Channels;
 
     /// <summary>
     /// 内部使用的通道字典，用于存储通道对象
     /// </summary>
     internal static ConcurrentDictionary<long, ChannelRuntime> Channels { get; } = new();
+
+
+
+    /// <summary>
+    /// 只读的设备字典，提供对设备的只读访问
+    /// </summary>
+    public static IReadOnlyDictionary<long, DeviceRuntime> ReadOnlyIdDevices => IdDevices;
+
+    /// <summary>
+    /// 只读的设备字典，提供对设备的只读访问
+    /// </summary>
+    public static IReadOnlyDictionary<string, DeviceRuntime> ReadOnlyDevices => Devices;
+
 
     /// <summary>
     /// 内部使用的设备字典，用于存储设备对象
@@ -422,24 +415,36 @@ public static class GlobalData
     /// 内部使用的设备字典，用于存储设备对象
     /// </summary>
     internal static ConcurrentDictionary<long, DeviceRuntime> IdDevices { get; } = new();
+
+
+    /// <summary>
+    /// 内部使用的报警配置变量字典
+    /// </summary>
+    internal static ConcurrentDictionary<long, VariableRuntime> AlarmEnableIdVariables { get; } = new();
+
+    /// <summary>
+    /// 内部使用的报警配置变量字典
+    /// </summary>
+    internal static ConcurrentDictionary<long, AlarmVariable> RealAlarmIdVariables { get; } = new();
+
     /// <summary>
     /// 内部使用的变量字典，用于存储变量对象
     /// </summary>
     internal static ConcurrentDictionary<long, VariableRuntime> IdVariables { get; } = new();
-    /// <summary>
-    /// 内部使用的变量字典，用于存储变量对象
-    /// </summary>
-    internal static ConcurrentDictionary<string, VariableRuntime> Variables { get; } = new();
-    /// <summary>
-    /// 内部使用的报警配置变量字典
-    /// </summary>
-    internal static ConcurrentDictionary<long, VariableRuntime> AlarmEnableVariables { get; } = new();
 
     /// <summary>
-    /// 内部使用的报警配置变量字典
+    /// 实时报警列表
     /// </summary>
-    internal static ConcurrentDictionary<string, VariableRuntime> RealAlarmVariables { get; } = new();
+    public static IReadOnlyDictionary<long, AlarmVariable> ReadOnlyRealAlarmIdVariables => RealAlarmIdVariables;
 
+    /// <summary>
+    /// 只读的变量字典
+    /// </summary>
+    public static IReadOnlyDictionary<long, VariableRuntime> ReadOnlyIdVariables => IdVariables;
+
+
+
+    #region 变化事件
     /// <summary>
     /// 报警状态变化处理方法，用于处理报警状态变化时的逻辑
     /// </summary>
@@ -490,4 +495,6 @@ public static class GlobalData
             VariableCollectChangeEvent.Invoke(variableRuntime);
         }
     }
+
+    #endregion
 }

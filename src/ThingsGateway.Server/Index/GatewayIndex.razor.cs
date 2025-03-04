@@ -199,7 +199,7 @@ public partial class GatewayIndex : IDisposable
         {
             return new TimelineItem()
             {
-                Content = $"{a.OperateObject}  [Source]  {a.OperateSource} ",
+                Content = $"{a.OperateDevice} : {a.OperateObject}  [Source]  {a.OperateSource} ",
 
                 Description = a.LogTime.ToDefaultDateTimeFormat()
             };

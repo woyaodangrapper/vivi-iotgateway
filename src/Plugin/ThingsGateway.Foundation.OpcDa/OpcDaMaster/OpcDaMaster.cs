@@ -454,7 +454,7 @@ public class OpcDaMaster : IDisposable
                 checkTimer.Enabled = false;
                 checkTimer.Stop();
             }
-
+            ItemDicts.Clear();
             try
             {
                 m_server?.Dispose();

@@ -26,7 +26,7 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
 
     protected override ValueTask<OperResult> UpdateVarModel(IEnumerable<CacheDBItem<QuestDBHistoryValue>> item, CancellationToken cancellationToken)
     {
-        return UpdateVarModel(item.Select(a => a.Value), cancellationToken);
+        return UpdateVarModel(item.Select(a => a.Value).OrderBy(a => a.Id), cancellationToken);
     }
     protected override void VariableTimeInterval(VariableRuntime variableRuntime, VariableBasicData variable)
     {

@@ -109,12 +109,12 @@ public class ModbusSlave : BusinessBase
     {
         await base.AfterVariablesChangedAsync().ConfigureAwait(false);
         _modbusVariableQueue.Clear();
-        VariableRuntimes.ForEach(a =>
+        IdVariableRuntimes.ForEach(a =>
         {
             VariableValueChange(a.Value, null);
         });
 
-        ModbusVariables = VariableRuntimes.ToDictionary(a =>
+        ModbusVariables = IdVariableRuntimes.ToDictionary(a =>
         {
             ModbusAddress address = ModbusAddress.ParseFrom(
                 a.Value.GetPropertyValue(DeviceId,
@@ -234,7 +234,7 @@ public class ModbusSlave : BusinessBase
     }
 
     /// <inheritdoc/>
-    private void VariableValueChange(VariableRuntime variableRuntime, VariableData variableData)
+    private void VariableValueChange(VariableRuntime variableRuntime, VariableBasicData variableData)
     {
         if (CurrentDevice.Pause == true)
             return;

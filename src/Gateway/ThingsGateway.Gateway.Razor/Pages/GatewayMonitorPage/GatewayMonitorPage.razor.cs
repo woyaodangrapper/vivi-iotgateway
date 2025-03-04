@@ -28,11 +28,11 @@ public partial class GatewayMonitorPage
             ShowChannelRuntime = channelRuntime;
             if (channelRuntime.IsCollect == true)
             {
-                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.ReadVariableRuntimes.Select(a => a.Value));
+                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.ReadOnlyIdVariableRuntimes.Select(a => a.Value));
             }
             else
             {
-                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.Driver?.VariableRuntimes?.Select(a => a.Value)).Where(a => a != null);
+                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.Driver?.IdVariableRuntimes?.Select(a => a.Value)).Where(a => a != null);
             }
 
         }
@@ -41,11 +41,11 @@ public partial class GatewayMonitorPage
             ShowDeviceRuntime = deviceRuntime;
             if (deviceRuntime.IsCollect == true)
             {
-                VariableRuntimes = deviceRuntime.ReadVariableRuntimes.Select(a => a.Value);
+                VariableRuntimes = deviceRuntime.ReadOnlyIdVariableRuntimes.Select(a => a.Value);
             }
             else
             {
-                VariableRuntimes = deviceRuntime.Driver?.VariableRuntimes?
+                VariableRuntimes = deviceRuntime.Driver?.IdVariableRuntimes?
 .Select(a => a.Value) ?? Enumerable.Empty<VariableRuntime>();
             }
 
@@ -56,12 +56,12 @@ public partial class GatewayMonitorPage
             if (pluginType == PluginTypeEnum.Collect)
             {
                 var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                VariableRuntimes = channels.Where(a => a.Value.PluginName == pluginName).SelectMany(a => a.Value.ReadDeviceRuntimes).SelectMany(a => a.Value.ReadVariableRuntimes).Select(a => a.Value);
+                VariableRuntimes = channels.Where(a => a.Value.PluginName == pluginName).SelectMany(a => a.Value.ReadDeviceRuntimes).SelectMany(a => a.Value.ReadOnlyIdVariableRuntimes).Select(a => a.Value);
             }
             else
             {
                 var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                VariableRuntimes = channels.Where(a => a.Value.PluginName == pluginName).SelectMany(a => a.Value.ReadDeviceRuntimes).SelectMany(a => a.Value.Driver?.VariableRuntimes).Select(a => a.Value).Where(a => a != null);
+                VariableRuntimes = channels.Where(a => a.Value.PluginName == pluginName).SelectMany(a => a.Value.ReadDeviceRuntimes).SelectMany(a => a.Value.Driver?.IdVariableRuntimes).Select(a => a.Value).Where(a => a != null);
             }
         }
         else

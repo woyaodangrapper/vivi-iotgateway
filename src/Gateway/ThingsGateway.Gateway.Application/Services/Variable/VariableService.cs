@@ -62,7 +62,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         List<Channel> newChannels = new();
         List<Device> newDevices = new();
         List<Variable> newVariables = new();
-        var addressNum = 1;
         // 计算每个设备分配的默认变量数
         var groupVariableCount = (int)Math.Ceiling((decimal)variableCount / deviceCount);
 
@@ -101,13 +100,15 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 ? variableCount - (deviceCount - 1) * groupVariableCount // 最后一个设备分配剩余的变量
                 : groupVariableCount;
 
+            var addressNum = 1;
+
             for (int i1 = 0; i1 < currentGroupVariableCount; i1++)
             {
                 if (addressNum > 65535) addressNum = 1;
                 var address = $"4{addressNum}";
                 addressNum++;
                 var id = CommonUtils.GetSingleId();
-                var name = $"modbusVariable{address}_{id}";
+                var name = $"modbus{address}";
                 Variable variable = new Variable();
                 variable.DataType = DataTypeEnum.Int16;
                 variable.Name = name;
@@ -177,6 +178,38 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             };
             newDevices.Add(mqttDevice);
         }
+
+
+        Channel opcuaChannel = new Channel();
+        Device opcuaDevice = new Device();
+
+        {
+            var id = CommonUtils.GetSingleId();
+            var name = $"opcuaChannel{id}";
+            opcuaChannel.ChannelType = ChannelTypeEnum.Other;
+            opcuaChannel.Name = name;
+            opcuaChannel.Id = id;
+            opcuaChannel.CreateUserId = UserManager.UserId;
+            opcuaChannel.CreateOrgId = UserManager.OrgId;
+            opcuaChannel.PluginName = "ThingsGateway.Plugin.OpcUa.OpcUaServer";
+            newChannels.Add(opcuaChannel);
+        }
+        {
+            var id = CommonUtils.GetSingleId();
+            var name = $"opcuaDevice{id}";
+            opcuaDevice.Name = name;
+            opcuaDevice.Id = id;
+            opcuaDevice.CreateUserId = UserManager.UserId;
+            opcuaDevice.CreateOrgId = UserManager.OrgId;
+            opcuaDevice.ChannelId = opcuaChannel.Id;
+            opcuaDevice.IntervalTime = "1000";
+            opcuaDevice.DevicePropertys = new Dictionary<string, string>
+            {
+              {"IsAllVariable", "true"}
+            };
+            newDevices.Add(opcuaDevice);
+        }
+
         using var db = GetDB();
 
         var result = await db.UseTranAsync(async () =>
@@ -295,12 +328,12 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         using var db = GetDB();
         if (devId == null)
         {
-            var deviceVariables = await db.Queryable<Variable>().Where(a => a.DeviceId > 0).ToListAsync().ConfigureAwait(false);
+            var deviceVariables = await db.Queryable<Variable>().OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
             return deviceVariables;
         }
         else
         {
-            var deviceVariables = await db.Queryable<Variable>().Where(a => a.DeviceId == devId).ToListAsync().ConfigureAwait(false);
+            var deviceVariables = await db.Queryable<Variable>().Where(a => a.DeviceId == devId).OrderBy(a => a.Id).ToListAsync().ConfigureAwait(false);
             return deviceVariables;
         }
     }
@@ -458,14 +491,14 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     //插件属性
                     //单个设备的行数据
                     Dictionary<string, object> driverInfo = new();
-                    var has = deviceDicts.TryGetValue(item.Key, out var businessDevice);
-                    if (!has)
+                    if (!(deviceDicts.TryGetValue(item.Key, out var businessDevice) && deviceDicts.TryGetValue(variable.DeviceId, out var collectDevice)))
                         continue;
 
                     channelDicts.TryGetValue(businessDevice.ChannelId, out var channel);
 
                     //没有包含设备名称，手动插入
-                    driverInfo.TryAdd(ExportString.DeviceName, businessDevice.Name);
+                    driverInfo.TryAdd(ExportString.DeviceName, collectDevice.Name);
+                    driverInfo.TryAdd(ExportString.BusinessDeviceName, businessDevice.Name);
                     driverInfo.TryAdd(ExportString.VariableName, variable.Name);
 
                     var propDict = item.Value;
@@ -588,8 +621,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
         {
             if (item.Key == ExportString.VariableName)
             {
-                var variableImports = ((ImportPreviewOutput<Variable>)item.Value).Data;
-                variables = new List<Variable>(variableImports.Values);
+                var variableImports = ((ImportPreviewOutput<Dictionary<string, Variable>>)item.Value).Data;
+                variables = variableImports.SelectMany(a => a.Value.Select(a => a.Value)).ToList();
                 break;
             }
         }
@@ -605,27 +638,21 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
     private static readonly WaitLock _cacheLock = new();
 
-    private async Task<Dictionary<string, VariableImportData>> GetVariableImportData()
+    private async Task<Dictionary<long, Dictionary<string, DeviecIdVariableImportData>>> GetVariableImportData()
     {
         var key = ThingsGatewayCacheConst.Cache_Variable;
-        var datas = App.CacheService.Get<Dictionary<string, VariableImportData>>(key);
+        var datas = App.CacheService.Get<Dictionary<long, Dictionary<string, DeviecIdVariableImportData>>>(key);
 
         if (datas == null)
         {
             try
             {
                 await _cacheLock.WaitAsync().ConfigureAwait(false);
-                datas = App.CacheService.Get<Dictionary<string, VariableImportData>>(key);
+                datas = App.CacheService.Get<Dictionary<long, Dictionary<string, DeviecIdVariableImportData>>>(key);
                 if (datas == null)
                 {
                     using var db = GetDB();
-                    datas = (await db.Queryable<Variable>().Select(it => new VariableImportData()
-                    {
-                        Id = it.Id,
-                        Name = it.Name,
-                        CreateOrgId = it.CreateOrgId,
-                        CreateUserId = it.CreateUserId
-                    }).ToListAsync().ConfigureAwait(false)).ToDictionary(a => a.Name);
+                    datas = (await db.Queryable<Variable>().Select<DeviecIdVariableImportData>().ToListAsync().ConfigureAwait(false)).GroupBy(a => a.DeviceId).ToDictionary(a => a.Key, a => a.ToDictionary(a => a.Name));
 
                     App.CacheService.Set(key, datas);
                 }
@@ -642,14 +669,15 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
     {
         return GetVariableImportData();
     }
-
-    private sealed class VariableImportData
+    private sealed class DeviecIdVariableImportData
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public long DeviceId { get; set; }
         public long CreateOrgId { get; set; }
         public long CreateUserId { get; set; }
     }
+
     public async Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile)
     {
         // 上传文件并获取文件路径
@@ -668,7 +696,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
             Dictionary<string, ImportPreviewOutputBase> ImportPreviews = new();
 
             // 设备页导入预览输出
-            ImportPreviewOutput<Variable> deviceImportPreview = new();
+            ImportPreviewOutput<Dictionary<string, Variable>> deviceImportPreview = new();
 
             // 获取驱动插件的全名和名称的字典
             var driverPluginFullNameDict = _pluginService.GetList().ToDictionary(a => a.FullName);
@@ -685,7 +713,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                 if (sheetName == ExportString.VariableName)
                 {
                     int row = 0;
-                    ImportPreviewOutput<Variable> importPreviewOutput = new();
+                    ImportPreviewOutput<Dictionary<string, Variable>> importPreviewOutput = new();
                     ImportPreviews.Add(sheetName, importPreviewOutput);
                     deviceImportPreview = importPreviewOutput;
 
@@ -746,7 +774,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                                 return;
                             }
 
-                            if (dbVariableDicts.TryGetValue(variable.Name, out var dbvar1))
+                            if (dbVariableDicts.TryGetValue(variable.DeviceId, out var dbvar1s) && dbvar1s.TryGetValue(variable.Name, out var dbvar1))
                             {
                                 variable.Id = dbvar1.Id;
                                 variable.CreateOrgId = dbvar1.CreateOrgId;
@@ -787,7 +815,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     }
 
                     // 将变量列表转换为字典，并赋值给导入预览输出对象的 Data 属性
-                    importPreviewOutput.Data = variables.OrderBy(a => a.Row).ToDictionary(a => a.Name);
+                    importPreviewOutput.Data = variables.OrderBy(a => a.Row).GroupBy(a => a.DeviceId.ToString()).ToDictionary(a => a.Key, b => b.ToDictionary(a => a.Name));
                 }
 
                 // 其他工作表处理
@@ -861,11 +889,13 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
                                 // 转化插件名称和变量名称
                                 item.TryGetValue(ExportString.VariableName, out var variableNameObj);
-                                item.TryGetValue(ExportString.DeviceName, out var businessDevName);
+                                item.TryGetValue(ExportString.BusinessDeviceName, out var businessDevName);
+                                item.TryGetValue(ExportString.DeviceName, out var collectDevName);
                                 deviceDicts.TryGetValue(businessDevName?.ToString(), out var businessDevice);
+                                deviceDicts.TryGetValue(collectDevName?.ToString(), out var collectDevice);
 
                                 // 如果设备名称或变量名称为空，或者找不到对应的设备，则添加错误信息到导入预览结果并返回
-                                if (businessDevName == null || businessDevice == null)
+                                if (businessDevName == null || businessDevice == null || collectDevName == null || collectDevice == null)
                                 {
                                     importPreviewOutput.HasError = true;
                                     importPreviewOutput.Results.Add((Interlocked.Add(ref row, 1), false, Localizer["DeviceNotNull"]));
@@ -913,10 +943,8 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
 
                                 // 获取变量名称并检查是否存在于设备导入预览数据中
                                 var variableName = variableNameObj?.ToString();
-                                var has = deviceImportPreview.Data.TryGetValue(variableName, out var deviceVariable);
-
                                 // 如果存在，则更新变量属性字典，并添加成功信息到导入预览结果；否则，添加错误信息到导入预览结果并返回
-                                if (has)
+                                if (deviceImportPreview.Data.TryGetValue(collectDevice.Id.ToString(), out var deviceVariables) && deviceVariables.TryGetValue(variableName, out var deviceVariable))
                                 {
                                     deviceVariable.VariablePropertys ??= new();
                                     deviceVariable.VariablePropertys?.AddOrUpdate(businessDevice.Id, dependencyProperties);

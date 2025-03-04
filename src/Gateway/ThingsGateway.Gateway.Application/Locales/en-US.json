@@ -223,6 +223,7 @@
     "LogTime": "LogTime",
     "OperateSource": "OperationSource",
     "OperateObject": "OperationObject",
+    "OperateDevice": "OperateDevice",
     "OperateMethod": "RPCMethod",
     "IsSuccess": "OperationResult",
     "ParamJson": "RequestParameters",
@@ -406,6 +407,7 @@
   "ThingsGateway.Gateway.Application.RpcLogPageInput": {
     "SearchDate": "SearchDate",
     "OperateObject": "OperateObject",
+    "OperateDevice": "OperateDevice",
     "OperateSource": "OperateSource"
   },
   "ThingsGateway.Gateway.Application.BackendLogPageInput": {
@@ -415,6 +417,7 @@
   },
   "ThingsGateway.Gateway.Application.RpcService": {
     "VariableNotNull": "{0} variable does not exist",
+    "DeviceNotNull": "Device name does not exist",
     "VariableReadOnly": "{0} variable is read-only",
     "VariableWriteDisable": "{0} variable is not allowed to write",
     "DriverNotNull": "System error, corresponding collection device does not exist, please try again later",
@@ -425,7 +428,8 @@
     "VariableName": "Variable",
     "RedundantDeviceName": "Redundant Device",
     "ChannelName": "Channel",
-    "DeviceName": "Device"
+    "DeviceName": "Device",
+    "BusinessDeviceName": "BusinessDevice"
   },
   "ThingsGateway.Gateway.Application.ProtectTypeEnum": {
     "ReadOnly": "ReadOnly",

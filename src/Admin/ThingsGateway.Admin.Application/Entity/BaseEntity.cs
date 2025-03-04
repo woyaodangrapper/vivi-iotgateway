@@ -125,7 +125,7 @@ public abstract class BaseEntity : PrimaryKeyEntity, IBaseEntity
     [SugarColumn(ColumnDescription = "排序码", IsNullable = true)]
     [AutoGenerateColumn(Visible = false, DefaultSort = true, Sortable = true, DefaultSortOrder = SortOrder.Asc)]
     [IgnoreExcel]
-    public int? SortCode { get; set; }
+    public virtual int? SortCode { get; set; }
 }
 
 public interface IBaseDataEntity

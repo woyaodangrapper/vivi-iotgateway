@@ -274,7 +274,7 @@ public partial class OpcDaImportVariable
             var id = Admin.Application.CommonUtils.GetSingleId();
             return new Variable()
             {
-                Name = a.Name + "-" + id,
+                Name = a.Name,
                 RegisterAddress = a.ItemName,
                 DeviceId = device.Id,
                 Enable = true,

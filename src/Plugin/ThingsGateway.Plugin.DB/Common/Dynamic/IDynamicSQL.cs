@@ -8,8 +8,6 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.Logging;
-
 using SqlSugar;
 
 namespace ThingsGateway.Plugin.DB;

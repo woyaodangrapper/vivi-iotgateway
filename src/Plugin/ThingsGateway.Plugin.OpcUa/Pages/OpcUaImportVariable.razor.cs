@@ -312,7 +312,7 @@ public partial class OpcUaImportVariable
 
                  variables.Add(new Variable()
                  {
-                     Name = a.DisplayName.Text + "-" + id,
+                     Name = a.NodeId.ToString().Replace('.', '/'),
                      RegisterAddress = a.NodeId.ToString(),
                      DeviceId = device.Id,
                      DataType = dataTypeEnum,

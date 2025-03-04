@@ -36,6 +36,13 @@ public class RpcLog : PrimaryIdEntity
     public string OperateSource { get; set; }
 
     /// <summary>
+    /// 操作设备
+    ///</summary>
+    [SugarColumn(ColumnDescription = "操作设备", IsNullable = false)]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public string OperateDevice { get; set; }
+
+    /// <summary>
     /// 操作对象
     ///</summary>
     [SugarColumn(ColumnDescription = "操作对象", IsNullable = false)]

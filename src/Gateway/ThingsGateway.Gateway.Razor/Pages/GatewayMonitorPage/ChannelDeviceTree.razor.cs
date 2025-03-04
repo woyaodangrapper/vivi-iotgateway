@@ -1055,25 +1055,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     private TreeViewItem<ChannelDeviceTreeItem> BusinessTreeViewItem;
     protected override async Task OnInitializedAsync()
     {
-        _ = Task.Run(async () =>
-        {
-            while (!Disposed)
-            {
-                try
-                {
-                    await OnClickSearch(SearchText);
-                    await InvokeAsync(StateHasChanged);
-                }
-                catch
-                {
 
-                }
-                finally
-                {
-                    await Task.Delay(5000);
-                }
-            }
-        });
 
         BusinessTreeViewItem = new TreeViewItem<ChannelDeviceTreeItem>(UnknownItem)
         {
@@ -1127,6 +1109,28 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         context = ExecutionContext.Capture();
         ChannelRuntimeDispatchService.Subscribe(Refresh);
         DeviceRuntimeDispatchService.Subscribe(Refresh);
+
+
+        _ = Task.Run(async () =>
+        {
+            while (!Disposed)
+            {
+                try
+                {
+                    await OnClickSearch(SearchText);
+                    await InvokeAsync(StateHasChanged);
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    await Task.Delay(5000);
+                }
+            }
+        });
+
         await base.OnInitializedAsync();
     }
 

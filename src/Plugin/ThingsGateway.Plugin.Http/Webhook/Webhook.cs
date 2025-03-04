@@ -13,7 +13,7 @@ namespace ThingsGateway.Plugin.Webhook;
 /// <summary>
 /// WebhookClient,RPC方法适配mqttNet
 /// </summary>
-public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableData, DeviceBasicData, AlarmVariable>
+public partial class Webhook : BusinessBaseWithCacheIntervalScript<VariableBasicData, DeviceBasicData, AlarmVariable>
 {
     private readonly WebhookProperty _driverPropertys = new();
     private readonly WebhookVariableProperty _variablePropertys = new();

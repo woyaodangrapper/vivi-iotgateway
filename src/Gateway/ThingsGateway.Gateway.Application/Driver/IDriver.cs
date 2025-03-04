@@ -36,7 +36,7 @@ namespace ThingsGateway.Gateway.Application
         bool Pause { get; }
         string PluginDirectory { get; }
         List<IEditorItem> PluginPropertyEditorItems { get; }
-        Dictionary<string, VariableRuntime> VariableRuntimes { get; }
+        Dictionary<long, VariableRuntime> IdVariableRuntimes { get; }
         IDeviceThreadManage DeviceThreadManage { get; }
 
         bool IsConnected();

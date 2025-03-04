@@ -28,7 +28,7 @@ namespace ThingsGateway.Gateway.Application;
 [SugarTable("variable", TableDescription = "设备变量表")]
 [Tenant(SqlSugarConst.DB_Custom)]
 [SugarIndex("index_device", nameof(Variable.DeviceId), OrderByType.Asc)]
-[SugarIndex("unique_variable_name", nameof(Variable.Name), OrderByType.Asc, true)]
+[SugarIndex("unique_variable_name", nameof(Variable.Name), OrderByType.Asc, nameof(Variable.DeviceId), OrderByType.Asc, true)]
 public class Variable : BaseDataEntity, IValidatableObject
 {
     /// <summary>
@@ -47,6 +47,7 @@ public class Variable : BaseDataEntity, IValidatableObject
     [SugarColumn(ColumnDescription = "变量名称", IsNullable = false)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true, Order = 1)]
     [Required]
+    [RegularExpression(@"^[^.]*$", ErrorMessage = "The field {0} cannot contain a dot ('.')")]
     public virtual string Name { get; set; }
 
     /// <summary>

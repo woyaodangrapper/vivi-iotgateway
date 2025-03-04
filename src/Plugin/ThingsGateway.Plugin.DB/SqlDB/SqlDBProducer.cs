@@ -219,7 +219,7 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
             {
                 try
                 {
-                    var varList = VariableRuntimes.Select(a => a.Value).Adapt<List<SQLRealValue>>();
+                    var varList = IdVariableRuntimes.Select(a => a.Value).Adapt<List<SQLRealValue>>();
 
                     var result = await UpdateAsync(varList, cancellationToken).ConfigureAwait(false);
                     if (success != result.IsSuccess)

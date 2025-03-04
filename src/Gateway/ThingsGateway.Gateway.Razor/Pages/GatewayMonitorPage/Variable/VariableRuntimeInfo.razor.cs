@@ -79,10 +79,9 @@ public partial class VariableRuntimeInfo : IDisposable
 
     private Task<QueryData<VariableRuntime>> OnQueryAsync(QueryPageOptions options)
     {
-
         var data = Items
-            .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
-            .GetQueryData(options);
+                .WhereIf(!options.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(options.SearchText))
+                .GetQueryData(options);
         return Task.FromResult(data);
     }
 
