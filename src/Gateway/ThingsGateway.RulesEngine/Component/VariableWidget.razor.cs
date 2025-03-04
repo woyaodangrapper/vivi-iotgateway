@@ -33,12 +33,17 @@ namespace ThingsGateway.RulesEngine
             };
 
             var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            var items = devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Value.Name.Contains(option.SearchText)).Select(a => a.Value).Take(20)
-               .Select(a => new SelectedItem(a.Name, a.Name));
+            var items = devices.Where(a => a.Value.IsCollect == true).WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Value.Name.Contains(option.SearchText)).Select(a => a.Value).Take(20)
+               .Select(a => new SelectedItem(a.Name, a.Name)).ToList();
 
-            ret.TotalCount = items.Count();
+            ret.TotalCount = items.Count;
             ret.Items = items;
             return ret;
+        }
+
+        private Task OnSelectedItemChanged(SelectedItem item)
+        {
+            return InvokeAsync(StateHasChanged);
         }
         private async Task<QueryData<SelectedItem>> OnRedundantVariablesQuery(VirtualizeQueryOption option)
         {
@@ -51,12 +56,12 @@ namespace ThingsGateway.RulesEngine
                 IsSearch = !option.SearchText.IsNullOrWhiteSpace()
             };
 
-            if (GlobalData.ReadOnlyDevices.TryGetValue(Node.DeviceText, out var device))
+            if ((!Node.DeviceText.IsNullOrWhiteSpace()) && GlobalData.ReadOnlyDevices.TryGetValue(Node.DeviceText, out var device))
             {
                 var items = device.ReadOnlyIdVariableRuntimes.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Value.Name.Contains(option.SearchText)).Select(a => a.Value).Take(20)
-                   .Select(a => new SelectedItem(a.Name, a.Name));
+                   .Select(a => new SelectedItem(a.Name, a.Name)).ToList();
 
-                ret.TotalCount = items.Count();
+                ret.TotalCount = items.Count;
                 ret.Items = items;
                 return ret;
             }

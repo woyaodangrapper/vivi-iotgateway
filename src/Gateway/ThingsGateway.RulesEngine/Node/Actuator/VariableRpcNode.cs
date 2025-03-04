@@ -2,6 +2,8 @@
 
 using TouchSocket.Core;
 
+using static Dm.net.buffer.ByteArrayBuffer;
+
 namespace ThingsGateway.RulesEngine;
 
 [CategoryNode(Category = "Actuator", ImgUrl = "_content/ThingsGateway.RulesEngine/img/Rpc.svg", Desc = nameof(VariableRpcNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(VariableWidget))]
@@ -13,7 +15,7 @@ public class VariableRpcNode : VariableNode, IActuatorNode
 
     async Task<NodeOutput> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {
-        if (GlobalData.ReadOnlyDevices.TryGetValue(DeviceText, out var device))
+        if ((!DeviceText.IsNullOrWhiteSpace()) && GlobalData.ReadOnlyDevices.TryGetValue(DeviceText, out var device))
         {
             if (device.ReadOnlyVariableRuntimes.TryGetValue(Text, out var value))
             {

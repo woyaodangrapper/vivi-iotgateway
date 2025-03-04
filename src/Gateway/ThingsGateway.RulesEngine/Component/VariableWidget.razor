@@ -13,6 +13,7 @@
                         @bind-Value="@Node.DeviceText"
                         IsVirtualize
                         OnQueryAsync="OnRedundantDevicesQuery"
+                        OnSelectedItemChanged="OnSelectedItemChanged"
                         ShowSearch="true"
                 @onpointerdown:stopPropagation
                 @onpointerup:stopPropagation
