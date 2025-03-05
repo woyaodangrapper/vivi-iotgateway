@@ -19,7 +19,7 @@ namespace ThingsGateway.Admin.Application;
 public static class QueryPageOptionsExtensions
 {
 
-    public static IEnumerable<T> GetData<T>(this IEnumerable<T> datas, QueryPageOptions option, FilterKeyValueAction where = null)
+    public static IEnumerable<T> GetData<T>(this IEnumerable<T> datas, QueryPageOptions option, out int totalCount, FilterKeyValueAction where = null)
     {
         where ??= option.ToFilter();
         if (where.HasFilters())
@@ -39,6 +39,9 @@ public static class QueryPageOptionsExtensions
         {
             datas = datas.Sort(option.SortName, option.SortOrder);
         }
+
+        totalCount = datas.Count();
+
         if (option.IsPage)
         {
             datas = datas.Skip((option.PageIndex - 1) * option.PageItems).Take(option.PageItems);
@@ -89,8 +92,8 @@ public static class QueryPageOptionsExtensions
             IsAdvanceSearch = option.AdvanceSearches.Count > 0 || option.CustomerSearches.Count > 0,
             IsSearch = option.Searches.Count > 0
         };
-        var items = datas.GetData(option, where);
-        ret.TotalCount = datas.Count();
+        var items = datas.GetData(option, out var totalCount, where);
+        ret.TotalCount = totalCount;
         ret.Items = items.ToList();
         return ret;
     }
