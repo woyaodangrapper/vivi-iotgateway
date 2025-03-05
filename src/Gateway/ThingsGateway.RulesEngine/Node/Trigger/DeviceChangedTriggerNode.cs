@@ -11,7 +11,7 @@ namespace ThingsGateway.RulesEngine;
 [CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(DeviceChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(DeviceWidget))]
 public class DeviceChangedTriggerNode : TextNode, ITriggerNode, IDisposable
 {
-    public DeviceChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "DeviceChangedTriggerNode"; Placeholder = "DeviceChangedTriggerNode.Placeholder"; }
+    public DeviceChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "DeviceChangedTriggerNode"; Placeholder = "Device.Placeholder"; }
 
 
     private Func<NodeOutput, Task> Func { get; set; }

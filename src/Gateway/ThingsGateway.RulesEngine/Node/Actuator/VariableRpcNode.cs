@@ -11,7 +11,7 @@ public class VariableRpcNode : VariableNode, IActuatorNode
 {
 
     public VariableRpcNode(string id, Point? position = null) : base(id, position)
-    { Title = "VariableRpcNode"; Placeholder = "VariableRpcNode.Placeholder"; }
+    { Title = "VariableRpcNode"; }
 
     async Task<NodeOutput> IActuatorNode.ExecuteAsync(NodeInput input, CancellationToken cancellationToken)
     {

@@ -12,7 +12,7 @@ namespace ThingsGateway.RulesEngine;
 [CategoryNode(Category = "Trigger", ImgUrl = "_content/ThingsGateway.RulesEngine/img/ValueChanged.svg", Desc = nameof(AlarmChangedTriggerNode), LocalizerType = typeof(ThingsGateway.RulesEngine._Imports), WidgetType = typeof(VariableWidget))]
 public class AlarmChangedTriggerNode : VariableNode, ITriggerNode, IDisposable
 {
-    public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; Placeholder = "AlarmChangedTriggerNode.Placeholder"; }
+    public AlarmChangedTriggerNode(string id, Point? position = null) : base(id, position) { Title = "AlarmChangedTriggerNode"; }
 
 
     private Func<NodeOutput, Task> Func { get; set; }

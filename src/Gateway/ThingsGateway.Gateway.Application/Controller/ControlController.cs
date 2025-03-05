@@ -117,13 +117,14 @@ public class ControlController : ControllerBase
     /// </summary>
     [HttpPost("writeVariables")]
     [DisplayName("写入变量")]
-    public async Task<Dictionary<string, Dictionary<string, OperResult>>> WriteVariablesAsync(Dictionary<string, Dictionary<string, string>> deviceDatas)
+    public async Task<Dictionary<string, Dictionary<string, OperResult>>> WriteVariablesAsync([FromBody] Dictionary<string, Dictionary<string, string>> deviceDatas)
     {
         foreach (var deviceData in deviceDatas)
         {
             if (GlobalData.Devices.TryGetValue(deviceData.Key, out var device))
             {
-                await GlobalData.SysUserService.CheckApiDataScopeAsync(device.IdVariableRuntimes.Select(a => a.Value.CreateOrgId), device.IdVariableRuntimes.Select(a => a.Value.CreateUserId)).ConfigureAwait(false);
+                var data = device.VariableRuntimes.Where(a => deviceData.Value.ContainsKey(a.Key)).ToList();
+                await GlobalData.SysUserService.CheckApiDataScopeAsync(data.Select(a => a.Value.CreateOrgId), data.Select(a => a.Value.CreateUserId)).ConfigureAwait(false);
             }
         }
 

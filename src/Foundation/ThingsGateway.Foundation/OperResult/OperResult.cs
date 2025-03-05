@@ -93,13 +93,18 @@ public struct OperResult<T> : IOperResult<T>
     public bool IsSuccess => OperCode == null || OperCode == 0;
 
     /// <inheritdoc/>
+#if NET6_0_OR_GREATER
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+#endif
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string? ErrorMessage { get; set; }
 
     /// <inheritdoc/>
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
 #endif
-
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [JsonConverter(typeof(StringEnumConverter))]
     public ErrorTypeEnum? ErrorType { get; set; }
 
@@ -137,7 +142,6 @@ public struct OperResult<T, T2> : IOperResult<T, T2>
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonIgnore]
 #endif
-
     [JsonIgnore]
     public Exception? Exception { get; set; }
 
@@ -208,13 +212,18 @@ public struct OperResult<T, T2> : IOperResult<T, T2>
     public bool IsSuccess => OperCode == null || OperCode == 0;
 
     /// <inheritdoc/>
+#if NET6_0_OR_GREATER
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+#endif
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string? ErrorMessage { get; set; }
 
     /// <inheritdoc/>
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
 #endif
-
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [JsonConverter(typeof(StringEnumConverter))]
     public ErrorTypeEnum? ErrorType { get; set; }
 
@@ -246,7 +255,6 @@ public struct OperResult<T, T2, T3> : IOperResult<T, T2, T3>
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonIgnore]
 #endif
-
     [JsonIgnore]
     public Exception? Exception { get; set; }
 
@@ -317,13 +325,18 @@ public struct OperResult<T, T2, T3> : IOperResult<T, T2, T3>
     public bool IsSuccess => OperCode == null || OperCode == 0;
 
     /// <inheritdoc/>
+#if NET6_0_OR_GREATER
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+#endif
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string? ErrorMessage { get; set; }
 
     /// <inheritdoc/>
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
 #endif
-
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [JsonConverter(typeof(StringEnumConverter))]
     public ErrorTypeEnum? ErrorType { get; set; }
 
@@ -426,12 +439,18 @@ public struct OperResult : IOperResult
     public bool IsSuccess => OperCode == null || OperCode == 0;
 
     /// <inheritdoc/>
+#if NET6_0_OR_GREATER
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+#endif
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string? ErrorMessage { get; set; }
 
     /// <inheritdoc/>
 #if NET6_0_OR_GREATER
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
 #endif
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     [JsonConverter(typeof(StringEnumConverter))]
     public ErrorTypeEnum? ErrorType { get; set; }
 
