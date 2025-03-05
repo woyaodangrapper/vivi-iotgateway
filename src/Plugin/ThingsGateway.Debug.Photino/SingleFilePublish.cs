@@ -39,6 +39,8 @@ public class SingleFilePublish : ISingleFilePublish
             "ThingsGateway.Furion",
             "ThingsGateway.NewLife.X",
             "ThingsGateway.Razor",
+            "ThingsGateway.Debug.Razor",
+            "ThingsGateway.Debug.ProRazor",
 
             "ThingsGateway.Foundation"   ,
             "ThingsGateway.Foundation.Razor",

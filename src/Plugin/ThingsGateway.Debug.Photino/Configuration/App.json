@@ -12,8 +12,8 @@
 
       "ThingsGateway.Foundation.Razor",
       "ThingsGateway.Debug.Razor",
-      "ThingsGateway.Razor"
-
+      "ThingsGateway.Razor",
+      "ThingsGateway.Debug.ProRazor"
     ]
   },
 
