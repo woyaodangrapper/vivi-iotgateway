@@ -128,7 +128,6 @@ public partial class ThingsGatewayServer : StandardServer
     /// <inheritdoc/>
     protected override void OnServerStarting(ApplicationConfiguration configuration)
     {
-        _opcUaServer.LogMessage.LogInformation("OPCUAServer Starting");
         base.OnServerStarting(configuration);
 
         // 由应用程序决定如何验证用户身份令牌。

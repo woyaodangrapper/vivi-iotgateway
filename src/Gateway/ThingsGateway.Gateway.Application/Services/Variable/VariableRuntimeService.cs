@@ -29,6 +29,9 @@ public class VariableRuntimeService : IVariableRuntimeService
     {
         _logger = logger;
     }
+
+
+
     public async Task AddBatchAsync(List<Variable> input, bool restart = true)
     {
         try
@@ -38,9 +41,9 @@ public class VariableRuntimeService : IVariableRuntimeService
             await GlobalData.VariableService.AddBatchAsync(input).ConfigureAwait(false);
 
             var newVariableRuntimes = input.Adapt<List<VariableRuntime>>();
-
+            var ids = newVariableRuntimes.Select(a => a.Id).ToHashSet();
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
-            var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+            var data = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
             HashSet<IDriver> changedDriver = new();
             foreach (var group in data)
@@ -52,10 +55,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     //需要重启业务线程
                     var deviceRuntimes = GlobalData.IdDevices.Where(a =>
 
-
                  GlobalData.ContainsVariable(a.Key, item.Value)
-
-
 
 ).Select(a => a.Value);
                     foreach (var deviceRuntime in deviceRuntimes)
@@ -126,10 +126,14 @@ public class VariableRuntimeService : IVariableRuntimeService
             var result = await GlobalData.VariableService.BatchEditAsync(models, oldModel, model).ConfigureAwait(false);
 
             using var db = DbContext.GetDB<Variable>();
-            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => models.Select(a => a.Id).ToHashSet().Contains(a.Id)).ToListAsync().ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+            var ids = models.Select(a => a.Id).ToHashSet();
+
+            var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => ids.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+
+            var newVarIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
 
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
-            var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+            var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
             HashSet<IDriver> changedDriver = new();
             foreach (var group in data)
@@ -208,20 +212,22 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             var result = await GlobalData.VariableService.DeleteVariableAsync(ids).ConfigureAwait(false);
 
-            var variableRuntimes = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).Select(a => a.Value).ToList();
+            var variableRuntimes = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).Select(a => a.Value);
+
+
+            var data = variableRuntimes.Where(a => a.DeviceRuntime?.Driver != null).GroupBy(a => a.DeviceRuntime).ToDictionary(a => a.Key, a => a.ToList());
 
             foreach (var variableRuntime in variableRuntimes)
             {
                 variableRuntime.Dispose();
             }
-            var data = variableRuntimes.Where(a => a.DeviceRuntime?.Driver != null).GroupBy(a => a.DeviceRuntime);
 
             HashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
                 //需要改动DeviceRuntim的变量字典
-                foreach (var item in group)
+                foreach (var item in group.Value)
                 {
                     //需要重启业务线程
                     var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item)).Select(a => a.Value);
@@ -284,8 +290,9 @@ public class VariableRuntimeService : IVariableRuntimeService
             using var db = DbContext.GetDB<Variable>();
             var newVariableRuntimes = (await db.Queryable<Variable>().Where(a => result.Contains(a.Id)).ToListAsync().ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
 
+            var newVarIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
             //先找出线程管理器，停止
-            var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+            var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
             HashSet<IDriver> changedDriver = new();
             foreach (var group in data)
@@ -403,7 +410,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                         }
                         if (deviceRuntime != null)
                         {
-                            deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                            deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
                         }
                     }
 
@@ -412,7 +419,8 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     var newVariableRuntimes = (datas.Item3).Adapt<List<VariableRuntime>>();
                     //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
-                    var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+                    var newVarIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
+                    var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
                     foreach (var group in data)
                     {
@@ -550,8 +558,9 @@ public class VariableRuntimeService : IVariableRuntimeService
         {
             // await WaitLock.WaitAsync().ConfigureAwait(false);
 
+            var newVarIds = newVariableRuntimes.Select(a => a.Id).ToHashSet();
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
-            var data = GlobalData.IdVariables.Where(a => newVariableRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
+            var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
             HashSet<IDriver> changedDriver = new();
             foreach (var group in data)
@@ -627,20 +636,22 @@ public class VariableRuntimeService : IVariableRuntimeService
             // await WaitLock.WaitAsync().ConfigureAwait(false);
             var ids = variableIds.ToHashSet();
 
-            var variableRuntimes = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).Select(a => a.Value).Where(a => a.DynamicVariable).ToList();
+            var variableRuntimes = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).Select(a => a.Value).Where(a => a.DynamicVariable);
+
+
+            var data = variableRuntimes.Where(a => a.DeviceRuntime?.Driver != null).GroupBy(a => a.DeviceRuntime).ToDictionary(a => a.Key, a => a.ToList());
 
             foreach (var variableRuntime in variableRuntimes)
             {
                 variableRuntime.Dispose();
             }
-            var data = variableRuntimes.Where(a => a.DeviceRuntime?.Driver != null).GroupBy(a => a.DeviceRuntime);
 
             HashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
                 //需要改动DeviceRuntim的变量字典
-                foreach (var item in group)
+                foreach (var item in group.Value)
                 {
                     //需要重启业务线程
                     var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, item)).Select(a => a.Value);

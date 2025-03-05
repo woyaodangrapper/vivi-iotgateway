@@ -88,10 +88,6 @@ public class DeviceRuntime : Device, IDisposable
         }
     }
 
-    /// <summary>
-    /// 设备变量数量
-    /// </summary>
-    public int DeviceVariableCount { get => IdVariableRuntimes == null ? 0 : IdVariableRuntimes.Count; }
 
     /// <summary>
     /// 暂停
@@ -125,12 +121,14 @@ public class DeviceRuntime : Device, IDisposable
     public RedundantTypeEnum? RedundantType { get; set; } = null;
 
     /// <summary>
-    /// 设备变量
+    /// 设备变量数量
     /// </summary>
-    [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
-    [AutoGenerateColumn(Ignore = true)]
-    public IReadOnlyDictionary<long, VariableRuntime>? ReadOnlyIdVariableRuntimes => IdVariableRuntimes;
+    public int DeviceVariableCount { get => Driver == null ? VariableRuntimes?.Count ?? 0 : Driver.IdVariableRuntimes.Count; }
+
+
+
+    #region 采集
+
 
     /// <summary>
     /// 设备变量
@@ -147,19 +145,8 @@ public class DeviceRuntime : Device, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [AdaptIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    internal ConcurrentDictionary<long, VariableRuntime>? IdVariableRuntimes { get; set; } = new(Environment.ProcessorCount, 1000);
-
-    /// <summary>
-    /// 设备变量
-    /// </summary>
-    [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
-    [AdaptIgnore]
-    [AutoGenerateColumn(Ignore = true)]
     internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; set; } = new(Environment.ProcessorCount, 1000);
 
-
-    #region 采集
     /// <summary>
     /// 特殊方法数量
     /// </summary>
@@ -250,7 +237,12 @@ public class DeviceRuntime : Device, IDisposable
         GlobalData.IdDevices.TryRemove(Id, out _);
         GlobalData.Devices.TryRemove(Name, out _);
 
+
         Driver = null;
+        VariableSourceReads?.Clear();
+        VariableScriptReads?.Clear();
+        ReadVariableMethods?.Clear();
+
         GC.SuppressFinalize(this);
     }
 

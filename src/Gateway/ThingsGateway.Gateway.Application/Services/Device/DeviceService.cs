@@ -99,6 +99,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     [OperDesc("DeleteDevice", isRecordPar: false, localizerType: typeof(Device))]
     public async Task DeleteByChannelIdAsync(IEnumerable<long> ids, SqlSugarClient db)
     {
+        var IdhashSet = ids.ToHashSet();
         var variableService = App.RootServices.GetRequiredService<IVariableService>();
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         //事务
@@ -107,7 +108,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
             var data = (await GetAllAsync(db).ConfigureAwait(false))
                           .WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
              .WhereIf(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
-             .Where(a => ids.ToHashSet().Contains(a.ChannelId))
+             .Where(a => IdhashSet.Contains(a.ChannelId))
             .Select(a => a.Id).ToList();
             await db.Deleteable<Device>(data).ExecuteCommandAsync().ConfigureAwait(false);
             await variableService.DeleteByDeviceIdAsync(data, db).ConfigureAwait(false);
@@ -126,6 +127,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
     [OperDesc("DeleteDevice", isRecordPar: false, localizerType: typeof(Device))]
     public async Task<bool> DeleteDeviceAsync(IEnumerable<long> ids)
     {
+        var IdhashSet = ids.ToHashSet();
         var variableService = App.RootServices.GetRequiredService<IVariableService>();
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
 
@@ -133,7 +135,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         //事务
         var result = await db.UseTranAsync(async () =>
         {
-            await db.Deleteable<Device>().Where(a => ids.ToHashSet().Contains(a.Id))
+            await db.Deleteable<Device>().Where(a => IdhashSet.Contains(a.Id))
                           .WhereIF(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.CreateOrgId))//在指定机构列表查询
              .WhereIF(dataScope?.Count == 0, u => u.CreateUserId == UserManager.UserId)
             .ExecuteCommandAsync().ConfigureAwait(false);

@@ -46,7 +46,7 @@
             };
 
         var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        var items = devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Value.Name.Contains(option.SearchText)).Select(a => a.Value).Take(20)
+        var items = devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText)).Take(20)
            .Select(a => new SelectedItem(a.Name, a.Name));
 
         ret.TotalCount = items.Count();

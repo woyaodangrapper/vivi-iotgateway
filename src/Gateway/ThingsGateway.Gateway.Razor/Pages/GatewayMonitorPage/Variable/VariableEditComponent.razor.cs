@@ -34,8 +34,8 @@ public partial class VariableEditComponent
     protected override async Task OnParametersSetAsync()
     {
         var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-        CollectDeviceItems = devices.Where(a => a.Value.IsCollect == true).Select(a => a.Value).BuildDeviceSelectList();
-        BusinessDeviceItems = devices.Where(a => a.Value.IsCollect == false).Select(a => a.Value).BuildDeviceSelectList();
+        CollectDeviceItems = devices.Where(a => a.IsCollect == true).BuildDeviceSelectList();
+        BusinessDeviceItems = devices.Where(a => a.IsCollect == false).BuildDeviceSelectList();
         base.OnParametersSet();
     }
 
@@ -162,6 +162,7 @@ public partial class VariableEditComponent
                  OnParametersSet();
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
+            {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
             {nameof(DeviceEditComponent.ValidateEnable),true },
             {nameof(DeviceEditComponent.BatchEditEnable),false },
         });

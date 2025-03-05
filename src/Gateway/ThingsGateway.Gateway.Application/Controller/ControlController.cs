@@ -79,7 +79,7 @@ public class ControlController : ControllerBase
     public async Task RestartScopeThread()
     {
         var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-        await GlobalData.ChannelRuntimeService.RestartChannelAsync(data.Select(a => a.Value)).ConfigureAwait(false);
+        await GlobalData.ChannelRuntimeService.RestartChannelAsync(data).ConfigureAwait(false);
     }
 
     /// <summary>

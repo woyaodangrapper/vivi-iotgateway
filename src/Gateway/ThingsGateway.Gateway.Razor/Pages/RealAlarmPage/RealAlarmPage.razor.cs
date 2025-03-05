@@ -23,7 +23,7 @@ public partial class RealAlarmPage
     {
         var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
         var data = realAlarmVariables
-            .Select(a => a.Value).GetQueryData(options);
+           .GetQueryData(options);
         return data;
     }
 

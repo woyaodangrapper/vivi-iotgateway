@@ -21,7 +21,8 @@ public interface IChannelRuntimeService
     /// </summary>
     /// <param name="input">通道对象</param>
     /// <param name="type">保存类型</param>
-    Task<bool> SaveChannelAsync(Channel input, ItemChangedType type);
+    /// <param name="restart">重启</param>
+    Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart);
 
     /// <summary>
     /// 批量修改
@@ -29,18 +30,19 @@ public interface IChannelRuntimeService
     /// <param name="models">列表</param>
     /// <param name="oldModel">旧数据</param>
     /// <param name="model">新数据</param>
+    /// <param name="restart">重启</param>
     /// <returns></returns>
-    Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model);
+    Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart);
 
     /// <summary>
     /// 删除通道
     /// </summary>
-    Task<bool> DeleteChannelAsync(IEnumerable<long> ids);
+    Task<bool> DeleteChannelAsync(IEnumerable<long> ids, bool restart);
 
     /// <summary>
     /// 导入通道数据
     /// </summary>
-    Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input);
+    Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart);
     Task<Dictionary<string, object>> ExportChannelAsync(ExportFilter exportFilter);
     Task<Dictionary<string, ImportPreviewOutputBase>> PreviewAsync(IBrowserFile browserFile);
     Task<MemoryStream> ExportMemoryStream(List<Channel> data);

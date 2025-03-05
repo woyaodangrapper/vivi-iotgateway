@@ -13,6 +13,7 @@ using BootstrapBlazor.Components;
 using Mapster;
 
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.Logging;
 
 using ThingsGateway.NewLife;
 
@@ -20,6 +21,12 @@ namespace ThingsGateway.Gateway.Application;
 
 public class DeviceRuntimeService : IDeviceRuntimeService
 {
+    private ILogger _logger;
+    public DeviceRuntimeService(ILogger<DeviceRuntimeService> logger)
+    {
+        _logger = logger;
+    }
+
     private WaitLock WaitLock { get; set; } = new WaitLock();
     public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart = true)
     {
@@ -31,13 +38,15 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             await WaitLock.WaitAsync().ConfigureAwait(false);
 
             var result = await GlobalData.DeviceService.BatchEditAsync(models, oldModel, model).ConfigureAwait(false);
-
-            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => models.Select(a => a.Id).ToHashSet().Contains(a.Id)).Adapt<List<DeviceRuntime>>();
+            var ids = models.Select(a => a.Id).ToHashSet();
+            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id)).Adapt<List<DeviceRuntime>>();
 
             if (restart)
             {
+                var newDeciceIds = newDeviceRuntimes.Select(a => a.Id).ToHashSet();
+
                 //先找出线程管理器，停止
-                var data = GlobalData.IdDevices.Where(a => newDeviceRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.ChannelRuntime?.DeviceThreadManage);
+                var data = GlobalData.IdDevices.Where(a => newDeciceIds.Contains(a.Key)).GroupBy(a => a.Value.ChannelRuntime?.DeviceThreadManage);
                 foreach (var group in data)
                 {
                     if (group.Key != null)
@@ -58,7 +67,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                 }
                 if (deviceRuntime != null)
                 {
-                    deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                    deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
                 }
             }
 
@@ -96,13 +105,26 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             var deviceRuntimes = GlobalData.IdDevices.Where(a => ids.Contains(a.Key)).Select(a => a.Value).ToList();
 
 
+            HashSet<IDriver> changedDriver = new();
 
             foreach (var deviceRuntime in deviceRuntimes)
             {
                 //也需要删除变量
-                deviceRuntime.IdVariableRuntimes.ParallelForEach(a =>
+                deviceRuntime.VariableRuntimes.ParallelForEach(v =>
                 {
-                    a.Value.Dispose();
+
+                    //需要重启业务线程
+                    var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v.Value)).Select(a => a.Value);
+                    foreach (var deviceRuntime in deviceRuntimes)
+                    {
+                        if (deviceRuntime.Driver != null)
+                        {
+                            changedDriver.Add(deviceRuntime.Driver);
+                        }
+                    }
+
+
+                    v.Value.Dispose();
                 });
                 deviceRuntime.Dispose();
             }
@@ -115,6 +137,19 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                     if (group.Key != null)
                         await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id)).ConfigureAwait(false);
                 }
+
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
+
             }
 
             return true;
@@ -143,8 +178,10 @@ public class DeviceRuntimeService : IDeviceRuntimeService
 
             if (restart)
             {
+                var newDeciceIds = newDeviceRuntimes.Select(a => a.Id).ToHashSet();
+
                 //先找出线程管理器，停止
-                var data = GlobalData.IdDevices.Where(a => newDeviceRuntimes.Select(a => a.Id).ToHashSet().Contains(a.Key)).GroupBy(a => a.Value.ChannelRuntime?.DeviceThreadManage);
+                var data = GlobalData.IdDevices.Where(a => newDeciceIds.Contains(a.Key)).GroupBy(a => a.Value.ChannelRuntime?.DeviceThreadManage);
                 foreach (var group in data)
                 {
                     if (group.Key != null)
@@ -165,7 +202,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                 }
                 if (deviceRuntime != null)
                 {
-                    deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                    deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
                 }
             }
 
@@ -213,7 +250,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                         await deviceThreadManage.RemoveDeviceAsync(deviceRuntime.Id).ConfigureAwait(false);
                 }
                 deviceRuntime.Dispose();
-                deviceRuntime.IdVariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
+                deviceRuntime.VariableRuntimes.ParallelForEach(a => a.Value.Init(newDeviceRuntime));
             }
 
             if (GlobalData.Channels.TryGetValue(newDeviceRuntime.ChannelId, out var channelRuntime))

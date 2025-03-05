@@ -40,7 +40,6 @@ public class RuntimeInfoController : ControllerBase
         var channelRuntimes = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
 
         var data = channelRuntimes
-         .Select(a => a.Value)
          .WhereIF(!string.IsNullOrEmpty(input.Name), u => u.Name.Contains(input.Name))
          .WhereIF(!string.IsNullOrEmpty(input.PluginName), u => u.PluginName == input.PluginName)
          .WhereIF(input.PluginType != null, u => u.PluginType == input.PluginType)
@@ -59,7 +58,6 @@ public class RuntimeInfoController : ControllerBase
     {
         var deviceRuntimes = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
         var data = deviceRuntimes
-         .Select(a => a.Value)
          .WhereIF(!string.IsNullOrEmpty(input.Name), u => u.Name.Contains(input.Name))
          .WhereIF(!input.ChannelName.IsNullOrEmpty(), u => u.ChannelName == input.ChannelName)
          .WhereIF(!string.IsNullOrEmpty(input.PluginName), u => u.PluginName == input.PluginName)
@@ -79,7 +77,6 @@ public class RuntimeInfoController : ControllerBase
         var realAlarmVariables = await GlobalData.GetCurrentUserRealAlarmVariables().ConfigureAwait(false);
 
         var data = realAlarmVariables
-         .Select(a => a.Value)
             .WhereIF(!input.RegisterAddress.IsNullOrEmpty(), a => a.RegisterAddress == input.RegisterAddress)
             .WhereIF(!input.Name.IsNullOrEmpty(), a => a.Name == input.Name)
             .WhereIF(!input.DeviceName.IsNullOrEmpty(), a => a.DeviceName == input.DeviceName)
@@ -112,7 +109,6 @@ public class RuntimeInfoController : ControllerBase
     {
         var variables = await GlobalData.GetCurrentUserIdVariables().ConfigureAwait(false);
         var data = variables
-        .Select(a => a.Value)
         .WhereIF(!input.Name.IsNullOrWhiteSpace(), a => a.Name == input.Name)
          .WhereIF(!input.DeviceName.IsNullOrEmpty(), a => a.DeviceName == input.DeviceName)
             .WhereIF(!input.RegisterAddress.IsNullOrWhiteSpace(), a => a.RegisterAddress == input.RegisterAddress)

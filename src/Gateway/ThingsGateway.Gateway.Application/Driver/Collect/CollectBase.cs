@@ -53,7 +53,7 @@ public abstract class CollectBase : DriverBase
     {
         LogMessage?.LogInformation("Refresh variable");
         var currentDevice = CurrentDevice;
-        IdVariableRuntimes = currentDevice.IdVariableRuntimes.Where(a => a.Value.Enable).ToDictionary();
+        IdVariableRuntimes = currentDevice.VariableRuntimes.Where(a => a.Value.Enable).ToDictionary(a => a.Value.Id, a => a.Value);
 
         //预热脚本，加速编译
         IdVariableRuntimes.Where(a => !string.IsNullOrWhiteSpace(a.Value.ReadExpressions))
@@ -241,217 +241,222 @@ public abstract class CollectBase : DriverBase
             ScriptVariableRun(cancellationToken);
         }
 
-        #region 执行方法
+    }
 
-        async ValueTask<bool> ReadVariableMed(ReadResultCount readResultCount, VariableMethod readVariableMethods, CancellationToken cancellationToken)
+    #region private
+
+    #region 执行方法
+
+    async ValueTask<bool> ReadVariableMed(ReadResultCount readResultCount, VariableMethod readVariableMethods, CancellationToken cancellationToken)
+    {
+        if (Pause)
+            return true;
+        if (cancellationToken.IsCancellationRequested)
+            return true;
+
+        // 如果请求更新时间已到，则执行方法调用
+        if (readVariableMethods.CheckIfRequestAndUpdateTime())
         {
-            if (Pause)
+            if (cancellationToken.IsCancellationRequested)
                 return true;
             if (cancellationToken.IsCancellationRequested)
                 return true;
+            if (await TestOnline(cancellationToken).ConfigureAwait(false))
+                return true;
+            var readErrorCount = 0;
+            LogMessage?.Trace(string.Format("{0} - Executing method[{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
+            var readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            // 如果请求更新时间已到，则执行方法调用
-            if (readVariableMethods.CheckIfRequestAndUpdateTime())
+            // 方法调用失败时重试一定次数
+            while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
             {
-                if (cancellationToken.IsCancellationRequested)
+                if (Pause)
                     return true;
                 if (cancellationToken.IsCancellationRequested)
                     return true;
                 if (await TestOnline(cancellationToken).ConfigureAwait(false))
                     return true;
-                var readErrorCount = 0;
+                readErrorCount++;
+                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+
                 LogMessage?.Trace(string.Format("{0} - Executing method[{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
-                var readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
+                readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
+            }
 
-                // 方法调用失败时重试一定次数
-                while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
+            if (readResult.IsSuccess)
+            {
+                // 方法调用成功时记录日志并增加成功计数器
+                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToJsonNetString()));
+                readResultCount.deviceMethodsVariableSuccessNum++;
+                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            }
+            else
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return true;
+
+                // 方法调用失败时记录日志并增加失败计数器，更新错误信息
+                if (readVariableMethods.LastErrorMessage != readResult.ErrorMessage)
                 {
-                    if (Pause)
-                        return true;
-                    if (cancellationToken.IsCancellationRequested)
-                        return true;
-                    if (await TestOnline(cancellationToken).ConfigureAwait(false))
-                        return true;
-                    readErrorCount++;
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
-
-                    LogMessage?.Trace(string.Format("{0} - Executing method[{1}]", DeviceName, readVariableMethods.MethodInfo.Name));
-                    readResult = await InvokeMethodAsync(readVariableMethods, cancellationToken: cancellationToken).ConfigureAwait(false);
-                }
-
-                if (readResult.IsSuccess)
-                {
-                    // 方法调用成功时记录日志并增加成功计数器
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - Succeeded {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.Content?.ToJsonNetString()));
-                    readResultCount.deviceMethodsVariableSuccessNum++;
-                    CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+                    if (!cancellationToken.IsCancellationRequested)
+                        LogMessage?.LogWarning(readResult.Exception, Localizer["MethodFail", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage]);
                 }
                 else
                 {
+                    if (!cancellationToken.IsCancellationRequested)
+                        if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                            LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                }
+
+                readResultCount.deviceMethodsVariableFailedNum++;
+                readVariableMethods.LastErrorMessage = readResult.ErrorMessage;
+                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            }
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region 执行默认读取
+
+    async ValueTask<bool> ReadVariableSource(ReadResultCount readResultCount, VariableSourceRead? variableSourceRead, CancellationToken cancellationToken)
+    {
+        if (Pause)
+            return true;
+        if (cancellationToken.IsCancellationRequested)
+            return true;
+        // 如果请求更新时间已到，则执行变量读取
+        if (variableSourceRead.CheckIfRequestAndUpdateTime())
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return true;
+            if (Pause)
+                return true;
+            if (await TestOnline(cancellationToken).ConfigureAwait(false))
+                return true;
+
+            var readErrorCount = 0;
+
+            LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
+            var readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
+
+            // 读取失败时重试一定次数
+            while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
+            {
+                if (Pause)
+                    return true;
+                if (cancellationToken.IsCancellationRequested)
+                    return true;
+                if (await TestOnline(cancellationToken).ConfigureAwait(false))
+                    return true;
+                readErrorCount++;
+                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
+
+
+                LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
+                readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
+            }
+
+            if (readResult.IsSuccess)
+            {
+                // 读取成功时记录日志并增加成功计数器
+                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
+                    LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
+                readResultCount.deviceSourceVariableSuccessNum++;
+                CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+            }
+            else
+            {
+                {
                     if (cancellationToken.IsCancellationRequested)
                         return true;
 
-                    // 方法调用失败时记录日志并增加失败计数器，更新错误信息
-                    if (readVariableMethods.LastErrorMessage != readResult.ErrorMessage)
+                    // 读取失败时记录日志并增加失败计数器，更新错误信息并清除变量状态
+                    if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)
                     {
                         if (!cancellationToken.IsCancellationRequested)
-                            LogMessage?.LogWarning(readResult.Exception, Localizer["MethodFail", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage]);
+                            LogMessage?.LogWarning(readResult.Exception, Localizer["CollectFail", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage]);
                     }
                     else
                     {
                         if (!cancellationToken.IsCancellationRequested)
                             if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                                LogMessage?.Trace(string.Format("{0} - Execute method[{1}] - failed - {2}", DeviceName, readVariableMethods.MethodInfo.Name, readResult.ErrorMessage));
+                                LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
                     }
 
-                    readResultCount.deviceMethodsVariableFailedNum++;
-                    readVariableMethods.LastErrorMessage = readResult.ErrorMessage;
-                    CurrentDevice.SetDeviceStatus(TimerX.Now, false);
+                    readResultCount.deviceSourceVariableFailedNum++;
+                    variableSourceRead.LastErrorMessage = readResult.ErrorMessage;
+                    CurrentDevice.SetDeviceStatus(TimerX.Now, true, readResult.ErrorMessage);
+                    var time = DateTime.Now;
+                    variableSourceRead.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
                 }
             }
-
-            return false;
         }
 
-        #endregion
-
-        #region 执行默认读取
-
-        async ValueTask<bool> ReadVariableSource(ReadResultCount readResultCount, VariableSourceRead? variableSourceRead, CancellationToken cancellationToken)
-        {
-            if (Pause)
-                return true;
-            if (cancellationToken.IsCancellationRequested)
-                return true;
-            // 如果请求更新时间已到，则执行变量读取
-            if (variableSourceRead.CheckIfRequestAndUpdateTime())
-            {
-                if (cancellationToken.IsCancellationRequested)
-                    return true;
-                if (Pause)
-                    return true;
-                if (await TestOnline(cancellationToken).ConfigureAwait(false))
-                    return true;
-
-                var readErrorCount = 0;
-
-                LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-                var readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
-
-                // 读取失败时重试一定次数
-                while (!readResult.IsSuccess && readErrorCount < CollectProperties.RetryCount)
-                {
-                    if (Pause)
-                        return true;
-                    if (cancellationToken.IsCancellationRequested)
-                        return true;
-                    if (await TestOnline(cancellationToken).ConfigureAwait(false))
-                        return true;
-                    readErrorCount++;
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
-
-
-                    LogMessage?.Trace(string.Format("{0} - Collecting [{1} - {2}]", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length));
-                    readResult = await ReadSourceAsync(variableSourceRead, cancellationToken).ConfigureAwait(false);
-                }
-
-                if (readResult.IsSuccess)
-                {
-                    // 读取成功时记录日志并增加成功计数器
-                    if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                        LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data succeeded {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.Content?.ToHexString(' ')));
-                    readResultCount.deviceSourceVariableSuccessNum++;
-                    CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-                }
-                else
-                {
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                            return true;
-
-                        // 读取失败时记录日志并增加失败计数器，更新错误信息并清除变量状态
-                        if (variableSourceRead.LastErrorMessage != readResult.ErrorMessage)
-                        {
-                            if (!cancellationToken.IsCancellationRequested)
-                                LogMessage?.LogWarning(readResult.Exception, Localizer["CollectFail", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage]);
-                        }
-                        else
-                        {
-                            if (!cancellationToken.IsCancellationRequested)
-                                if (LogMessage.LogLevel <= TouchSocket.Core.LogLevel.Trace)
-                                    LogMessage?.Trace(string.Format("{0} - Collection[{1} - {2}] data failed - {3}", DeviceName, variableSourceRead?.RegisterAddress, variableSourceRead?.Length, readResult.ErrorMessage));
-                        }
-
-                        readResultCount.deviceSourceVariableFailedNum++;
-                        variableSourceRead.LastErrorMessage = readResult.ErrorMessage;
-                        CurrentDevice.SetDeviceStatus(TimerX.Now, true, readResult.ErrorMessage);
-                        var time = DateTime.Now;
-                        variableSourceRead.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        #endregion
-
-        async ValueTask<bool> TestOnline(CancellationToken cancellationToken)
-        {
-            //设备无法连接时
-            // 检查协议是否为空，如果为空则抛出异常
-            if (FoundationDevice != null)
-            {
-                if (FoundationDevice.OnLine == false)
-                {
-                    Exception exception = null;
-                    try
-                    {
-                        await FoundationDevice.Channel.ConnectAsync(FoundationDevice.Channel.ChannelOptions.ConnectTimeout, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (Exception ex)
-                    {
-                        exception = ex;
-                    }
-                    if (FoundationDevice.OnLine == false && exception != null)
-                    {
-                        foreach (var item in CurrentDevice.VariableSourceReads)
-                        {
-                            if (item.LastErrorMessage != exception.Message)
-                            {
-                                if (!cancellationToken.IsCancellationRequested)
-                                    LogMessage?.LogWarning(exception, Localizer["CollectFail", DeviceName, item?.RegisterAddress, item?.Length, exception.Message]);
-                            }
-                            item.LastErrorMessage = exception.Message;
-                            CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
-                            var time = DateTime.Now;
-                            item.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
-                        }
-                        foreach (var item in CurrentDevice.ReadVariableMethods)
-                        {
-                            if (item.LastErrorMessage != exception.Message)
-                            {
-                                if (!cancellationToken.IsCancellationRequested)
-                                    LogMessage?.LogWarning(exception, Localizer["MethodFail", DeviceName, item.MethodInfo.Name, exception.Message]);
-                            }
-                            item.LastErrorMessage = exception.Message;
-                            CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
-                            var time = DateTime.Now;
-                            item.Variable.SetValue(null, time, isOnline: false);
-                        }
-
-                        await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
+        return false;
     }
+
+    #endregion
+
+    async ValueTask<bool> TestOnline(CancellationToken cancellationToken)
+    {
+        //设备无法连接时
+        // 检查协议是否为空，如果为空则抛出异常
+        if (FoundationDevice != null)
+        {
+            if (FoundationDevice.OnLine == false)
+            {
+                Exception exception = null;
+                try
+                {
+                    await FoundationDevice.Channel.ConnectAsync(FoundationDevice.Channel.ChannelOptions.ConnectTimeout, cancellationToken).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+                if (FoundationDevice.OnLine == false && exception != null)
+                {
+                    foreach (var item in CurrentDevice.VariableSourceReads)
+                    {
+                        if (item.LastErrorMessage != exception.Message)
+                        {
+                            if (!cancellationToken.IsCancellationRequested)
+                                LogMessage?.LogWarning(exception, Localizer["CollectFail", DeviceName, item?.RegisterAddress, item?.Length, exception.Message]);
+                        }
+                        item.LastErrorMessage = exception.Message;
+                        CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
+                        var time = DateTime.Now;
+                        item.VariableRuntimes.ForEach(a => a.SetValue(null, time, isOnline: false));
+                    }
+                    foreach (var item in CurrentDevice.ReadVariableMethods)
+                    {
+                        if (item.LastErrorMessage != exception.Message)
+                        {
+                            if (!cancellationToken.IsCancellationRequested)
+                                LogMessage?.LogWarning(exception, Localizer["MethodFail", DeviceName, item.MethodInfo.Name, exception.Message]);
+                        }
+                        item.LastErrorMessage = exception.Message;
+                        CurrentDevice.SetDeviceStatus(TimerX.Now, true, exception.Message);
+                        var time = DateTime.Now;
+                        item.Variable.SetValue(null, time, isOnline: false);
+                    }
+
+                    await Task.Delay(3000, cancellationToken).ConfigureAwait(false);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    #endregion
 
     protected void ScriptVariableRun(CancellationToken cancellationToken)
     {

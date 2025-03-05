@@ -338,11 +338,8 @@ public class VariableRuntime : Variable, IVariable, IDisposable
 
         DeviceRuntime?.VariableRuntimes?.TryRemove(Name, out _);
 
-        DeviceRuntime?.IdVariableRuntimes?.TryRemove(Id, out _);
-
         DeviceRuntime = deviceRuntime;
 
-        DeviceRuntime.IdVariableRuntimes.TryAdd(Id, this);
         DeviceRuntime?.VariableRuntimes?.TryAdd(Name, this);
         GlobalData.IdVariables.TryRemove(Id, out _);
         GlobalData.IdVariables.TryAdd(Id, this);
@@ -356,7 +353,6 @@ public class VariableRuntime : Variable, IVariable, IDisposable
     public void Dispose()
     {
 
-        DeviceRuntime?.IdVariableRuntimes?.TryRemove(Id, out _);
         DeviceRuntime?.VariableRuntimes?.TryRemove(Name, out _);
 
         GlobalData.IdVariables.TryRemove(Id, out _);
@@ -368,6 +364,8 @@ public class VariableRuntime : Variable, IVariable, IDisposable
             oldAlarm.EventTime = DateTime.Now;
             GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
         }
+
+        DeviceRuntime = null;
 
         GC.SuppressFinalize(this);
     }

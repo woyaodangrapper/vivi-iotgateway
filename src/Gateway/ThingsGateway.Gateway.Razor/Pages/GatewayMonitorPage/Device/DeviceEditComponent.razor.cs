@@ -30,6 +30,9 @@ public partial class DeviceEditComponent
     public Device Model { get; set; }
 
     [Parameter]
+    public bool AutoRestartThread { get; set; }
+
+    [Parameter]
     public Func<Task> OnValidSubmit { get; set; }
 
     [Parameter]
@@ -42,7 +45,7 @@ public partial class DeviceEditComponent
     protected override async Task OnParametersSetAsync()
     {
         var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-        _channelItems = channels.Select(a => a.Value).BuildChannelSelectList();
+        _channelItems = channels.BuildChannelSelectList();
         base.OnParametersSet();
     }
 
@@ -88,7 +91,7 @@ public partial class DeviceEditComponent
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
              {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,ItemChangedType.Add));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,ItemChangedType.Add,AutoRestartThread));
                  OnParametersSet();
             }},
             {nameof(ChannelEditComponent.Model),oneModel },
@@ -112,8 +115,8 @@ public partial class DeviceEditComponent
 
         var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
         var pluginName = GlobalData.ReadOnlyChannels.TryGetValue(device.ChannelId, out var channel) ? channel.PluginName : string.Empty;
-        var items = new List<SelectedItem>() { new SelectedItem(string.Empty, "none") }.Concat(devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Value.Name.Contains(option.SearchText))
-            .Where(a => a.Value.PluginName == pluginName && a.Value.Id != device.Id).Select(a => a.Value).Take(20).BuildDeviceSelectList()
+        var items = new List<SelectedItem>() { new SelectedItem(string.Empty, "none") }.Concat(devices.WhereIf(!option.SearchText.IsNullOrWhiteSpace(), a => a.Name.Contains(option.SearchText))
+            .Where(a => a.PluginName == pluginName && a.Id != device.Id).Take(20).BuildDeviceSelectList()
             );
 
         ret.TotalCount = items.Count();

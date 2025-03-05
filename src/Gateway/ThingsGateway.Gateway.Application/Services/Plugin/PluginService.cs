@@ -590,8 +590,9 @@ internal sealed class PluginService : IPluginService
                 var dictionary = (ConcurrentDictionary<string, ResourceManagerStringLocalizer>)fieldInfo.GetValue(App.StringLocalizerFactory);
                 foreach (var item in _assemblyLoadContextDict)
                 {
+                    var ids = item.Value.Assembly.ExportedTypes.Select(b => b.AssemblyQualifiedName).ToHashSet();
                     // 移除特定键
-                    dictionary.RemoveWhere(a => item.Value.Assembly.ExportedTypes.Select(b => b.AssemblyQualifiedName).ToHashSet().Contains(a.Key));
+                    dictionary.RemoveWhere(a => ids.Contains(a.Key));
                 }
             }
             catch (Exception ex)

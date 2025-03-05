@@ -14,14 +14,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace ThingsGateway.Admin.Application;
 
 [Route("api/[controller]/[action]")]
-[RolePermission]
-[Authorize(AuthenticationSchemes = "Bearer")]
+[AllowAnonymous]
 public class TestController : ControllerBase
 {
     [HttpPost]
-    public async Task Test(string data)
+    public Task Test(string data)
     {
-        GC.Collect();
-        await Task.CompletedTask.ConfigureAwait(false);
+        for (int i = 0; i < 3; i++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+        return Task.CompletedTask;
     }
 }

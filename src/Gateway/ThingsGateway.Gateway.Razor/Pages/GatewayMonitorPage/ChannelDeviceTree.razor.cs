@@ -151,7 +151,7 @@ public partial class ChannelDeviceTree : IDisposable
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,itemChangedType));
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.SaveChannelAsync(oneModel,itemChangedType,AutoRestartThread));
             }},
             {nameof(ChannelEditComponent.Model),oneModel },
             {nameof(ChannelEditComponent.ValidateEnable),true },
@@ -193,7 +193,7 @@ public partial class ChannelDeviceTree : IDisposable
         {
             //插件名称
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-            models = data.Where(a => a.Value.PluginName == pluginName).Select(a => a.Value);
+            models = data.Where(a => a.PluginName == pluginName);
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.Adapt<Channel>();
@@ -204,7 +204,7 @@ public partial class ChannelDeviceTree : IDisposable
             //采集
 
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-            models = data.Where(a => a.Value.PluginType == pluginType).Select(a => a.Value);
+            models = data.Where(a => a.PluginType == pluginType);
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.Adapt<Channel>();
@@ -229,7 +229,7 @@ public partial class ChannelDeviceTree : IDisposable
                     ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
                 });
                 });
-                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
                        await InvokeAsync(async ()=>
             {
 
@@ -303,7 +303,7 @@ public partial class ChannelDeviceTree : IDisposable
         {
             //插件名称
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-            modelIds = data.Where(a => a.Value.PluginName == pluginName).Select(a => a.Value);
+            modelIds = data.Where(a => a.PluginName == pluginName);
 
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
@@ -311,7 +311,7 @@ public partial class ChannelDeviceTree : IDisposable
             //采集
 
             var data = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-            modelIds = data.Where(a => a.Value.PluginType == pluginType).Select(a => a.Value);
+            modelIds = data.Where(a => a.PluginType == pluginType);
 
         }
         else
@@ -350,7 +350,7 @@ public partial class ChannelDeviceTree : IDisposable
                         ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
                     });
                 });
-                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id)));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id), AutoRestartThread));
                 await InvokeAsync(async () =>
                 {
                     await MaskService.Close();
@@ -400,7 +400,7 @@ public partial class ChannelDeviceTree : IDisposable
                     });
                 });
                 var key = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Key)));
+                await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id), AutoRestartThread));
                 await InvokeAsync(async () =>
                 {
                     await MaskService.Close();
@@ -524,7 +524,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                     ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
                 });
             });
-            await Task.Run(() => GlobalData.ChannelRuntimeService.ImportChannelAsync(value));
+            await Task.Run(() => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
             await InvokeAsync(async () =>
             {
                 await MaskService.Close();
@@ -587,6 +587,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                  await Task.Run(() =>GlobalData.DeviceRuntimeService.SaveDeviceAsync(oneModel,itemChangedType, AutoRestartThread));
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
+            {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
             {nameof(DeviceEditComponent.ValidateEnable),true },
             {nameof(DeviceEditComponent.BatchEditEnable),false },
         });
@@ -624,7 +625,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             //插件名称
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            models = data.Select(a => a.Value).Where(a => a.ChannelId == channelRuntime.Id);
+            models = data.Where(a => a.ChannelId == channelRuntime.Id);
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.Adapt<Device>();
@@ -634,7 +635,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             //插件名称
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            models = data.Select(a => a.Value).Where(a => a.PluginName == pluginName); ;
+            models = data.Where(a => a.PluginName == pluginName); ;
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.Adapt<Device>();
@@ -645,7 +646,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             //采集
 
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            models = data.Select(a => a.Value).Where(a => a.PluginType == pluginType); ;
+            models = data.Where(a => a.PluginType == pluginType); ;
             oldModel = models.FirstOrDefault();
             changedModels = models;
             oneModel = oldModel.Adapt<Device>();
@@ -677,6 +678,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 });
             }},
             {nameof(DeviceEditComponent.Model),oneModel },
+            {nameof(DeviceEditComponent.AutoRestartThread),AutoRestartThread },
             {nameof(DeviceEditComponent.ValidateEnable),true },
             {nameof(DeviceEditComponent.BatchEditEnable),true },
         });
@@ -742,20 +744,20 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         else if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
         {
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            modelIds = data.Select(a => a.Value).Where(a => a.ChannelId == channelRuntime.Id);
+            modelIds = data.Where(a => a.ChannelId == channelRuntime.Id);
         }
         else if (channelDeviceTreeItem.TryGetPluginName(out var pluginName))
         {
             //插件名称
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            modelIds = data.Select(a => a.Value).Where(a => a.PluginName == pluginName);
+            modelIds = data.Where(a => a.PluginName == pluginName);
 
         }
         else if (channelDeviceTreeItem.TryGetPluginType(out var pluginType))
         {
             //采集
             var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            modelIds = data.Select(a => a.Value).Where(a => a.PluginType == pluginType);
+            modelIds = data.Where(a => a.PluginType == pluginType);
         }
         else
         {
@@ -845,7 +847,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
                 });
                 var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
 
-                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Key), AutoRestartThread));
+                await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id), AutoRestartThread));
                 await InvokeAsync(async () =>
                 {
                     await MaskService.Close();
@@ -1078,9 +1080,9 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
 
         var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
 
-        ZItem[0].Items = ResourceUtil.BuildTreeItemList(channels.Where(a => a.Value.IsCollect == true).Select(a => a.Value), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
-        ZItem[1].Items = ResourceUtil.BuildTreeItemList(channels.Where(a => a.Value.IsCollect == false).Select(a => a.Value), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
-        var item2 = ResourceUtil.BuildTreeItemList(channels.Where(a => a.Value.IsCollect == null).Select(a => a.Value), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+        ZItem[0].Items = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == true), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+        ZItem[1].Items = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == false), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
+        var item2 = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
         if (item2.Count > 0)
         {
             BusinessTreeViewItem.Items = item2;
@@ -1117,7 +1119,6 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             {
                 try
                 {
-                    await OnClickSearch(SearchText);
                     await InvokeAsync(StateHasChanged);
                 }
                 catch
@@ -1188,7 +1189,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
         if (searchText.IsNullOrWhiteSpace())
         {
-            var items = channels.Select(a => a.Value).WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
+            var items = channels.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
 
             ZItem[0].Items = ResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == true), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem, items: ZItem[0].Items);
             ZItem[1].Items = ResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == false), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem, items: ZItem[1].Items);
@@ -1222,9 +1223,9 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         }
         else
         {
-            var items = channels.Select(a => a.Value).WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
+            var items = channels.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
             var devices = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
-            var deviceItems = devices.Select(a => a.Value).WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
+            var deviceItems = devices.WhereIF(!searchText.IsNullOrEmpty(), a => a.Name.Contains(searchText));
 
             Dictionary<ChannelRuntime, List<DeviceRuntime>> collectChannelDevices = new();
             Dictionary<ChannelRuntime, List<DeviceRuntime>> businessChannelDevices = new();

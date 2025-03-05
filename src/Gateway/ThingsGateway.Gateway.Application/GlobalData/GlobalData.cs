@@ -65,38 +65,38 @@ public static class GlobalData
     public static event VariableAlarmEventHandler? AlarmChangedEvent;
 
 
-    public static async Task<IEnumerable<KeyValuePair<long, ChannelRuntime>>> GetCurrentUserChannels()
+    public static async Task<IEnumerable<ChannelRuntime>> GetCurrentUserChannels()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return ReadOnlyChannels.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
-    public static async Task<IEnumerable<KeyValuePair<long, DeviceRuntime>>> GetCurrentUserDevices()
+    public static async Task<IEnumerable<DeviceRuntime>> GetCurrentUserDevices()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return ReadOnlyIdDevices.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
-    public static async Task<IEnumerable<KeyValuePair<long, VariableRuntime>>> GetCurrentUserIdVariables()
+    public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserIdVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return IdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
 
-    public static async Task<IEnumerable<KeyValuePair<long, AlarmVariable>>> GetCurrentUserRealAlarmVariables()
+    public static async Task<IEnumerable<AlarmVariable>> GetCurrentUserRealAlarmVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return RealAlarmIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
 
 
-    public static async Task<IEnumerable<KeyValuePair<long, VariableRuntime>>> GetCurrentUserAlarmEnableVariables()
+    public static async Task<IEnumerable<VariableRuntime>> GetCurrentUserAlarmEnableVariables()
     {
         var dataScope = await GlobalData.SysUserService.GetCurrentUserDataScopeAsync().ConfigureAwait(false);
         return AlarmEnableIdVariables.WhereIf(dataScope != null && dataScope?.Count > 0, u => dataScope.Contains(u.Value.CreateOrgId))//在指定机构列表查询
-          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId);
+          .WhereIf(dataScope?.Count == 0, u => u.Value.CreateUserId == UserManager.UserId).Select(a => a.Value);
     }
 
     public static bool ContainsVariable(long businessDeviceId, VariableRuntime a)
@@ -118,9 +118,9 @@ public static class GlobalData
     /// <summary>
     /// 只读的通道字典，提供对通道的只读访问
     /// </summary>
-    public static IEnumerable<KeyValuePair<long, ChannelRuntime>> GetEnableChannels()
+    public static IEnumerable<ChannelRuntime> GetEnableChannels()
     {
-        return Channels.Where(a => a.Value.Enable);
+        return Channels.Where(a => a.Value.Enable).Select(a => a.Value);
     }
 
     public static VariableRuntime GetVariable(string deviceName, string variableName)
@@ -135,13 +135,10 @@ public static class GlobalData
         return null;
     }
 
-    /// <summary>
-    /// 只读的通道字典，提供对通道的只读访问
-    /// </summary>
-    public static IEnumerable<KeyValuePair<long, DeviceRuntime>> GetEnableDevices()
+    public static IEnumerable<DeviceRuntime> GetEnableDevices()
     {
         var idSet = GetRedundantDeviceIds();
-        return IdDevices.Where(a => a.Value.Enable && !idSet.Contains(a.Value.Id));
+        return IdDevices.Where(a => a.Value.Enable && !idSet.Contains(a.Value.Id)).Select(a => a.Value);
     }
 
     public static HashSet<long> GetRedundantDeviceIds()
@@ -164,9 +161,9 @@ public static class GlobalData
     }
 
 
-    public static IEnumerable<KeyValuePair<long, VariableRuntime>> GetEnableVariables()
+    public static IEnumerable<VariableRuntime> GetEnableVariables()
     {
-        return IdDevices.SelectMany(a => a.Value.IdVariableRuntimes).Where(a => a.Value.Enable);
+        return IdDevices.SelectMany(a => a.Value.VariableRuntimes).Where(a => a.Value.Enable).Select(a => a.Value);
     }
 
 

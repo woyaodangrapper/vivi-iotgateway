@@ -50,7 +50,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         .Map(dest => dest.StatusCode, (src) =>
         src.IsOnline ? StatusCodes.Good : StatusCodes.Bad);
     }
-    Dictionary<long, IDriver>? driverDict;
+    ConcurrentList<IDriver>? dbDrivers;
     internal FolderState rootFolder;
     /// <summary>
     /// 创建服务目录结构
@@ -61,7 +61,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
         lock (Lock)
         {
 
-            driverDict = GlobalData.GetEnableDevices().Where(a => a.Value.Driver is IDBHistoryValueService).ToDictionary(a => a.Key, a => a.Value.Driver);
+            dbDrivers = new(GlobalData.GetEnableDevices().Where(a => a.Driver is IDBHistoryValueService).Select(a => a.Driver));
             if (!externalReferences.TryGetValue(ObjectIds.ObjectsFolder, out IList<IReference> references))
             {
                 externalReferences[ObjectIds.ObjectsFolder] = references = new List<IReference>();
@@ -109,7 +109,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
     {
         base.HistoryRead(context, details, timestampsToReturn, releaseContinuationPoints, nodesToRead, results, errors);
         //必须带有时间范围
-        if (details is not ReadRawModifiedDetails readDetail || readDetail.StartTime == DateTime.MinValue || readDetail.EndTime == DateTime.MinValue || driverDict == null)
+        if (details is not ReadRawModifiedDetails readDetail || readDetail.StartTime == DateTime.MinValue || readDetail.EndTime == DateTime.MinValue || dbDrivers == null)
         {
             errors[0] = StatusCodes.BadHistoryOperationUnsupported;
             return;
@@ -134,7 +134,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
                 }
 
 
-                var service = driverDict.FirstOrDefault(a => GlobalData.ContainsVariable(a.Key, variableRuntime)).Value;
+                var service = dbDrivers.FirstOrDefault(a => GlobalData.ContainsVariable(a.DeviceId, variableRuntime));
                 if (service == null)
                 {
                     results[i] = new HistoryReadResult()
@@ -384,7 +384,7 @@ public class ThingsGatewayNodeManager : CustomNodeManager2
             Id = variableRuntime.Id,
             DataType = DataNodeType(variableRuntime)
         };
-        var service = driverDict.FirstOrDefault(a => GlobalData.ContainsVariable(a.Key, variableRuntime)).Value;
+        var service = dbDrivers.FirstOrDefault(a => GlobalData.ContainsVariable(a.DeviceId, variableRuntime));
         var level = ThingsGatewayNodeManager.ProtectTypeTrans(variableRuntime, service != null);
         variable.AccessLevel = level;
         variable.UserAccessLevel = level;

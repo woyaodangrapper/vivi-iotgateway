@@ -30,7 +30,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         _logger = logger;
     }
     private WaitLock WaitLock { get; set; } = new WaitLock();
-    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model)
+    public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart = true)
     {
         try
         {
@@ -40,8 +40,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             oldModel = oldModel.Adapt<Channel>();
             model = model.Adapt<Channel>();
             var result = await GlobalData.ChannelService.BatchEditAsync(models, oldModel, model).ConfigureAwait(false);
-
-            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => models.Select(a => a.Id).ToHashSet().Contains(a.Id)).Adapt<List<ChannelRuntime>>();
+            var ids = models.Select(a => a.Id).ToHashSet();
+            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id)).Adapt<List<ChannelRuntime>>();
 
             //批量修改之后，需要重新加载通道
             foreach (var newChannelRuntime in newChannelRuntimes)
@@ -62,7 +62,10 @@ public class ChannelRuntimeService : IChannelRuntimeService
             }
 
             //根据条件重启通道线程
-            await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            if (restart)
+            {
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            }
 
             return true;
         }
@@ -72,7 +75,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
         }
     }
 
-    public async Task<bool> DeleteChannelAsync(IEnumerable<long> ids)
+    public async Task<bool> DeleteChannelAsync(IEnumerable<long> ids, bool restart = true)
     {
         try
         {
@@ -80,6 +83,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
             ids = ids.ToHashSet();
             var result = await GlobalData.ChannelService.DeleteChannelAsync(ids).ConfigureAwait(false);
+            HashSet<IDriver> changedDriver = new();
 
             //批量修改之后，需要重新加载通道
             foreach (var id in ids)
@@ -89,19 +93,51 @@ public class ChannelRuntimeService : IChannelRuntimeService
                     channelRuntime.Dispose();
 
                     //也需要删除设备和变量
-                    channelRuntime.DeviceRuntimes.ParallelForEach(a =>
+                    channelRuntime.DeviceRuntimes.ParallelForEach((a =>
                     {
 
-                        a.Value.IdVariableRuntimes.ParallelForEach(v => v.Value.Dispose());
+                        ParallelExtensions.ParallelForEach(a.Value.VariableRuntimes, (v =>
+                        {
+                            //需要重启业务线程
+                            var deviceRuntimes = GlobalData.IdDevices.Where(a => GlobalData.ContainsVariable(a.Key, v.Value)).Select(a => a.Value);
+                            foreach (var deviceRuntime in deviceRuntimes)
+                            {
+                                if (deviceRuntime.Driver != null)
+                                {
+                                    changedDriver.Add(deviceRuntime.Driver);
+                                }
+                            }
+
+
+                            v.Value.Dispose();
+
+
+                        }
+                        ));
                         a.Value.Dispose();
 
-                    });
+                    }));
                 }
 
             }
 
             //根据条件重启通道线程
-            await GlobalData.ChannelThreadManage.RemoveChannelAsync(ids).ConfigureAwait(false);
+            if (restart)
+            {
+                await GlobalData.ChannelThreadManage.RemoveChannelAsync(ids).ConfigureAwait(false);
+
+                foreach (var driver in changedDriver)
+                {
+                    try
+                    {
+                        await driver.AfterVariablesChangedAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "VariablesChanged");
+                    }
+                }
+            }
 
             return true;
 
@@ -117,7 +153,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
     public Task<MemoryStream> ExportMemoryStream(List<Channel> data) =>
       GlobalData.ChannelService.ExportMemoryStream(data);
 
-    public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input)
+    public async Task ImportChannelAsync(Dictionary<string, ImportPreviewOutputBase> input, bool restart = true)
     {
         try
         {
@@ -146,7 +182,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             }
 
             //根据条件重启通道线程
-            await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
 
         }
 
@@ -155,7 +192,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             WaitLock.Release();
         }
     }
-    public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type)
+    public async Task<bool> SaveChannelAsync(Channel input, ItemChangedType type, bool restart = true)
     {
         try
         {
@@ -184,7 +221,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
 
             //根据条件重启通道线程
-            await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntime).ConfigureAwait(false);
+            if (restart)
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntime).ConfigureAwait(false);
 
             return true;
         }
@@ -197,7 +235,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
     public async Task RestartChannelAsync(IEnumerable<ChannelRuntime> oldChannelRuntimes)
     {
-        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes.SelectMany(a => a.Value.IdVariableRuntimes)).ParallelForEach(a => a.Value.SafeDispose());
+        oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes.SelectMany(a => a.Value.VariableRuntimes)).ParallelForEach(a => a.Value.SafeDispose());
         oldChannelRuntimes.SelectMany(a => a.DeviceRuntimes).ParallelForEach(a => a.Value.SafeDispose());
         oldChannelRuntimes.ParallelForEach(a => a.SafeDispose());
         var ids = oldChannelRuntimes.Select(a => a.Id).ToHashSet();
