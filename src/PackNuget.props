@@ -3,7 +3,6 @@
 	<PropertyGroup>
 
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageOutputPath>$(SolutionDir)..\..\nupkgs</PackageOutputPath>
 		<PackageVersion>$(Version)</PackageVersion>
 		<PackageTags>ThingsGateway;Diego;Blazor;IOT;设备采集;边缘网关;物联网</PackageTags>
@@ -13,6 +12,12 @@
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+
 	<ItemGroup>
 		<None Include="$(SolutionDir)PackNuget.props" Pack="true" PackagePath="\" />
 	</ItemGroup>
