@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 
 using ThingsGateway.Extension;
+using ThingsGateway.NewLife.Log;
 
 namespace ThingsGateway.Admin.Application;
 
@@ -86,8 +87,8 @@ public static class DbContext
     /// <inheritdoc/>
     public static void WriteErrorLogWithSql(string msg)
     {
-        Console.WriteLine("【Sql执行错误时间】：" + DateTime.Now.ToDefaultDateTimeFormat());
-        Console.WriteLine("【Sql语句】：" + msg + Environment.NewLine);
+        XTrace.Log.Error("【Sql执行错误时间】：" + DateTime.Now.ToDefaultDateTimeFormat());
+        XTrace.Log.Error("【Sql语句】：" + msg + Environment.NewLine);
     }
 
     /// <inheritdoc/>

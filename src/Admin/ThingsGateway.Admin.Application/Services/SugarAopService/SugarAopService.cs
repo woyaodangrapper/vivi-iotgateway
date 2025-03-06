@@ -11,6 +11,8 @@
 
 using SqlSugar;
 
+using ThingsGateway.NewLife.Log;
+
 namespace ThingsGateway.Admin.Application;
 
 public class SugarAopService : ISugarAopService
@@ -64,7 +66,6 @@ public class SugarAopService : ISugarAopService
             Console.ForegroundColor = ConsoleColor.Red;
             DbContext.WriteLog($"{config.ConfigId}库操作异常");
             DbContext.WriteErrorLogWithSql(UtilMethods.GetNativeSql(ex.Sql, (SugarParameter[])ex.Parametres));
-            Console.WriteLine(ex.ToString());
             NewLife.Log.XTrace.WriteException(ex);
             Console.ForegroundColor = ConsoleColor.White;
         };
