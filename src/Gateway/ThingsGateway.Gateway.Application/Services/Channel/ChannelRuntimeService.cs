@@ -126,7 +126,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RemoveChannelAsync(ids).ConfigureAwait(false);
 
-                foreach (var driver in changedDriver)
+                foreach (var driver in changedDriver.Where(a => a.DisposedValue == false && a.IsCollectDevice == false))
                 {
                     try
                     {

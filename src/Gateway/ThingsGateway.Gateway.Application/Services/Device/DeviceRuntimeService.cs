@@ -138,7 +138,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                         await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id)).ConfigureAwait(false);
                 }
 
-                foreach (var driver in changedDriver)
+                foreach (var driver in changedDriver.Where(a => a.DisposedValue == false && a.IsCollectDevice == false))
                 {
                     try
                     {
