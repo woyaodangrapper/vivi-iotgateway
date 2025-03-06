@@ -83,11 +83,15 @@ public partial class LogConsole : IDisposable
         Disposed = true;
         GC.SuppressFinalize(this);
     }
-
+    private WaitLock WaitLock = new();
     protected async Task ExecuteAsync()
     {
+        if (WaitLock.Waited) return;
         try
         {
+            await WaitLock.WaitAsync();
+            await Task.Delay(1000);
+
             if (LogPath != null)
             {
                 var files = TextFileReader.GetFiles(LogPath);
@@ -122,6 +126,11 @@ public partial class LogConsole : IDisposable
         catch (Exception ex)
         {
             NewLife.Log.XTrace.WriteException(ex);
+        }
+        finally
+        {
+
+            WaitLock.Release();
         }
     }
 
@@ -218,7 +227,6 @@ public partial class LogConsole : IDisposable
             {
                 await ExecuteAsync();
                 await InvokeAsync(StateHasChanged);
-                await Task.Delay(1000);
             }
             catch (Exception ex)
             {
