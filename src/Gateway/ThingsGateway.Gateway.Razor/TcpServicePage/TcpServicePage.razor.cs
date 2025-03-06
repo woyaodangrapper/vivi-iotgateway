@@ -41,7 +41,7 @@ public partial class TcpServicePage : IDriverUIBase
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(null, $"{ex.Message}");
+            await ToastService.Warn(ex);
             return false;
         }
     }

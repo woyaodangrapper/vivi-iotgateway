@@ -45,7 +45,7 @@ public partial class SaveUpdateZipFile
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(ex.Message).ConfigureAwait(false);
+            await ToastService.Warn(ex).ConfigureAwait(false);
         }
     }
 

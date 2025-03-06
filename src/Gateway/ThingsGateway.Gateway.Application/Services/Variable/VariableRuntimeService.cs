@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
+using ThingsGateway.NewLife.Collections;
 
 using TouchSocket.Core;
 
@@ -45,7 +46,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
             var data = GlobalData.IdVariables.Where(a => ids.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
@@ -62,7 +63,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -72,7 +73,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     if (group.Key.Driver != null)
                     {
-                        changedDriver.Add(group.Key.Driver);
+                        changedDriver.TryAdd(group.Key.Driver);
                     }
                 }
             }
@@ -86,7 +87,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
                     if (deviceRuntime.Driver != null && !changedDriver.Contains(deviceRuntime.Driver))
                     {
-                        changedDriver.Add(deviceRuntime.Driver);
+                        changedDriver.TryAdd(deviceRuntime.Driver);
                     }
                 }
             }
@@ -135,7 +136,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
             var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
@@ -148,7 +149,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -158,7 +159,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     if (group.Key.Driver != null)
                     {
-                        changedDriver.Add(group.Key.Driver);
+                        changedDriver.TryAdd(group.Key.Driver);
                     }
                 }
             }
@@ -172,7 +173,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
                     if (deviceRuntime.Driver != null && !changedDriver.Contains(deviceRuntime.Driver))
                     {
-                        changedDriver.Add(deviceRuntime.Driver);
+                        changedDriver.TryAdd(deviceRuntime.Driver);
                     }
                 }
             }
@@ -222,7 +223,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 variableRuntime.Dispose();
             }
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
@@ -235,7 +236,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -245,7 +246,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     if (group.Key.Driver != null)
                     {
-                        changedDriver.Add(group.Key.Driver);
+                        changedDriver.TryAdd(group.Key.Driver);
                     }
                 }
             }
@@ -294,7 +295,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             //先找出线程管理器，停止
             var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
@@ -307,7 +308,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -317,7 +318,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     if (group.Key.Driver != null)
                     {
-                        changedDriver.Add(group.Key.Driver);
+                        changedDriver.TryAdd(group.Key.Driver);
                     }
                 }
             }
@@ -331,7 +332,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     //添加新变量所在任务
                     if (deviceRuntime.Driver != null && !changedDriver.Contains(deviceRuntime.Driver))
                     {
-                        changedDriver.Add(deviceRuntime.Driver);
+                        changedDriver.TryAdd(deviceRuntime.Driver);
                     }
                 }
             }
@@ -480,7 +481,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
             if (newVariableRuntime == null) return false;
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
 
 
 
@@ -491,7 +492,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             {
                 if (variableRuntime.DeviceRuntime?.Driver != null)
                 {
-                    changedDriver.Add(variableRuntime.DeviceRuntime.Driver);
+                    changedDriver.TryAdd(variableRuntime.DeviceRuntime.Driver);
                 }
                 variableRuntime.Dispose();
             }
@@ -502,7 +503,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             {
                 if (businessDeviceRuntime.Driver != null)
                 {
-                    changedDriver.Add(businessDeviceRuntime.Driver);
+                    changedDriver.TryAdd(businessDeviceRuntime.Driver);
                 }
             }
 
@@ -514,7 +515,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
                 if (deviceRuntime.Driver != null && !changedDriver.Contains(deviceRuntime.Driver))
                 {
-                    changedDriver.Add(deviceRuntime.Driver);
+                    changedDriver.TryAdd(deviceRuntime.Driver);
                 }
 
             }
@@ -562,7 +563,7 @@ public class VariableRuntimeService : IVariableRuntimeService
             //获取变量，先找到原插件线程，然后修改插件线程内的字典，再改动全局字典，最后刷新插件
             var data = GlobalData.IdVariables.Where(a => newVarIds.Contains(a.Key)).GroupBy(a => a.Value.DeviceRuntime);
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
@@ -575,7 +576,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -585,7 +586,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     if (group.Key.Driver != null)
                     {
-                        changedDriver.Add(group.Key.Driver);
+                        changedDriver.TryAdd(group.Key.Driver);
                     }
                 }
             }
@@ -600,7 +601,7 @@ public class VariableRuntimeService : IVariableRuntimeService
 
                     if (deviceRuntime.Driver != null && !changedDriver.Contains(deviceRuntime.Driver))
                     {
-                        changedDriver.Add(deviceRuntime.Driver);
+                        changedDriver.TryAdd(deviceRuntime.Driver);
                     }
                 }
             }
@@ -646,7 +647,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 variableRuntime.Dispose();
             }
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
             foreach (var group in data)
             {
                 //这里改动的可能是旧绑定设备
@@ -659,7 +660,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -669,7 +670,7 @@ public class VariableRuntimeService : IVariableRuntimeService
                 {
                     if (group.Key.Driver != null)
                     {
-                        changedDriver.Add(group.Key.Driver);
+                        changedDriver.TryAdd(group.Key.Driver);
                     }
                 }
             }

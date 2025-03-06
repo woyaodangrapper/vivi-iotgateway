@@ -363,7 +363,7 @@ public partial class ChannelDeviceTree : IDisposable
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 
@@ -413,7 +413,7 @@ public partial class ChannelDeviceTree : IDisposable
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 
@@ -808,7 +808,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 
@@ -860,7 +860,7 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 

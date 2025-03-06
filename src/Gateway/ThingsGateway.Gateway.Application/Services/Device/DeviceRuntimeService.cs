@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Collections;
 
 namespace ThingsGateway.Gateway.Application;
 
@@ -105,7 +106,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
             var deviceRuntimes = GlobalData.IdDevices.Where(a => ids.Contains(a.Key)).Select(a => a.Value).ToList();
 
 
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
 
             foreach (var deviceRuntime in deviceRuntimes)
             {
@@ -119,7 +120,7 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                     {
                         if (deviceRuntime.Driver != null)
                         {
-                            changedDriver.Add(deviceRuntime.Driver);
+                            changedDriver.TryAdd(deviceRuntime.Driver);
                         }
                     }
 
@@ -138,7 +139,8 @@ public class DeviceRuntimeService : IDeviceRuntimeService
                         await group.Key.RemoveDeviceAsync(group.Value.Select(a => a.Id)).ConfigureAwait(false);
                 }
 
-                foreach (var driver in changedDriver.Where(a => a.DisposedValue == false && a.IsCollectDevice == false))
+                var changedDrivers = changedDriver.Where(a => a.DisposedValue == false && a.IsCollectDevice == false).ToHashSet();
+                foreach (var driver in changedDrivers)
                 {
                     try
                     {

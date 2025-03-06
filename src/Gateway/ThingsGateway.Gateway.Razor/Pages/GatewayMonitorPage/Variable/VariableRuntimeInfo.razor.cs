@@ -174,7 +174,7 @@ public partial class VariableRuntimeInfo : IDisposable
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
             return false;
         }
@@ -199,7 +199,7 @@ public partial class VariableRuntimeInfo : IDisposable
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(null, $"{ex.Message}");
+            await ToastService.Warn(ex);
             return false;
         }
     }
@@ -295,7 +295,7 @@ public partial class VariableRuntimeInfo : IDisposable
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 
@@ -335,7 +335,7 @@ public partial class VariableRuntimeInfo : IDisposable
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 

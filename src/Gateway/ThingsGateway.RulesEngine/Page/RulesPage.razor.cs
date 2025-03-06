@@ -84,7 +84,7 @@ public partial class RulesPage
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
             return false;
         }
@@ -102,7 +102,7 @@ public partial class RulesPage
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
             return false;
         }
@@ -134,7 +134,7 @@ public partial class RulesPage
         {
             await InvokeAsync(async () =>
             {
-                await ToastService.Warning(null, $"{ex.Message}");
+                await ToastService.Warn(ex);
             });
         }
 

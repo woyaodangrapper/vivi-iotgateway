@@ -38,7 +38,7 @@ public partial class UpdateZipFilePage
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(ex.Message);
+            await ToastService.Warn(ex);
             return new QueryData<UpdateZipFile>() { };
         }
 

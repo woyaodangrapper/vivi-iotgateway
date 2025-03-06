@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 
 using ThingsGateway.Extension.Generic;
 using ThingsGateway.NewLife;
+using ThingsGateway.NewLife.Collections;
 
 using TouchSocket.Core;
 
@@ -83,7 +84,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
 
             ids = ids.ToHashSet();
             var result = await GlobalData.ChannelService.DeleteChannelAsync(ids).ConfigureAwait(false);
-            HashSet<IDriver> changedDriver = new();
+            ConcurrentHashSet<IDriver> changedDriver = new();
 
             //批量修改之后，需要重新加载通道
             foreach (var id in ids)
@@ -104,7 +105,7 @@ public class ChannelRuntimeService : IChannelRuntimeService
                             {
                                 if (deviceRuntime.Driver != null)
                                 {
-                                    changedDriver.Add(deviceRuntime.Driver);
+                                    changedDriver.TryAdd(deviceRuntime.Driver);
                                 }
                             }
 
@@ -126,7 +127,8 @@ public class ChannelRuntimeService : IChannelRuntimeService
             {
                 await GlobalData.ChannelThreadManage.RemoveChannelAsync(ids).ConfigureAwait(false);
 
-                foreach (var driver in changedDriver.Where(a => a.DisposedValue == false && a.IsCollectDevice == false))
+                var changedDrivers = changedDriver.Where(a => a.DisposedValue == false && a.IsCollectDevice == false).ToHashSet();
+                foreach (var driver in changedDrivers)
                 {
                     try
                     {

@@ -10,6 +10,8 @@
 
 using Microsoft.Extensions.Hosting;
 
+using ThingsGateway.NewLife.Log;
+
 namespace ThingsGateway.Razor;
 
 /// <inheritdoc/>
@@ -28,9 +30,13 @@ public static class ToastServiceExtensions
     /// <inheritdoc/>
     public static Task Warn(this ToastService toastService, Exception ex)
     {
+        XTrace.WriteException(ex);
+
         if (App.HostEnvironment.IsDevelopment())
             return toastService.Warning("Warn", ex.ToString());
         else
             return toastService.Warning("Warn", ex.Message);
+
+
     }
 }

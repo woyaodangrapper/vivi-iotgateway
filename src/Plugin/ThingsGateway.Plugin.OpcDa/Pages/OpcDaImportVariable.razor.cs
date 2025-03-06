@@ -218,7 +218,7 @@ public partial class OpcDaImportVariable
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(ex.Message);
+            await ToastService.Warn(ex);
         }
     }
 
@@ -240,7 +240,7 @@ public partial class OpcDaImportVariable
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(ex.Message);
+            await ToastService.Warn(ex);
         }
     }
 

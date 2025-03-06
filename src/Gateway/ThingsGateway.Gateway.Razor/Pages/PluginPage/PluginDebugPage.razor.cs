@@ -84,7 +84,7 @@ public partial class PluginDebugPage
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(null, ex.Message);
+            await ToastService.Warn(ex);
             return null;
         }
     }

@@ -268,7 +268,7 @@ public partial class OpcUaImportVariable
         }
         catch (Exception ex)
         {
-            await ToastService.Warning(ex.Message);
+            await ToastService.Warn(ex);
         }
     }
 
