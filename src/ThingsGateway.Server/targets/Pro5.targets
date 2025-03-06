@@ -5,7 +5,7 @@
 		<PackageReference Include="ThingsGateway.Plugin.MqttYINGKE" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
 	</ItemGroup>
 
-	<Target Name="CopyOtherPluginNugetPackages" AfterTargets="Build">
+	<Target Name="CopyOtherPlugin5NugetPackages" AfterTargets="Build">
 		<PropertyGroup>
 			<PluginTargetFramework>net8.0</PluginTargetFramework>
 		</PropertyGroup>

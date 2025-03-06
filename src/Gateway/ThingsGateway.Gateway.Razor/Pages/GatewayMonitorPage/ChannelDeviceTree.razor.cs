@@ -1054,12 +1054,12 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     private ChannelDeviceTreeItem BusinessItem = new() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginType, PluginType = PluginTypeEnum.Business };
     private ChannelDeviceTreeItem UnknownItem = new() { ChannelDevicePluginType = ChannelDevicePluginTypeEnum.PluginType, PluginType = null };
 
-    private TreeViewItem<ChannelDeviceTreeItem> BusinessTreeViewItem;
+    private TreeViewItem<ChannelDeviceTreeItem> UnknownTreeViewItem;
     protected override async Task OnInitializedAsync()
     {
 
 
-        BusinessTreeViewItem = new TreeViewItem<ChannelDeviceTreeItem>(UnknownItem)
+        UnknownTreeViewItem = new TreeViewItem<ChannelDeviceTreeItem>(UnknownItem)
         {
             Text = GatewayLocalizer["Unknown"],
             IsActive = Value == UnknownItem,
@@ -1085,22 +1085,22 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         var item2 = ResourceUtil.BuildTreeItemList(channels.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
         if (item2.Count > 0)
         {
-            BusinessTreeViewItem.Items = item2;
-            if (ZItem.Count >= 2)
+            UnknownTreeViewItem.Items = item2;
+            if (ZItem.Count >= 3)
             {
 
             }
             else
             {
-                ZItem.Add(BusinessTreeViewItem);
+                ZItem.Add(UnknownTreeViewItem);
             }
 
         }
         else
         {
-            if (ZItem.Count >= 2)
+            if (ZItem.Count >= 3)
             {
-                ZItem.Remove(BusinessTreeViewItem);
+                ZItem.Remove(UnknownTreeViewItem);
             }
             else
             {
@@ -1197,22 +1197,22 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             var item2 = ResourceUtil.BuildTreeItemList(items.Where(a => a.IsCollect == null), new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
             if (item2.Count > 0)
             {
-                BusinessTreeViewItem.Items = item2;
-                if (ZItem.Count >= 2)
+                UnknownTreeViewItem.Items = item2;
+                if (ZItem.Count >= 3)
                 {
 
                 }
                 else
                 {
-                    ZItem.Add(BusinessTreeViewItem);
+                    ZItem.Add(UnknownTreeViewItem);
                 }
 
             }
             else
             {
-                if (ZItem.Count >= 2)
+                if (ZItem.Count >= 3)
                 {
-                    ZItem.Remove(BusinessTreeViewItem);
+                    ZItem.Remove(UnknownTreeViewItem);
                 }
                 else
                 {
@@ -1280,22 +1280,22 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             var item2 = otherChannelDevices.BuildTreeItemList(new List<ChannelDeviceTreeItem> { Value }, RenderTreeItem);
             if (item2.Count > 0)
             {
-                BusinessTreeViewItem.Items = item2;
-                if (ZItem.Count >= 2)
+                UnknownTreeViewItem.Items = item2;
+                if (ZItem.Count >= 3)
                 {
 
                 }
                 else
                 {
-                    ZItem.Add(BusinessTreeViewItem);
+                    ZItem.Add(UnknownTreeViewItem);
                 }
 
             }
             else
             {
-                if (ZItem.Count >= 2)
+                if (ZItem.Count >= 3)
                 {
-                    ZItem.Remove(BusinessTreeViewItem);
+                    ZItem.Remove(UnknownTreeViewItem);
                 }
                 else
                 {

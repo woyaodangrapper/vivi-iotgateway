@@ -7,7 +7,7 @@
 		<PackageReference Include="ThingsGateway.Plugin.YPSFSK" Version="$(ProPluginVersion)" GeneratePathProperty="true" Private="false"  IncludeAssets="native;" />
 	</ItemGroup>
 
-	<Target Name="CopyOtherPluginNugetPackages" AfterTargets="Build">
+	<Target Name="CopyOtherPlugin3NugetPackages" AfterTargets="Build">
 		<PropertyGroup>
 			<PluginTargetFramework>net8.0</PluginTargetFramework>
 		</PropertyGroup>
