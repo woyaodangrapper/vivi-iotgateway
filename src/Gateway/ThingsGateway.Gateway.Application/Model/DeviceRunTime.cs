@@ -145,7 +145,7 @@ public class DeviceRuntime : Device, IDisposable
     [Newtonsoft.Json.JsonIgnore]
     [AdaptIgnore]
     [AutoGenerateColumn(Ignore = true)]
-    internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; set; } = new(Environment.ProcessorCount, 1000);
+    internal ConcurrentDictionary<string, VariableRuntime>? VariableRuntimes { get; } = new(Environment.ProcessorCount, 1000);
 
     /// <summary>
     /// 特殊方法数量

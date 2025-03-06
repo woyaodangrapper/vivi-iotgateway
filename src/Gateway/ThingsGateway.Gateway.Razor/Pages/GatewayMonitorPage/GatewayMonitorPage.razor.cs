@@ -28,11 +28,11 @@ public partial class GatewayMonitorPage
             ShowChannelRuntime = channelRuntime;
             if (channelRuntime.IsCollect == true)
             {
-                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value));
+                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).Where(a => a != null));
             }
             else
             {
-                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.SelectMany(a => a.Value.Driver?.IdVariableRuntimes?.Select(a => a.Value)).Where(a => a != null);
+                VariableRuntimes = channelRuntime.ReadDeviceRuntimes.Where(a => a.Value?.Driver?.IdVariableRuntimes != null).SelectMany(a => a.Value?.Driver?.IdVariableRuntimes?.Where(a => a.Value != null)?.Select(a => a.Value)).Where(a => a != null);
             }
 
         }
@@ -41,11 +41,11 @@ public partial class GatewayMonitorPage
             ShowDeviceRuntime = deviceRuntime;
             if (deviceRuntime.IsCollect == true)
             {
-                VariableRuntimes = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value);
+                VariableRuntimes = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).Where(a => a != null);
             }
             else
             {
-                VariableRuntimes = deviceRuntime.Driver?.IdVariableRuntimes?
+                VariableRuntimes = deviceRuntime.Driver?.IdVariableRuntimes?.Where(a => a.Value != null)
 .Select(a => a.Value) ?? Enumerable.Empty<VariableRuntime>();
             }
 
@@ -56,18 +56,18 @@ public partial class GatewayMonitorPage
             if (pluginType == PluginTypeEnum.Collect)
             {
                 var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).SelectMany(a => a.Value.ReadOnlyVariableRuntimes).Select(a => a.Value);
+                VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).SelectMany(a => a.Value.ReadOnlyVariableRuntimes).Select(a => a.Value).Where(a => a != null);
             }
             else
             {
                 var channels = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
-                VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).SelectMany(a => a.Value.Driver?.IdVariableRuntimes).Select(a => a.Value).Where(a => a != null);
+                VariableRuntimes = channels.Where(a => a.PluginName == pluginName).SelectMany(a => a.ReadDeviceRuntimes).Where(a => a.Value.Driver?.IdVariableRuntimes != null).SelectMany(a => a.Value.Driver?.IdVariableRuntimes).Select(a => a.Value);
             }
         }
         else
         {
             var variables = await GlobalData.GetCurrentUserIdVariables().ConfigureAwait(false);
-            VariableRuntimes = variables;
+            VariableRuntimes = variables.Where(a => a != null);
         }
         await InvokeAsync(StateHasChanged);
     }
