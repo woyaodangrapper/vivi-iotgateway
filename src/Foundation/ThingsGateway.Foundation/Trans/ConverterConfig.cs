@@ -100,7 +100,7 @@ public class ConverterConfig
         StringBuilder stringBuilder = Pool.StringBuilder.Get();
         if (DataFormat != null)
         {
-            stringBuilder.Append("format=");
+            stringBuilder.Append("data=");
             stringBuilder.Append(DataFormat.ToString());
             stringBuilder.Append(';');
         }
