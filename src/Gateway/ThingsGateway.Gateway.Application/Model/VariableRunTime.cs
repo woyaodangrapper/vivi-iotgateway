@@ -365,8 +365,6 @@ public class VariableRuntime : Variable, IVariable, IDisposable
             GlobalData.AlarmChange(this.Adapt<AlarmVariable>());
         }
 
-        DeviceRuntime = null;
-
         GC.SuppressFinalize(this);
     }
 
