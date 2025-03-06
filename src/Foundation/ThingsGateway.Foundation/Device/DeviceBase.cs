@@ -315,7 +315,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
         return EasyTask.CompletedTask;
     }
-
+    protected volatile bool AutoConnect = true;
     /// <inheritdoc/>
     private async ValueTask<OperResult> SendAsync(ISendMessage sendMessage, IClientChannel channel = default, CancellationToken token = default)
     {
@@ -327,43 +327,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 channel = clientChannel;
             }
 
-            SetDataAdapter(channel);
-            try
-            {
-                if (!Channel.Online)
-                    await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await Task.Delay(1000, token).ConfigureAwait(false);
-                return new(ex);
-            }
-
-            if (token.IsCancellationRequested)
-                return new(new OperationCanceledException());
-
-
-
-            if (token.IsCancellationRequested)
-                return new(new OperationCanceledException());
-
-
-            if (SendDelayTime != 0)
-                await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
-
-            try
-            {
-                if (!Channel.Online)
-                    await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await Task.Delay(1000, token).ConfigureAwait(false);
-                return new(ex);
-            }
-
-            if (token.IsCancellationRequested)
-                return new(new OperationCanceledException());
 
             await channel.SendAsync(sendMessage).ConfigureAwait(false);
 
@@ -373,6 +336,42 @@ public abstract class DeviceBase : DisposableObject, IDevice
         {
             return new(ex);
         }
+    }
+
+    private async ValueTask BefortSendAsync(IClientChannel channel, CancellationToken token)
+    {
+        SetDataAdapter(channel);
+        try
+        {
+            if (AutoConnect && !Channel.Online)
+                await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            await Task.Delay(1000, token).ConfigureAwait(false);
+            throw ex;
+        }
+
+        if (token.IsCancellationRequested)
+            throw  new OperationCanceledException();
+
+
+        if (SendDelayTime != 0)
+            await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
+
+        try
+        {
+            if (AutoConnect && !Channel.Online)
+                await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            await Task.Delay(1000, token).ConfigureAwait(false);
+            throw ex;
+        }
+
+        if (token.IsCancellationRequested)
+            throw  new OperationCanceledException();
     }
 
     /// <inheritdoc/>
@@ -386,7 +385,12 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
             try
             {
+
+                await BefortSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
+
                 await channelResult.Content.WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+
                 return await SendAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
             }
             finally
@@ -482,8 +486,10 @@ public abstract class DeviceBase : DisposableObject, IDevice
         command.Sign = sign;
         try
         {
-            waitData.SetCancellationToken(cancellationToken);
+            await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
+
             await clientChannel.WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            waitData.SetCancellationToken(cancellationToken);
 
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
             await SendAsync(command, clientChannel, cancellationToken).ConfigureAwait(false);

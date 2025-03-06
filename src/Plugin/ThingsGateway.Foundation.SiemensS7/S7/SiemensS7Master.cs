@@ -337,6 +337,7 @@ public partial class SiemensS7Master : DeviceBase
     {
         try
         {
+            AutoConnect = false;
             var ISO_CR = SiemensHelper.ISO_CR;
 
             var S7_PN = SiemensHelper.S7_PN;
@@ -397,7 +398,7 @@ public partial class SiemensS7Master : DeviceBase
 
             try
             {
-                var result2 = await SendThenReturnAsync(new S7Send(ISO_CR)).ConfigureAwait(false);
+                var result2 = await GetResponsedDataAsync(new S7Send(ISO_CR), channel,Timeout).ConfigureAwait(false);
                 if (!result2.IsSuccess)
                 {
                     Logger?.LogWarning(SiemensS7Resource.Localizer["HandshakeError1", channel.ToString(), result2.ErrorMessage]);
@@ -438,6 +439,7 @@ public partial class SiemensS7Master : DeviceBase
         }
         finally
         {
+            AutoConnect = true;
             await base.ChannelStarted(channel, last).ConfigureAwait(false);
         }
         return true;

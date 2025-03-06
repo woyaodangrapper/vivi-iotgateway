@@ -81,8 +81,11 @@ public class TcpClientChannel : TcpClient, IClientChannel
                 if (Online)
                 {
                     await base.CloseAsync(msg).ConfigureAwait(false);
-                    Logger?.Debug($"{ToString()}  Closed{msg}");
-                    await this.OnChannelEvent(Stoped).ConfigureAwait(false);
+                    if (!Online)
+                    {
+                        Logger?.Debug($"{ToString()}  Closed{msg}");
+                        await this.OnChannelEvent(Stoped).ConfigureAwait(false);
+                    }
                 }
             }
             finally
@@ -104,9 +107,12 @@ public class TcpClientChannel : TcpClient, IClientChannel
                 {
                     //await SetupAsync(Config.Clone()).ConfigureAwait(false);
                     await base.ConnectAsync(millisecondsTimeout, token).ConfigureAwait(false);
-                    Logger?.Debug($"{ToString()}  Connected");
-                    await this.OnChannelEvent(Started).ConfigureAwait(false);
+                    if (Online)
+                    {
+                        Logger?.Debug($"{ToString()}  Connected");
+                        await this.OnChannelEvent(Started).ConfigureAwait(false);
 
+                    }
                 }
             }
             finally

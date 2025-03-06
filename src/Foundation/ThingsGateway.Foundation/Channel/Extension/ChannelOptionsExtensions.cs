@@ -69,10 +69,6 @@ public static class ChannelOptionsExtensions
                     break;
                 }
             }
-            foreach (var func in funcs)
-            {
-
-            }
         }
     }
 
