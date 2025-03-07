@@ -173,15 +173,16 @@ public partial class MqttCollect : CollectBase
     {
         if (_mqttClient?.IsConnected == true)
             return OperResult.Success;
-        return await Cilent().ConfigureAwait(false);
+        return await Client().ConfigureAwait(false);
 
-        async ValueTask<OperResult> Cilent()
+        async ValueTask<OperResult> Client()
         {
             if (_mqttClient?.IsConnected == true)
                 return OperResult.Success;
             try
             {
                 await ConnectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+                await Task.Delay(100,cancellationToken).ConfigureAwait(false);
                 if (_mqttClient?.IsConnected == true)
                     return OperResult.Success;
                 using var timeoutToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(_driverPropertys.ConnectTimeout));
