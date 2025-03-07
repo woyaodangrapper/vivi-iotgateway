@@ -30,7 +30,6 @@
 		<ProjectReference Include="..\ThingsGateway.Furion\ThingsGateway.Furion.csproj" />
 	</ItemGroup>
 
-
 </Project>
 
 

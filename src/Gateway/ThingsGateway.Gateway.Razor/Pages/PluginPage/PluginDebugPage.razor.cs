@@ -57,7 +57,7 @@ public partial class PluginDebugPage
                   Children = a.ToList()
               };
           }
-          ).ToList();
+          ).OrderBy(a=>a.Name).ToList();
         PluginTreeViewItems = pluginGroups.BuildTreeItemList();
         base.OnParametersSet();
     }

@@ -25,7 +25,7 @@
 
 
 	<!--nuget包解压复制文件，上下文动态加载-->
-	<Import Project="..\ThingsGateway.Server\targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' OR  '$(Configuration)' != 'Debug' " />
+	<Import Project="..\ThingsGateway.Server\targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
 	<!--直接引用-->
 	<Import Project="..\ThingsGateway.Server\targets\PluginDebug.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug' " />
 
@@ -37,6 +37,8 @@
 
 	<!--直接引用Pro-->
 	<Import Project="..\ThingsGateway.Server\targets\PluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug'" />
+	<Import Project="..\ThingsGateway.Server\targets\PluginContext.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
+
 	<Import Project="..\ThingsGateway.Server\targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug'" />
 
 	<!--打包复制-->

@@ -117,8 +117,6 @@ dotnet_naming_style.帕斯卡拼写法.required_suffix =
 dotnet_naming_style.帕斯卡拼写法.word_separator =
 dotnet_naming_style.帕斯卡拼写法.capitalization = pascal_case
 
-[*.cs]
-# Add file header
 file_header_template = ------------------------------------------------------------------------------\n此代码版权声明为全文件覆盖，如有原作者特别声明，会在下方手动补充\n此代码版权（除特别声明外的代码）归作者本人Diego所有\n源代码使用协议遵循本仓库的开源协议及附加协议\nGitee源代码仓库：https://gitee.com/diego2098/ThingsGateway\nGithub源代码仓库：https://github.com/kimdiego2098/ThingsGateway\n使用文档：https://thingsgateway.cn/\nQQ群：605534569\n------------------------------------------------------------------------------
 
 [*.{cs,vb}]

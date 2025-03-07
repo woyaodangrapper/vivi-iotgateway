@@ -26,8 +26,9 @@ public class Device : BaseDataEntity, IValidatableObject
 {
     public override string ToString()
     {
-        return Name ?? base.ToString();
+        return $"{Name}[{Description}]";
     }
+
     /// <summary>
     /// 名称
     /// </summary>
