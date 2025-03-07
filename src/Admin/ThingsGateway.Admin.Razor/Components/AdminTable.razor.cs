@@ -360,7 +360,7 @@ public partial class AdminTable<TItem> where TItem : class, new()
 
     /// <inheritdoc cref="Table{TItem}.TableSize"/>
     [Parameter]
-    public TableSize TableSize { get; set; } = TableSize.Normal;
+    public TableSize TableSize { get; set; } = TableSize.Compact;
 
     /// <inheritdoc cref="Table{TItem}.TableToolbarBeforeTemplate"/>
     [NotNull]
