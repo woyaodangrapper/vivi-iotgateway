@@ -14,6 +14,8 @@ using SqlSugar;
 
 using System.ComponentModel.DataAnnotations;
 
+using ThingsGateway.NewLife.Extension;
+
 namespace ThingsGateway.Gateway.Application;
 
 /// <summary>
@@ -26,7 +28,10 @@ public class Device : BaseDataEntity, IValidatableObject
 {
     public override string ToString()
     {
-        return $"{Name}[{Description}]";
+        if (Description.IsNullOrWhiteSpace())
+            return Name;
+        else
+            return $"{Name}[{Description}]";
     }
 
     /// <summary>

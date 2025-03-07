@@ -353,7 +353,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         }
 
         if (token.IsCancellationRequested)
-            throw  new OperationCanceledException();
+            throw new OperationCanceledException();
 
 
         if (SendDelayTime != 0)
@@ -371,7 +371,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         }
 
         if (token.IsCancellationRequested)
-            throw  new OperationCanceledException();
+            throw new OperationCanceledException();
     }
 
     /// <inheritdoc/>

@@ -901,7 +901,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 
             if (sysUser.Account == RoleConst.SuperAdmin)
             {
-                var modules = (await _sysResourceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.Category == ResourceCategoryEnum.Module).OrderBy(a=>a.SortCode);
+                var modules = (await _sysResourceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.Category == ResourceCategoryEnum.Module).OrderBy(a => a.SortCode);
                 sysUser.ModuleList = modules.ToList();//模块列表赋值给用户
             }
             else

@@ -11,8 +11,6 @@
 
 using SqlSugar;
 
-using ThingsGateway.NewLife.Log;
-
 namespace ThingsGateway.Admin.Application;
 
 public class SugarAopService : ISugarAopService

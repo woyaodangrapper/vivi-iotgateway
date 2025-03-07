@@ -246,7 +246,7 @@ public class AuthService : IAuthService
         await UpdateUser(logingEvent).ConfigureAwait(false);
         if (sysUser.Account == RoleConst.SuperAdmin)
         {
-            var modules = (await _sysResourceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.Category == ResourceCategoryEnum.Module).OrderBy(a=>a.SortCode);//获取模块列表
+            var modules = (await _sysResourceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.Category == ResourceCategoryEnum.Module).OrderBy(a => a.SortCode);//获取模块列表
             sysUser.ModuleList = modules.ToList();//模块列表赋值给用户
         }
         //返回结果

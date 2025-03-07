@@ -10,8 +10,6 @@
 
 using Microsoft.AspNetCore.Components.Forms;
 
-using TouchSocket.Core;
-
 namespace ThingsGateway.Upgrade;
 
 public partial class SaveUpdateZipFile

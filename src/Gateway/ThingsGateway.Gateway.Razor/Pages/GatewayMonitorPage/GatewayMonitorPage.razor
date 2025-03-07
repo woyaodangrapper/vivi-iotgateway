@@ -9,31 +9,38 @@
 
 <div class="row h-100 g-0">
 
-    <div class="col-0 col-sm-3 h-100 g-0 pe-1">
-        <Card IsShadow=true class="h-100" Color="Color.Primary">
-            <BodyTemplate>
-                <ChannelDeviceTree @bind-ShowType=ShowType AutoRestartThread ="AutoRestartThread" ChannelDeviceChanged="TreeChangedAsync" Value="SelectModel"></ChannelDeviceTree>
-            </BodyTemplate>
-        </Card>
-    </div>
-    <div class="col-0 col-sm-9 h-100 g-0 ">
-        @if (ShowType == ShowTypeEnum.Variable)
-        {
-            <VariableRuntimeInfo Items="VariableRuntimes" SelectModel="SelectModel" AutoRestartThread="AutoRestartThread" />
-        }
-        else
-        {
-            if (ShowDeviceRuntime != null)
+    <Split Basis="20%" ShowBarHandle=false>
+        <FirstPaneTemplate>
+
+
+            <Card IsShadow=true class="h-100" Color="Color.Primary">
+                <BodyTemplate>
+                    <ChannelDeviceTree @bind-ShowType=ShowType AutoRestartThread="AutoRestartThread" ChannelDeviceChanged="TreeChangedAsync" Value="SelectModel"></ChannelDeviceTree>
+                </BodyTemplate>
+            </Card>
+
+
+        </FirstPaneTemplate>
+        <SecondPaneTemplate>
+
+            @if (ShowType == ShowTypeEnum.Variable)
             {
-                <DeviceRuntimeInfo DeviceRuntime="ShowDeviceRuntime" />
+                <VariableRuntimeInfo Items="VariableRuntimes" SelectModel="SelectModel" AutoRestartThread="AutoRestartThread" />
             }
-            if (ShowChannelRuntime != null)
+            else
             {
-                <ChannelRuntimeInfo ChannelRuntime="ShowChannelRuntime" />
+                if (ShowDeviceRuntime != null)
+                {
+                    <DeviceRuntimeInfo DeviceRuntime="ShowDeviceRuntime" />
+                }
+                if (ShowChannelRuntime != null)
+                {
+                    <ChannelRuntimeInfo ChannelRuntime="ShowChannelRuntime" />
+                }
             }
-        }
-    </div>
+        </SecondPaneTemplate>
+    </Split>
 
 </div>
-<QuickActions @bind-AutoRestartThread=AutoRestartThread  />
+<QuickActions @bind-AutoRestartThread=AutoRestartThread />
 
