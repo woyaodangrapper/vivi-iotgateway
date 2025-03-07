@@ -38,7 +38,7 @@
     "AvailableMemory": "Available Memory",
     "TotalMemory": "Total Memory",
     "WorkingSet": "WorkingSet",
-    "MemoryUsage": "Memory Usage",
+    "MemoryUsage": "Memory",
     "AvailableDisk": "Available Disk",
     "TotalDisk": "Total Disk",
     "DiskUsage": "Disk Usage",

@@ -85,6 +85,14 @@
   },
 
   "ThingsGateway.Gateway.Razor._Imports": {
+    "CopyChannelNamePrefix": "通道名称前缀",
+    "CopyChannelNameSuffixNumber": "通道名称后缀开始序号",
+    "CopyDeviceNamePrefix": "设备名称前缀",
+    "CopyDeviceNameSuffixNumber": "设备名称后缀开始序号",
+    "CopyCount": "复制数量",
+    "CopyChannel": "复制通道",
+    "CopyDevice": "复制设备",
+    "CopyVariable": "复制变量",
 
     "GatewayDeviceShowDriverUI": "插件UI",
     "DeviceRedundantThread": "切换冗余",

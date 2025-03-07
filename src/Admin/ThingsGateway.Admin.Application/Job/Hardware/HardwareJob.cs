@@ -121,7 +121,7 @@ public class HardwareJob : IJob, IHardwareJob
                                 Date = TimerX.Now,
                                 DriveUsage = (100 - (HardwareInfo.DriveInfo.TotalFreeSpace * 100.00 / HardwareInfo.DriveInfo.TotalSize)).ToString("F2"),
                                 Battery = (HardwareInfo.MachineInfo.Battery * 100).ToString("F2"),
-                                MemoryUsage = (100 - (HardwareInfo.MachineInfo.AvailableMemory * 100.00 / HardwareInfo.MachineInfo.Memory)).ToString("F2"),
+                                MemoryUsage = (HardwareInfo.WorkingSet),
                                 CpuUsage = (HardwareInfo.MachineInfo.CpuRate * 100).ToString("F2"),
                                 Temperature = (HardwareInfo.MachineInfo.Temperature).ToString("F2"),
                             };

@@ -91,6 +91,14 @@
 
 
   "ThingsGateway.Gateway.Razor._Imports": {
+    "CopyChannelNamePrefix": "CopyChannelNamePrefix",
+    "CopyChannelNameSuffixNumber": "CopyChannelNameSuffixNumber",
+    "CopyDeviceNamePrefix": "CopyDeviceNamePrefix",
+    "CopyDeviceNameSuffixNumber": "CopyDeviceNameSuffixNumber",
+    "CopyCount": "CopyCount",
+    "CopyChannel": "CopyChannel",
+    "CopyDevice": "CopyDevice",
+    "CopyVariable": "CopyVariable",
 
     "GatewayDeviceShowDriverUI": "Show driverUI",
     "DeviceRedundantThread": "Switching redundancy",

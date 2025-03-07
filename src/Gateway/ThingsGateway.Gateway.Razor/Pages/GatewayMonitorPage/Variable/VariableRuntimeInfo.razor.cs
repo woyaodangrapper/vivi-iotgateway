@@ -160,6 +160,7 @@ public partial class VariableRuntimeInfo : IDisposable
         await DialogService.Show(op);
     }
 
+
     private async Task<bool> Delete(IEnumerable<Variable> devices)
     {
         try
@@ -308,13 +309,6 @@ public partial class VariableRuntimeInfo : IDisposable
         try
         {
 
-            await InvokeAsync(async () =>
-            {
-                await MaskService.Show(new MaskOption()
-                {
-                    ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                });
-            });
             try
             {
                 await Task.Run(() => GlobalData.VariableRuntimeService.InsertTestDataAsync(TestVariableCount, TestDeviceCount, SlaveUrl, AutoRestartThread));
@@ -323,7 +317,6 @@ public partial class VariableRuntimeInfo : IDisposable
             {
                 await InvokeAsync(async () =>
                 {
-                    await MaskService.Close();
                     await ToastService.Default();
                     await table.QueryAsync();
                     StateHasChanged();

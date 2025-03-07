@@ -17,6 +17,7 @@ namespace ThingsGateway.Gateway.Application
     public interface IDeviceRuntimeService
     {
         Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart);
+        Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart = true);
         Task<bool> DeleteDeviceAsync(IEnumerable<long> ids, bool restart);
         Task<Dictionary<string, object>> ExportDeviceAsync(ExportFilter exportFilter);
         Task<MemoryStream> ExportMemoryStream(List<Device> data, string channelName);

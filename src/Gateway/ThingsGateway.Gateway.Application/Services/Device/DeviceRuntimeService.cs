@@ -29,6 +29,57 @@ public class DeviceRuntimeService : IDeviceRuntimeService
     }
 
     private WaitLock WaitLock { get; set; } = new WaitLock();
+
+
+    public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices, bool restart = true)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var result = await GlobalData.DeviceService.CopyAsync(devices).ConfigureAwait(false);
+
+            var deviceids = devices.Select(a => a.Key.Id).ToHashSet();
+            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => deviceids.Contains(a.Id)).Adapt<List<DeviceRuntime>>();
+
+            foreach (var newDeviceRuntime in newDeviceRuntimes)
+            {
+                if (GlobalData.Channels.TryGetValue(newDeviceRuntime.ChannelId, out var newChannelRuntime))
+                {
+                    newDeviceRuntime.Init(newChannelRuntime);
+
+                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+
+                    newVariableRuntimes.ParallelForEach(item =>
+                    {
+                        item.Init(newDeviceRuntime);
+                    });
+                }
+                else
+                {
+                    throw new("Channel not found");
+                }
+            }
+
+            //根据条件重启通道线程
+            if (restart)
+            {
+                foreach (var group in newDeviceRuntimes.Where(a => a.ChannelRuntime?.DeviceThreadManage != null).GroupBy(a => a.ChannelRuntime))
+                {
+                    if (group.Key?.DeviceThreadManage != null)
+                        await group.Key.DeviceThreadManage.RestartDeviceAsync(group, false).ConfigureAwait(false);
+                }
+            }
+
+            return true;
+        }
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
+
     public async Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model, bool restart = true)
     {
         try

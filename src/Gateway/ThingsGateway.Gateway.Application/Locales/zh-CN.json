@@ -155,6 +155,87 @@
     "EventTime": "事件时间",
     "EventType": "事件类型"
   },
+  "ThingsGateway.Gateway.Application.AlarmVariable": {
+    "ChangeTime": "变化时间",
+    "CollectTime": "采集时间",
+    "DeviceName": "设备名称",
+    "IsOnline": "在线",
+    "LastErrorMessage": "离线原因",
+    "LastSetValue": "上次值",
+    "RawValue": "原始值",
+    "Value": "实时值",
+    "AlarmEnable": "报警使能",
+
+    "Name": "名称",
+    "Name.Required": " {0} 不可为空",
+    "Description": "描述",
+    "DeviceId": "采集设备",
+    "DeviceId.MinValue": " {0} 不可为空",
+    "DeviceId.Required": " {0} 不可为空",
+    "IntervalTime": "执行间隔",
+    "IntervalTime.MinValue": " {0} 值太小",
+
+    "ArrayLength": "数组长度",
+    "Enable": "变量使能",
+    "ProtectType": "读写权限",
+    "DataType": "数据类型",
+    "ReadExpressions": "读取表达式",
+    "WriteExpressions": "写入表达式",
+    "RpcWriteEnable": "远程写入",
+    "SaveValue": "保存初始值",
+
+    "AlarmDelay": "报警延时",
+    "BoolOpenAlarmEnable": "布尔开报警使能",
+    "BoolOpenRestrainExpressions": "布尔开报警约束",
+    "BoolOpenAlarmText": "布尔开报警文本",
+
+    "BoolCloseAlarmEnable": "布尔关报警使能",
+    "BoolCloseRestrainExpressions": "布尔关报警约束",
+    "BoolCloseAlarmText": "布尔关报警文本",
+
+    "HAlarmEnable": "高报使能",
+    "HRestrainExpressions": "高报约束",
+    "HAlarmText": "高报文本",
+    "HAlarmCode": "高限值",
+
+    "HHAlarmEnable": "高高报使能",
+    "HHRestrainExpressions": "高高报约束",
+    "HHAlarmText": "高高报文本",
+    "HHAlarmCode": "高高限值",
+
+    "LAlarmEnable": "低报使能",
+    "LRestrainExpressions": "低报约束",
+    "LAlarmText": "低报文本",
+    "LAlarmCode": "低限值",
+
+    "LLAlarmEnable": "低低报使能",
+    "LLRestrainExpressions": "低低报约束",
+    "LLAlarmText": "低低报文本",
+    "LLAlarmCode": "低低限值",
+
+    "CustomAlarmEnable": "自定义报警使能",
+    "CustomRestrainExpressions": "自定义报警约束",
+    "CustomAlarmText": "自定义报警文本",
+    "CustomAlarmCode": "自定义报警限值",
+
+    "Unit": "单位",
+    "RegisterAddress": "变量地址",
+    "OtherMethod": "特殊方法",
+
+    "Remark1": "备用1",
+    "Remark2": "备用2",
+    "Remark3": "备用3",
+    "Remark4": "备用4",
+    "Remark5": "备用5",
+
+    "AlarmCode": "报警值",
+    "AlarmLimit": "报警限值",
+    "AlarmText": "报警文本",
+    "AlarmTime": "报警时间",
+    "AlarmType": "报警类型",
+    "EventTime": "事件时间",
+    "EventType": "事件类型"
+  },
 
   "ThingsGateway.Gateway.Application.BusinessBase": {
     "IntervalInsertVariableFail": "间隔上传变量失败",
@@ -305,6 +386,7 @@
     "MaxConcurrentCount": "最大并发数",
 
     "SaveChannel": "添加/修改通道",
+    "CopyChannel": "复制通道",
     "DeleteChannel": "删除通道",
     "ClearChannel": "清空通道",
     "ExportChannel": "导出通道",
@@ -347,6 +429,7 @@
     "MaxConcurrentCount": "最大并发数",
 
     "SaveChannel": "添加/修改通道",
+    "CopyChannel": "复制通道",
     "DeleteChannel": "删除通道",
     "ClearChannel": "清空通道",
     "ExportChannel": "导出通道",

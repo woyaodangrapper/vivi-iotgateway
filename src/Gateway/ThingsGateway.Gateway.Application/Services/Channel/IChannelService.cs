@@ -29,6 +29,7 @@ internal interface IChannelService
     /// <param name="model">新数据</param>
     /// <returns></returns>
     Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model);
+    Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices);
 
     /// <summary>
     /// 删除通道

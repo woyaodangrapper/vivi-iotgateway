@@ -32,6 +32,7 @@ internal interface IDeviceService
     /// <param name="model">新数据</param>
     /// <returns></returns>
     Task<bool> BatchEditAsync(IEnumerable<Device> models, Device oldModel, Device model);
+    Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices);
 
     /// <summary>
     /// 根据通道ID异步删除设备信息。

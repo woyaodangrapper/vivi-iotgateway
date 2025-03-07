@@ -15,6 +15,7 @@ using System.Collections.Concurrent;
 
 using ThingsGateway.Gateway.Application;
 using ThingsGateway.NewLife.Extension;
+using ThingsGateway.NewLife.Json.Extension;
 
 using TouchSocket.Core;
 
@@ -22,6 +23,21 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class VariableEditComponent
 {
+
+    /// <summary>
+    /// IntFormatter
+    /// </summary>
+    /// <param name="d"></param>
+    /// <returns></returns>
+    private static string JsonFormatter(object? d)
+    {
+        var ret = "";
+        if (d != null)
+        {
+            ret = d.ToJsonNetString();
+        }
+        return ret;
+    }
     public long ChoiceBusinessDeviceId;
 
     [Parameter]

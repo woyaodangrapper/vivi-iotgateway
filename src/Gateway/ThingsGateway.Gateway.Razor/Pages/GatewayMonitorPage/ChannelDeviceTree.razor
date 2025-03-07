@@ -6,8 +6,12 @@
 @using ThingsGateway.Gateway.Application
 
 <div class="listtree-view">
-    <RadioList class="m-2" IsButton="true" AutoSelectFirstWhenValueIsNull="false" TValue="ShowTypeEnum?" ValueExpression=@(()=> ShowType ) Value="ShowType" ValueChanged="OnShowTypeChanged" ShowLabel="true" />
 
+    <div class="d-flex align-items-center">
+        <RadioList class="m-2" IsButton="true" AutoSelectFirstWhenValueIsNull="false" TValue="ShowTypeEnum?" ValueExpression=@(()=> ShowType ) Value="ShowType" ValueChanged="OnShowTypeChanged" ShowLabel="false" />
+
+        <SpinnerComponent @ref=Spinner></SpinnerComponent>
+    </div>
 
     <span style="color:var(--bs-body-color)" class="text-h6 mb-2">@GatewayLocalizer["DeviceList"]</span>
 
@@ -25,6 +29,8 @@
 
                 <ContextMenuItem Icon="fa-regular fa-pen-to-square" Disabled="(SelectModel.ChannelDevicePluginType !=ChannelDevicePluginTypeEnum.Channel||!AuthorizeButton(AdminOperConst.Edit))" Text="@GatewayLocalizer["UpdateChannel"]" OnClick=@((a,b)=>EditChannel(a,b,ItemChangedType.Update))></ContextMenuItem>
 
+                <ContextMenuItem Icon="fa-regular fa-copy" Disabled="(SelectModel.ChannelDevicePluginType !=ChannelDevicePluginTypeEnum.Channel||!AuthorizeButton(AdminOperConst.Add))" Text="@GatewayLocalizer["CopyChannel"]" OnClick=@((a,b)=>CopyChannel(a,b))></ContextMenuItem>
+
                 <ContextMenuItem Icon="fa-solid fa-xmark" Text="@GatewayLocalizer["DeleteChannel"]" Disabled="(SelectModel.ChannelDevicePluginType ==ChannelDevicePluginTypeEnum.Device||!AuthorizeButton(AdminOperConst.Delete))" OnClick="DeleteChannel"></ContextMenuItem>
 
                 <ContextMenuItem Icon="fas fa-file-export" Text="@GatewayLocalizer["ExportChannel"]"
@@ -38,6 +44,8 @@
                 <ContextMenuItem Icon="fa-regular fa-pen-to-square" Text="@GatewayLocalizer["BatchEditDevice"]" Disabled="(SelectModel.ChannelDevicePluginType >=ChannelDevicePluginTypeEnum.Device)||!AuthorizeButton(AdminOperConst.Edit)" OnClick=@((a,b)=>BatchEditDevice(a,b))></ContextMenuItem>
 
                 <ContextMenuItem Disabled="(SelectModel.ChannelDevicePluginType !=ChannelDevicePluginTypeEnum.Device)||!AuthorizeButton(AdminOperConst.Edit)" Icon="fa-regular fa-pen-to-square" Text="@GatewayLocalizer["UpdateDevice"]" OnClick=@((a,b)=>EditDevice(a,b,ItemChangedType.Update))></ContextMenuItem>
+
+                <ContextMenuItem Disabled="(SelectModel.ChannelDevicePluginType !=ChannelDevicePluginTypeEnum.Device)||!AuthorizeButton(AdminOperConst.Add)" Icon="fa-regular fa-pen-to-square" Text="@GatewayLocalizer["CopyDevice"]" OnClick=@((a,b)=>CopyDevice(a,b))></ContextMenuItem>
 
                 <ContextMenuItem Icon="fa-solid fa-xmark" Disabled="(!AuthorizeButton(AdminOperConst.Delete))" Text="@GatewayLocalizer["DeleteDevice"]" OnClick="DeleteDevice"></ContextMenuItem>
 

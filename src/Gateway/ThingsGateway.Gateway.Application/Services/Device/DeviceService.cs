@@ -47,6 +47,38 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
         _dispatchService = dispatchService;
     }
 
+
+    /// <inheritdoc/>
+    [OperDesc("CopyDevice", localizerType: typeof(Device), isRecordPar: false)]
+    public async Task<bool> CopyAsync(Dictionary<Device, List<Variable>> devices)
+    {
+        using var db = GetDB();
+
+        //事务
+        var result = await db.UseTranAsync(async () =>
+        {
+
+            await db.Insertable(devices.Keys.ToList()).ExecuteCommandAsync().ConfigureAwait(false);
+
+            await db.Insertable(devices.SelectMany(a => a.Value).ToList()).ExecuteCommandAsync().ConfigureAwait(false);
+
+
+        }).ConfigureAwait(false);
+        if (result.IsSuccess)//如果成功了
+        {
+            DeleteDeviceFromCache();
+            App.GetService<IVariableService>().DeleteVariableCache();
+            return true;
+        }
+        else
+        {
+            //写日志
+            throw new(result.ErrorMessage, result.ErrorException);
+        }
+
+    }
+
+
     public async Task UpdateLogAsync(long channelId, bool logEnable, LogLevel logLevel)
     {
         using var db = GetDB();

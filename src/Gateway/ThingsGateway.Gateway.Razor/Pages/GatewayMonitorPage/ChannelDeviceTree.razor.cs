@@ -25,6 +25,7 @@ namespace ThingsGateway.Gateway.Razor;
 
 public partial class ChannelDeviceTree : IDisposable
 {
+    SpinnerComponent Spinner;
     [Inject]
     [NotNull]
     protected BlazorAppContext? AppContext { get; set; }
@@ -63,9 +64,6 @@ public partial class ChannelDeviceTree : IDisposable
     [Parameter]
     public bool AutoRestartThread { get; set; }
 
-
-    [Inject]
-    private MaskService MaskService { get; set; }
     private static string GetClass(ChannelDeviceTreeItem item)
     {
         if (item.TryGetChannelRuntime(out var channelRuntime))
@@ -163,6 +161,50 @@ public partial class ChannelDeviceTree : IDisposable
 
     }
 
+    async Task CopyChannel(ContextMenuItem item, object value)
+    {
+        var op = new DialogOption()
+        {
+            IsScrolling = false,
+            ShowMaximizeButton = true,
+            Size = Size.ExtraLarge,
+            Title = item.Text,
+            ShowFooter = false,
+            ShowCloseButton = false,
+        };
+        Channel oneModel = null;
+        Dictionary<Device, List<Variable>> deviceDict = new();
+        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
+
+        if (channelDeviceTreeItem.TryGetChannelRuntime(out var channelRuntime))
+        {
+            oneModel = channelRuntime.Adapt<Channel>();
+            oneModel.Id = 0;
+
+            deviceDict = channelRuntime.ReadDeviceRuntimes.ToDictionary(a => a.Value.Adapt<Device>(), a => a.Value.ReadOnlyVariableRuntimes.Select(a => a.Value).Adapt<List<Variable>>());
+        }
+        else
+        {
+            return;
+        }
+
+        op.Component = BootstrapDynamicComponent.CreateComponent<ChannelCopyComponent>(new Dictionary<string, object?>
+        {
+             {nameof(ChannelCopyComponent.OnSave), async (List<Channel> channels,Dictionary<Device,List<Variable>> devices) =>
+            {
+
+                await Task.Run(() =>GlobalData.ChannelRuntimeService.CopyAsync(channels,devices,AutoRestartThread));
+
+            }},
+            {nameof(ChannelCopyComponent.Model),oneModel },
+            {nameof(ChannelCopyComponent.Devices),deviceDict },
+        });
+
+        await DialogService.Show(op);
+
+    }
+
+
     async Task BatchEditChannel(ContextMenuItem item, object value)
     {
 
@@ -221,19 +263,12 @@ public partial class ChannelDeviceTree : IDisposable
         {
              {nameof(ChannelEditComponent.OnValidSubmit), async () =>
             {
-                  await InvokeAsync(async ()=>
-            {
-
-                  await MaskService.Show(new MaskOption()
-                {
-                    ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                });
-                });
+            Spinner.SetRun(true);
                 await Task.Run(() => GlobalData.ChannelRuntimeService.BatchEditAsync(changedModels, oldModel, oneModel,AutoRestartThread));
-                       await InvokeAsync(async ()=>
+                       await InvokeAsync( ()=>
             {
 
-                await MaskService.Close();
+            Spinner.SetRun(false);
              StateHasChanged();
                 });
             }},
@@ -343,17 +378,12 @@ public partial class ChannelDeviceTree : IDisposable
             if (ret)
             {
 
-                await InvokeAsync(async () =>
-                {
-                    await MaskService.Show(new MaskOption()
-                    {
-                        ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                    });
-                });
+                Spinner.SetRun(true);
+
                 await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(modelIds.Select(a => a.Id), AutoRestartThread));
-                await InvokeAsync(async () =>
+                await InvokeAsync(() =>
                 {
-                    await MaskService.Close();
+                    Spinner.SetRun(false);
                     StateHasChanged();
                 });
             }
@@ -391,19 +421,13 @@ public partial class ChannelDeviceTree : IDisposable
             var ret = await SwalService.ShowModal(op);
             if (ret)
             {
+                Spinner.SetRun(true);
 
-                await InvokeAsync(async () =>
-                {
-                    await MaskService.Show(new MaskOption()
-                    {
-                        ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                    });
-                });
                 var key = await GlobalData.GetCurrentUserChannels().ConfigureAwait(false);
                 await Task.Run(() => GlobalData.ChannelRuntimeService.DeleteChannelAsync(key.Select(a => a.Id), AutoRestartThread));
-                await InvokeAsync(async () =>
+                await InvokeAsync(() =>
                 {
-                    await MaskService.Close();
+                    Spinner.SetRun(false);
                     StateHasChanged();
                 });
             }
@@ -517,17 +541,15 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.ChannelRuntimeService.PreviewAsync(a));
         Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (async value =>
         {
-            await InvokeAsync(async () =>
+            await InvokeAsync(() =>
             {
-                await MaskService.Show(new MaskOption()
-                {
-                    ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                });
+                Spinner.SetRun(true);
+
             });
             await Task.Run(() => GlobalData.ChannelRuntimeService.ImportChannelAsync(value, AutoRestartThread));
-            await InvokeAsync(async () =>
+            await InvokeAsync(() =>
             {
-                await MaskService.Close();
+                Spinner.SetRun(false);
                 StateHasChanged();
             });
 
@@ -546,6 +568,50 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
     #endregion
 
     #region 设备
+
+    async Task CopyDevice(ContextMenuItem item, object value)
+    {
+        var op = new DialogOption()
+        {
+            IsScrolling = true,
+            ShowMaximizeButton = true,
+            Size = Size.ExtraLarge,
+            Title = item.Text,
+            ShowFooter = false,
+            ShowCloseButton = false,
+        };
+        Device oneModel = null;
+        List<Variable> variables = new();
+        if (value is not ChannelDeviceTreeItem channelDeviceTreeItem) return;
+
+        if (channelDeviceTreeItem.TryGetDeviceRuntime(out var deviceRuntime))
+        {
+            oneModel = deviceRuntime.Adapt<Device>();
+            oneModel.Id = 0;
+
+            variables = deviceRuntime.ReadOnlyVariableRuntimes.Select(a => a.Value).Adapt<List<Variable>>();
+        }
+        else
+        {
+            return;
+        }
+
+        op.Component = BootstrapDynamicComponent.CreateComponent<DeviceCopyComponent>(new Dictionary<string, object?>
+        {
+             {nameof(DeviceCopyComponent.OnSave), async (Dictionary<Device,List<Variable>> devices) =>
+            {
+
+                await Task.Run(() =>GlobalData.DeviceRuntimeService.CopyAsync(devices,AutoRestartThread));
+
+            }},
+            {nameof(DeviceCopyComponent.Model),oneModel },
+            {nameof(DeviceCopyComponent.Variables),variables },
+        });
+
+        await DialogService.Show(op);
+
+    }
+
 
     async Task EditDevice(ContextMenuItem item, object value, ItemChangedType itemChangedType)
     {
@@ -663,17 +729,15 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         {
              {nameof(DeviceEditComponent.OnValidSubmit), async () =>
             {
-                    await InvokeAsync(async () =>
+                    await InvokeAsync( () =>
             {
-                await MaskService.Show(new MaskOption()
-                {
-                    ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                });
+                Spinner.SetRun(true);
+
                 });
                 await Task.Run(() =>GlobalData.DeviceRuntimeService.BatchEditAsync(changedModels,oldModel,oneModel,AutoRestartThread));
                          await InvokeAsync(async () =>
             {
-                await MaskService.Close();
+                                Spinner.SetRun(false);
                 await OnClickSearch(SearchText);
                 });
             }},
@@ -788,17 +852,12 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             if (ret)
             {
 
-                await InvokeAsync(async () =>
-                {
-                    await MaskService.Show(new MaskOption()
-                    {
-                        ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                    });
-                });
+                Spinner.SetRun(true);
+
                 await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(modelIds.Select(a => a.Id), AutoRestartThread));
                 await InvokeAsync(async () =>
                 {
-                    await MaskService.Close();
+                    Spinner.SetRun(false);
                     await OnClickSearch(SearchText);
                 });
             }
@@ -838,19 +897,14 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
             if (ret)
             {
 
-                await InvokeAsync(async () =>
-                {
-                    await MaskService.Show(new MaskOption()
-                    {
-                        ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                    });
-                });
+                Spinner.SetRun(true);
+
                 var data = await GlobalData.GetCurrentUserDevices().ConfigureAwait(false);
 
                 await Task.Run(() => GlobalData.DeviceRuntimeService.DeleteDeviceAsync(data.Select(a => a.Id), AutoRestartThread));
                 await InvokeAsync(async () =>
                 {
-                    await MaskService.Close();
+                    Spinner.SetRun(false);
                     await OnClickSearch(SearchText);
                 });
             }
@@ -970,20 +1024,18 @@ EventCallback.Factory.Create<MouseEventArgs>(this, async e =>
         Func<IBrowserFile, Task<Dictionary<string, ImportPreviewOutputBase>>> preview = (a => GlobalData.DeviceRuntimeService.PreviewAsync(a));
         Func<Dictionary<string, ImportPreviewOutputBase>, Task> import = (async value =>
         {
-            await InvokeAsync(async () =>
+            await InvokeAsync(() =>
             {
 
-                await MaskService.Show(new MaskOption()
-                {
-                    ChildContent = builder => builder.AddContent(0, new MarkupString("<i class=\"text-white fa-solid fa-3x fa-spinner fa-spin-pulse\"></i><span class=\"ms-3 fs-2 text-white\">loading ....</span>"))
-                });
+                Spinner.SetRun(true);
+
             });
 
             await Task.Run(() => GlobalData.DeviceRuntimeService.ImportDeviceAsync(value, AutoRestartThread));
             await InvokeAsync(async () =>
             {
 
-                await MaskService.Close();
+                Spinner.SetRun(false);
                 await OnClickSearch(SearchText);
             });
 

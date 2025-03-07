@@ -22,7 +22,7 @@ public class HistoryHardwareInfo
     public string DriveUsage { get; set; }
 
     /// <inheritdoc/>
-    [SugarColumn(ColumnDescription = "内存使用率")]
+    [SugarColumn(ColumnDescription = "内存")]
     public string MemoryUsage { get; set; }
 
     /// <inheritdoc/>

@@ -31,6 +31,54 @@ public class ChannelRuntimeService : IChannelRuntimeService
         _logger = logger;
     }
     private WaitLock WaitLock { get; set; } = new WaitLock();
+
+    public async Task<bool> CopyAsync(List<Channel> models, Dictionary<Device, List<Variable>> devices, bool restart = true)
+    {
+        try
+        {
+            await WaitLock.WaitAsync().ConfigureAwait(false);
+
+            var result = await GlobalData.ChannelService.CopyAsync(models, devices).ConfigureAwait(false);
+
+            var ids = models.Select(a => a.Id).ToHashSet();
+            var newChannelRuntimes = (await GlobalData.ChannelService.GetAllAsync().ConfigureAwait(false)).Where(a => ids.Contains(a.Id)).Adapt<List<ChannelRuntime>>();
+
+            var deviceids = devices.Select(a => a.Key.Id).ToHashSet();
+            var newDeviceRuntimes = (await GlobalData.DeviceService.GetAllAsync().ConfigureAwait(false)).Where(a => deviceids.Contains(a.Id)).Adapt<List<DeviceRuntime>>();
+
+
+            //批量修改之后，需要重新加载通道
+            foreach (var newChannelRuntime in newChannelRuntimes)
+            {
+                newChannelRuntime.Init();
+                foreach (var newDeviceRuntime in newDeviceRuntimes.Where(a => a.ChannelId == newChannelRuntime.Id))
+                {
+                    newDeviceRuntime.Init(newChannelRuntime);
+
+                    var newVariableRuntimes = (await GlobalData.VariableService.GetAllAsync(newDeviceRuntime.Id).ConfigureAwait(false)).Adapt<List<VariableRuntime>>();
+
+                    newVariableRuntimes.ParallelForEach(item =>
+                    {
+                        item.Init(newDeviceRuntime);
+                    });
+                }
+            }
+
+            //根据条件重启通道线程
+            if (restart)
+            {
+                await GlobalData.ChannelThreadManage.RestartChannelAsync(newChannelRuntimes).ConfigureAwait(false);
+            }
+
+            return true;
+        }
+        finally
+        {
+            WaitLock.Release();
+        }
+    }
+
+
     public async Task<bool> BatchEditAsync(IEnumerable<Channel> models, Channel oldModel, Channel model, bool restart = true)
     {
         try

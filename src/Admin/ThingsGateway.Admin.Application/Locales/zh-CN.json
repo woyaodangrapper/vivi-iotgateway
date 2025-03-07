@@ -238,7 +238,7 @@
     },
     "ThingsGateway.Admin.Application.HistoryHardwareInfo": {
       "DriveUsage": "磁盘使用率",
-      "MemoryUsage": "内存使用率",
+      "MemoryUsage": "内存",
       "CpuUsage": "CPU使用率",
       "Temperature": "温度",
       "Battery": "电池"

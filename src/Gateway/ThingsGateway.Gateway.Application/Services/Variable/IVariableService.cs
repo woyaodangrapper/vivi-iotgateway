@@ -108,4 +108,6 @@ internal interface IVariableService
 
 
     Task<List<Variable>> GetByDeviceIdAsync(List<long> deviceIds);
+    void DeleteVariableCache();
+    Task<bool> CopyAsync(List<Variable> variables);
 }
