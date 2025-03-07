@@ -901,13 +901,13 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
 
             if (sysUser.Account == RoleConst.SuperAdmin)
             {
-                var modules = (await _sysResourceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.Category == ResourceCategoryEnum.Module);
+                var modules = (await _sysResourceService.GetAllAsync().ConfigureAwait(false)).Where(a => a.Category == ResourceCategoryEnum.Module).OrderBy(a=>a.SortCode);
                 sysUser.ModuleList = modules.ToList();//模块列表赋值给用户
             }
             else
             {
                 var moduleIds = await _relationService.GetUserModuleId(sysUser.RoleIdList, sysUser.Id).ConfigureAwait(false);//获取模块ID列表
-                var modules = await _sysResourceService.GetMuduleByMuduleIdsAsync(moduleIds).ConfigureAwait(false);//获取模块列表
+                var modules = (await _sysResourceService.GetMuduleByMuduleIdsAsync(moduleIds).ConfigureAwait(false)).OrderBy(a => a.SortCode);//获取模块列表
                 sysUser.ModuleList = modules.ToList();//模块列表赋值给用户
             }
 

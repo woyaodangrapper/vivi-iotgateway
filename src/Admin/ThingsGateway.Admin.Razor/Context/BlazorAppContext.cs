@@ -95,7 +95,8 @@ public class BlazorAppContext
                 });
             }
             AllResource = sysResources;
-            CurrentUser.ModuleList = AllResource.Where(a => CurrentUser.ModuleList.Select(a => a.Id).ToHashSet().Contains(a.Id)).ToList();
+            var ids = CurrentUser.ModuleList.Select(a => a.Id).ToHashSet();
+            CurrentUser.ModuleList = AllResource.Where(a => ids.Contains(a.Id)).OrderBy(a=>a.SortCode).ToList();
             AllMenus = sysResources.Where(a => a.Category == ResourceCategoryEnum.Menu);
 
             if (moduleId == null)
