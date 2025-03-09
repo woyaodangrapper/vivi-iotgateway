@@ -39,7 +39,6 @@ public class Startup : AppStartup
 
         services.AddConfigurableOptions<EmailOptions>();
         services.AddConfigurableOptions<HardwareInfoOptions>();
-        services.AddSingleton<IEmailService, EmailService>();
 
         services.AddSingleton<INoticeService, NoticeService>();
         services.AddSingleton<IUnifyResultProvider, UnifyResultProvider>();

@@ -8,6 +8,10 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
+using BootstrapBlazor.Components;
+
+using Microsoft.AspNetCore.Components.Forms;
+
 namespace ThingsGateway.Plugin.Mqtt;
 
 /// <summary>
@@ -26,6 +30,30 @@ public class MqttClientProperty : BusinessPropertyWithCacheIntervalScript
     /// </summary>
     [DynamicProperty]
     public int Port { get; set; } = 1883;
+
+    [DynamicProperty]
+    public bool TLS { get; set; } = false;
+
+    [AutoGenerateColumn(Ignore = true)]
+    [DynamicProperty]
+    public string CAFile { get; set; }
+
+    [FileValidation(Extensions = [".txt", ".pem"], FileSize = 1024 * 1024)]
+    internal IBrowserFile CAFile_BrowserFile { get; set; }
+
+    [DynamicProperty]
+    [AutoGenerateColumn(Ignore = true)]
+    public string ClientCertificateFile { get; set; }
+
+    [FileValidation(Extensions = [".txt", ".pem"], FileSize = 1024 * 1024)]
+    internal IBrowserFile ClientCertificateFile_BrowserFile { get; set; }
+
+    [DynamicProperty]
+    [AutoGenerateColumn(Ignore = true)]
+    public string ClientKeyFile { get; set; }
+
+    [FileValidation(Extensions = [".txt", ".pem"], FileSize = 1024 * 1024)]
+    internal IBrowserFile ClientKeyFile_BrowserFile { get; set; }
 
     /// <summary>
     /// 是否显示详细日志

@@ -161,6 +161,8 @@ public static class PluginServiceUtil
         Dictionary<string, string> dict = new();
         foreach (var property in properties)
         {
+            var classAttribute = property.GetCustomAttribute<DynamicPropertyAttribute>(false);
+            if (classAttribute == null) continue;
             string propertyName = property.Name;
             // 如果属性存在且可写
             if (property != null && property.CanWrite)
@@ -185,6 +187,9 @@ public static class PluginServiceUtil
 
         foreach (var property in properties)
         {
+            var classAttribute = property.GetCustomAttribute<DynamicPropertyAttribute>(false);
+            if (classAttribute == null) continue;
+
             string propertyName = property.Name;
 
             // 如果属性存在且可写

@@ -10,6 +10,12 @@
 
 using MQTTnet;
 
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.OpenSsl;
+using Org.BouncyCastle.Security;
+
+using System.Security.Cryptography.X509Certificates;
+
 using ThingsGateway.Extension;
 using ThingsGateway.Foundation;
 
@@ -27,19 +33,59 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
     public override VariablePropertyBase VariablePropertys => _variablePropertys;
     protected override BusinessPropertyWithCacheIntervalScript _businessPropertyWithCacheIntervalScript => _driverPropertys;
 
+    public override Type DriverPropertyUIType => typeof(MqttClientPropertyRazor);
+
+    /// <summary>
+    /// 加载 PEM 证书和私钥
+    /// </summary>
+    private static X509Certificate2 LoadCertificate(string certPath, string keyPath)
+    {
+        var cert = new X509Certificate2(certPath);
+
+        using var reader = new StreamReader(keyPath);
+        var pemReader = new PemReader(reader);
+        var keyPair = pemReader.ReadObject() as AsymmetricCipherKeyPair;
+
+        if (keyPair == null)
+        {
+            throw new Exception("Invalid private key.");
+        }
+
+        var rsaPrivateKey = DotNetUtilities.ToRSA(keyPair.Private as Org.BouncyCastle.Crypto.Parameters.RsaPrivateCrtKeyParameters);
+        var certWithKey = cert.CopyWithPrivateKey(rsaPrivateKey);
+
+        return certWithKey;
+    }
+
     protected override async Task InitChannelAsync(IChannel? channel = null)
     {
-
-
         #region 初始化
+
+
 #if NET8_0_OR_GREATER
         var mqttFactory = new MqttClientFactory();
         var mqttClientOptionsBuilder = mqttFactory.CreateClientOptionsBuilder()
            .WithClientId(_driverPropertys.ConnectId)
            .WithCredentials(_driverPropertys.UserName, _driverPropertys.Password)//账密
            .WithCleanSession(true)
+
+
+
            .WithKeepAlivePeriod(TimeSpan.FromSeconds(120.0));
 
+        if(_driverPropertys.TLS)
+        {
+            var caCert = new X509Certificate2(_driverPropertys.CAFile);
+            var clientCert = LoadCertificate(_driverPropertys.ClientCertificateFile, _driverPropertys.ClientKeyFile);
+            mqttClientOptionsBuilder = mqttClientOptionsBuilder.WithTlsOptions(a => a
+                    .WithTrustChain(new X509Certificate2Collection(caCert))
+                    .WithClientCertificates(new X509Certificate2Collection(clientCert))
+                    .WithCertificateValidationHandler((a) =>
+                    {
+                        return true;
+                    })
+                    );
+        }
 
 #else
 

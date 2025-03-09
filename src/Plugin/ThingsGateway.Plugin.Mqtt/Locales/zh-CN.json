@@ -7,6 +7,12 @@
     "IP": "IP",
     "Port": "端口",
     "DetailLog": "详细日志",
+    "TLS": "TLS",
+    "CAFile_BrowserFile": "CA文件",
+    "ClientCertificateFile_BrowserFile": "客户端证书",
+    "ClientKeyFile_BrowserFile": "客户端key文件",
+
+
     "IsWebSocket": "Websocket",
     "WebSocketUrl": "WebSocketUrl",
     "UserName": "用户名",
@@ -69,6 +75,10 @@
     "IP": "IP",
     "Port": "端口",
     "DetailLog": "详细日志",
+    "TLS": "TLS",
+    "CAFile_BrowserFile": "CA文件",
+    "ClientCertificateFile_BrowserFile": "客户端证书",
+    "ClientKeyFile_BrowserFile": "客户端key文件",
     "IsWebSocket": "Websocket",
     "WebSocketUrl": "WebSocketUrl",
     "UserName": "用户名",
