@@ -58,11 +58,13 @@ public class AppService : IAppService
         }
     }
 
+ 
+
     public async Task LoginAsync(ClaimsIdentity identity, int expire)
     {
         var diffTime = DateTime.Now + TimeSpan.FromMinutes(expire);
         //var diffTime = DateTime.Now.AddMinutes(expire);
-        await App.HttpContext!.SignInAsync(Assembly.GetEntryAssembly().GetName().Name, new ClaimsPrincipal(identity), new AuthenticationProperties()
+        await App.HttpContext!.SignInAsync(ClaimConst.Scheme, new ClaimsPrincipal(identity), new AuthenticationProperties()
         {
             IsPersistent = true,
             AllowRefresh = true,

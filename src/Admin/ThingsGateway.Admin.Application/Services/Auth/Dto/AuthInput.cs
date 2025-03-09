@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace ThingsGateway.Admin.Application;
 

@@ -270,24 +270,6 @@ public class BlazorAuthenticationHandler : AppAuthorizeHandler
 
                 //无法在server中刷新cookies，单页面应用会一直保持登录状态，所以这里不需要刷新cookies，但是F5刷新后会重新登录
 
-                //if (App.HttpContext != null)
-                //{
-                //    try
-                //    {
-                //        var authProperties = new AuthenticationProperties
-                //        {
-                //            IsPersistent = true,
-                //            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                //        };
-                //        await App.HttpContext.SignInAsync(Assembly.GetEntryAssembly().GetName().Name, context.User, authProperties).ConfigureAwait(false);
-
-                //    }
-                //    catch
-                //    {
-
-                //    }
-                //}
-
             }
 
 

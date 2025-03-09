@@ -51,8 +51,6 @@ public interface IAppService
     /// <returns></returns>
     public Task LoginAsync(ClaimsIdentity claimsIdentity, int expire);
 
-
-
 }
 
 

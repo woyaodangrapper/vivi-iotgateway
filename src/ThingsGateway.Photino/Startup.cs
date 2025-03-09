@@ -256,7 +256,7 @@ public class Startup : AppStartup
         services.AddHttpContextAccessor();
 
         //添加cookie授权
-        var authenticationBuilder = services.AddAuthentication(Assembly.GetEntryAssembly().GetName().Name).AddCookie(Assembly.GetEntryAssembly().GetName().Name, a =>
+        var authenticationBuilder = services.AddAuthentication(ClaimConst.Scheme).AddCookie(Assembly.GetEntryAssembly().GetName().Name, a =>
         {
             a.AccessDeniedPath = "/Account/AccessDenied/";
             a.LogoutPath = "/Account/Logout/";
