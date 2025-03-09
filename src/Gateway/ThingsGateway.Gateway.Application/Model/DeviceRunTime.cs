@@ -61,7 +61,7 @@ public class DeviceRuntime : Device, IDisposable
     /// 通道名称
     /// </summary>
     public string? ChannelName => ChannelRuntime?.Name;
-    public string LogPath => Id.GetLogPath();
+    public string LogPath => Name.GetDeviceLogPath();
 
     /// <summary>
     /// 设备状态

@@ -106,7 +106,7 @@ public class ChannelRuntime : Channel, IChannelOptions, IDisposable
     [AdaptIgnore]
     public IDeviceThreadManage? DeviceThreadManage { get; internal set; }
 
-    public string LogPath => Id.GetLogPath();
+    public string LogPath => Name.GetChannelLogPath();
 
     public void Init()
     {

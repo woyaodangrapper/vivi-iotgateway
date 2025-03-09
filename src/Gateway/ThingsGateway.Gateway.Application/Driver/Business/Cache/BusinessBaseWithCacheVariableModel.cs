@@ -41,7 +41,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetFilePath(CurrentDevice.Id.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(VarModel).FullName}_{nameof(VarModel)}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
@@ -117,7 +117,7 @@ public abstract class BusinessBaseWithCacheVariableModel<VarModel> : BusinessBas
     /// </summary>
     protected virtual CacheDB LocalDBCacheVarModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<VarModel>), CurrentDevice.Id.ToString(), $"{CurrentDevice.PluginName}_{typeof(VarModel).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<VarModel>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(VarModel).Name}");
         if (!LocalDBCacheVarModelInited)
         {
             cacheDb.InitDb();

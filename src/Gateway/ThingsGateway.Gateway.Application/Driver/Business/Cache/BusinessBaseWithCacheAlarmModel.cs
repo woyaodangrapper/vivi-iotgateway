@@ -39,7 +39,7 @@ public abstract class BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmM
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetFilePath(CurrentDevice.Id.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(AlarmModel).FullName}_{nameof(AlarmModel)}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
@@ -117,7 +117,7 @@ public abstract class BusinessBaseWithCacheAlarmModel<VarModel, DevModel, AlarmM
     /// </summary>
     protected virtual CacheDB LocalDBCacheAlarmModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<AlarmModel>), CurrentDevice.Id.ToString(), $"{CurrentDevice.PluginName}_{typeof(AlarmModel).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<AlarmModel>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(AlarmModel).Name}");
 
         if (!LocalDBCacheAlarmModelInited)
         {

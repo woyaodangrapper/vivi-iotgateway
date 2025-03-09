@@ -138,7 +138,9 @@ public class OpcDaMaster : CollectBase
                   TimeTick = new(_driverProperties.UpdateRate.ToString()),
                   RegisterAddress = it.Key,
               };
-              var variables = deviceVariables.Where(a => it.Value.Select(b => b.ItemID).Contains(a.RegisterAddress));
+              HashSet<string> ids = new(it.Value.Select(b => b.ItemID));
+
+              var variables = deviceVariables.Where(a => ids.Contains(a.RegisterAddress));
               foreach (var v in variables)
               {
                   read.AddVariable(v);

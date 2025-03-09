@@ -46,7 +46,7 @@ public class CacheDBUtil
     /// </summary>
     public static CacheDB GetCache(Type tableType, string folder, string name)
     {
-        var dir = GetFilePath(folder);
+        var dir = GetCacheFilePath(folder);
         var fileStart = GetFileName(name);
         var fullName = dir.CombinePathWithOs($"{fileStart}{EX}");
 
@@ -58,7 +58,7 @@ public class CacheDBUtil
     }
 
 
-    public static string GetFileBasePath()
+    public static string GetCacheFileBasePath()
     {
         var dir = Path.Combine(App.HostEnvironment?.ContentRootPath ?? AppContext.BaseDirectory, "PluginCache");
         //创建文件夹
@@ -87,9 +87,9 @@ public class CacheDBUtil
         return fileStart;
     }
 
-    public static string GetFilePath(string folderName)
+    public static string GetCacheFilePath(string folderName)
     {
-        var dir = GetFileBasePath().CombinePathWithOs(folderName);
+        var dir = GetCacheFileBasePath().CombinePathWithOs(folderName);
         //创建文件夹
         Directory.CreateDirectory(dir);
         return dir;

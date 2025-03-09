@@ -17,6 +17,8 @@
 	<!--nuget包解压复制文件，上下文动态加载，网关管理和网关冗余-->
 	<Import Project="targets\GatewayOther.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayRelease' " />
 
+	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
+	
 	<!--nuget包解压复制文件，上下文动态加载-->
 	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' != 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
 	<!--直接引用-->
@@ -30,7 +32,7 @@
 
 	<!--直接引用Pro-->
 	<Import Project="targets\PluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug'" />
-	<Import Project="targets\PluginContext.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND  '$(Configuration)' != 'Debug' " />
+
 
 	<Import Project="targets\ProPluginDebug.targets" Condition=" '$(SolutionName)' == 'ThingsGatewayPro' AND '$(Configuration)' == 'Debug'" />
 	

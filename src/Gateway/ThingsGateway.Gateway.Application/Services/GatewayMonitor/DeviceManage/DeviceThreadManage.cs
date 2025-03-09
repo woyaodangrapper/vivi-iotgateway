@@ -306,10 +306,9 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                 await Task.Delay(1000).ConfigureAwait(false);
                 Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
                 await Task.Delay(1000).ConfigureAwait(false);
-                var basePath = CacheDBUtil.GetFileBasePath();
+                var basePath = CacheDBUtil.GetCacheFileBasePath();
 
-
-                var strings = deviceRuntimes.Select(a => a.Id.ToString()).ToHashSet();
+                var strings = deviceRuntimes.Select(a => a.Name.ToString()).ToHashSet();
                 var dirs = Directory.GetDirectories(basePath).Where(a => strings.Contains(Path.GetFileName(a)));
                 foreach (var dir in dirs)
                 {

@@ -96,7 +96,8 @@ internal sealed class SysResourceService : BaseService<SysResource>, ISysResourc
             if (delModules.Any())
             {
                 //获取模块下的所有列表
-                var delModuleResources = resourceList.Where(it => delModules.Select(a => a.Id).Contains(it.Module));
+                var delHashSet = delModules.Select(a => a.Id).ToHashSet();
+                var delModuleResources = resourceList.Where(it => delHashSet.Contains(it.Module));
                 delSysResources = delSysResources.Concat(delModuleResources).ToHashSet();
             }
             //查找内置菜单

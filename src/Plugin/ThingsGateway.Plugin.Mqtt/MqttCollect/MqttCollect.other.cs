@@ -182,7 +182,7 @@ public partial class MqttCollect : CollectBase
             try
             {
                 await ConnectLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-                await Task.Delay(100,cancellationToken).ConfigureAwait(false);
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
                 if (_mqttClient?.IsConnected == true)
                     return OperResult.Success;
                 using var timeoutToken = new CancellationTokenSource(TimeSpan.FromMilliseconds(_driverPropertys.ConnectTimeout));

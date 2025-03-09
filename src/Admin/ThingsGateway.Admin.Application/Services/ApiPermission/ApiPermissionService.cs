@@ -155,7 +155,8 @@ internal sealed class ApiPermissionService : IApiPermissionService
     public IEnumerable<PermissionTreeSelector> PermissionTreeSelector(IEnumerable<string> routes)
     {
         List<PermissionTreeSelector> permissions = PermissionTreeSelector();
-        return permissions.Where(a => routes.ToHashSet().Contains(a.ApiRoute));
+        var hashSet = routes.ToHashSet();
+        return permissions.Where(a => hashSet.Contains(a.ApiRoute));
     }
 
     /// <inheritdoc />

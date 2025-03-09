@@ -104,7 +104,8 @@ public class BlazorAppContext
                 moduleId = AllMenus.FirstOrDefault(a => a.Href == url)?.Module;
                 if (moduleId != null)
                 {
-                    CurrentModuleId = CurrentUser.ModuleList.Select(a => a.Id).Contains(moduleId.Value) ? moduleId.Value : CurrentUser.ModuleList.Select(a => a.Id).FirstOrDefault();
+                    var moduleIds = CurrentUser.ModuleList.Select(a => a.Id).ToHashSet();
+                    CurrentModuleId = moduleIds.Contains(moduleId.Value) ? moduleId.Value : moduleIds.FirstOrDefault();
                 }
                 else
                 {

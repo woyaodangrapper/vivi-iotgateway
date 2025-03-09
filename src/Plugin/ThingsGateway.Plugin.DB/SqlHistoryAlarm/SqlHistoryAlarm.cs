@@ -54,6 +54,8 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
         await base.AfterVariablesChangedAsync().ConfigureAwait(false);
         IdVariableRuntimes = GlobalData.ReadOnlyIdVariables.Where(a => a.Value.AlarmEnable).ToDictionary();
 
+        var ids = IdVariableRuntimes.Select(b => b.Value.DeviceId).ToHashSet();
+
         CollectDevices = GlobalData.ReadOnlyIdDevices
                                 .Where(a => IdVariableRuntimes.Select(b => b.Value.DeviceId).Contains(a.Value.Id))
                                 .ToDictionary(a => a.Key, a => a.Value);

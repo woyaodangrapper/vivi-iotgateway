@@ -222,8 +222,8 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
         var relationResourcePermissions = resourceList.Select(it => it.ExtJson?.FromJsonNetString<RelationResourcePermission>());
         var allResources = await _sysResourceService.GetAllAsync().ConfigureAwait(false);
 
-
-        var menus = allResources.Where(it => it.Category == ResourceCategoryEnum.Menu && relationResourcePermissions.Select(a => a.MenuId).Contains(it.Id)).ToDictionary(a => a, a => relationResourcePermissions.FirstOrDefault(b => b.MenuId == a.Id));
+        var ids = relationResourcePermissions.Select(a => a.MenuId);
+        var menus = allResources.Where(it => it.Category == ResourceCategoryEnum.Menu && ids.Contains(it.Id)).ToDictionary(a => a, a => relationResourcePermissions.FirstOrDefault(b => b.MenuId == a.Id));
 
         Dictionary<string, List<string>> buttonCodeList = new();
         foreach (var item in menus)

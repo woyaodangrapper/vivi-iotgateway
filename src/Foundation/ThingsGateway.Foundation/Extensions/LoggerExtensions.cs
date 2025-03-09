@@ -62,9 +62,9 @@ public static class LoggerExtensions
     /// <summary>
     /// GetLogBasePath
     /// </summary>
-    public static string GetLogBasePath()
+    public static string GetChannelLogBasePath()
     {
-        return "Logs/ChannnelLog";
+        return "Logs/ChannelLog";
     }
 
     /// <summary>
@@ -72,18 +72,47 @@ public static class LoggerExtensions
     /// </summary>
     /// <param name="channelId"></param>
     /// <returns></returns>
-    public static string GetLogPath(this long channelId)
+    public static string GetChannelLogPath(this long channelId)
     {
-        return GetLogBasePath().CombinePath(channelId.ToString()).FileNameReplace();
+        return GetChannelLogBasePath().CombinePath(channelId.ToString()).FileNameReplace();
     }
     /// <summary>
     /// 获取日志路径
     /// </summary>
     /// <param name="channelId"></param>
     /// <returns></returns>
-    public static string GetLogPath(this string channelId)
+    public static string GetChannelLogPath(this string channelId)
     {
-        return GetLogBasePath().CombinePath(channelId.ToString()).FileNameReplace();
+        return GetChannelLogBasePath().CombinePath(channelId.ToString()).FileNameReplace();
+    }
+
+
+
+    /// <summary>
+    /// GetLogBasePath
+    /// </summary>
+    public static string GetDeviceLogBasePath()
+    {
+        return "Logs/DeviceLog";
+    }
+
+    /// <summary>
+    /// 获取日志路径
+    /// </summary>
+    /// <param name="DeviceId"></param>
+    /// <returns></returns>
+    public static string GetDeviceLogPath(this long DeviceId)
+    {
+        return GetDeviceLogBasePath().CombinePath(DeviceId.ToString()).FileNameReplace();
+    }
+    /// <summary>
+    /// 获取日志路径
+    /// </summary>
+    /// <param name="DeviceId"></param>
+    /// <returns></returns>
+    public static string GetDeviceLogPath(this string DeviceId)
+    {
+        return GetDeviceLogBasePath().CombinePath(DeviceId.ToString()).FileNameReplace();
     }
 
     #region 日志

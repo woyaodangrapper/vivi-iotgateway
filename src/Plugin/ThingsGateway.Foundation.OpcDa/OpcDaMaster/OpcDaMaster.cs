@@ -130,7 +130,8 @@ public class OpcDaMaster : IDisposable
                 }
                 else
                 {
-                    ItemDicts.AddOrUpdate(item.Key, item.Value.Where(a => !result.Select(b => b.Item1).Contains(a)).ToList());
+                    HashSet<OpcItem> ids = new(result.Select(b => b.Item1));
+                    ItemDicts.AddOrUpdate(item.Key, item.Value.Where(a => !ids.Contains(a)).ToList());
                 }
             }
             catch (Exception ex)
@@ -284,7 +285,9 @@ public class OpcDaMaster : IDisposable
                 }
                 else
                 {
-                    ItemDicts[opcGroup.Name].RemoveWhere(a => tag.Contains(a) && !result.Select(b => b.Item1).Contains(a));
+                    HashSet<OpcItem> ids = new(result.Select(b => b.Item1));
+
+                    ItemDicts[opcGroup.Name].RemoveWhere(a => tag.Contains(a) && !ids.Contains(a));
                 }
             }
         }

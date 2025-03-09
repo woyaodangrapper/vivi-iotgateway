@@ -8,7 +8,6 @@
 // QQ群：605534569
 // ------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife.Extension;
 using ThingsGateway.Schedule;
 
 namespace ThingsGateway.Gateway.Application;
@@ -52,29 +51,17 @@ public class LogJob : IJob
     {
         //网关通道日志以通道id命名
         var channelService = App.RootServices.GetService<IChannelService>();
-        var channelIds = (await channelService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Id.ToString()).ToHashSet();
+        var deviceService = App.RootServices.GetService<IDeviceService>();
+        var channelNames = (await channelService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name.ToString()).ToHashSet();
+        var deviceNames = (await deviceService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name.ToString()).ToHashSet();
+        var channelBaseDir = LoggerExtensions.GetChannelLogBasePath();
+        Directory.CreateDirectory(channelBaseDir);
+        var deviceBaseDir = LoggerExtensions.GetDeviceLogBasePath();
+        Directory.CreateDirectory(deviceBaseDir);
 
-        var baseDir = LoggerExtensions.GetLogBasePath();
-        Directory.CreateDirectory(baseDir);
-        string[] dirs = Directory.GetDirectories(baseDir)
-.Select(a => Path.GetFileName(a))
-.ToArray();
-        foreach (var dir in dirs)
-        {
-            if (stoppingToken.IsCancellationRequested)
-            {
-                return;
-            }
-            //删除文件夹
-            try
-            {
-                if (!channelIds.Contains(dir))
-                {
-                    Directory.Delete(baseDir.CombinePathWithOs(dir), true);
-                }
-            }
-            catch { }
-        }
+        Delete(channelBaseDir, channelNames, stoppingToken);
+        Delete(deviceBaseDir, deviceNames, stoppingToken);
+
 
         //底层调试
         var debugDir = LoggerExtensions.GetDebugLogBasePath();
@@ -99,11 +86,34 @@ public class LogJob : IJob
 
     }
 
+    private static void Delete(string baseDir, HashSet<string> strings, CancellationToken stoppingToken)
+    {
+        var channelDir = Directory.GetDirectories(baseDir)
+  .Select(a => Path.GetFileName(a))
+  .ToArray();
+        foreach (var dir in channelDir)
+        {
+            if (stoppingToken.IsCancellationRequested)
+            {
+                return;
+            }
+            //删除文件夹
+            try
+            {
+                if (!strings.Contains(dir))
+                {
+                    Directory.Delete(baseDir.CombinePathWithOs(dir), true);
+                }
+            }
+            catch { }
+        }
+    }
+
     public async Task DeleteLocalDB(CancellationToken stoppingToken)
     {
         var deviceService = App.RootServices.GetService<IDeviceService>();
-        var data = (await deviceService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Id).ToHashSet();
-        var dir = CacheDBUtil.GetFileBasePath();
+        var data = (await deviceService.GetAllAsync().ConfigureAwait(false)).Select(a => a.Name).ToHashSet();
+        var dir = CacheDBUtil.GetCacheFileBasePath();
         string[] dirs = Directory.GetDirectories(dir);
         foreach (var item in dirs)
         {
@@ -114,13 +124,10 @@ public class LogJob : IJob
             //删除文件夹
             try
             {
-                var id = Path.GetFileName(item).ToLong();
-                if (id > 0) //非ID文件夹不删除
+                var id = Path.GetFileName(item);
+                if (!data.Contains(id))
                 {
-                    if (!data.Contains(id))
-                    {
-                        Directory.Delete(item, true);
-                    }
+                    Directory.Delete(item, true);
                 }
             }
             catch { }

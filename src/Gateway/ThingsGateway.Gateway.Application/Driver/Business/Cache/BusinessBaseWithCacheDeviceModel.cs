@@ -40,7 +40,7 @@ public abstract class BusinessBaseWithCacheDeviceModel<VarModel, DevModel> : Bus
                 {
                     item.Id = CommonUtils.GetSingleId();
                 }
-                var dir = CacheDBUtil.GetFilePath(CurrentDevice.Id.ToString());
+                var dir = CacheDBUtil.GetCacheFilePath(CurrentDevice.Name.ToString());
                 var fileStart = CacheDBUtil.GetFileName($"{CurrentDevice.PluginName}_{typeof(DevModel).FullName}_{nameof(DevModel)}");
                 var fullName = dir.CombinePathWithOs($"{fileStart}{CacheDBUtil.EX}");
 
@@ -118,7 +118,7 @@ public abstract class BusinessBaseWithCacheDeviceModel<VarModel, DevModel> : Bus
     /// </summary>
     protected virtual CacheDB LocalDBCacheDevModel()
     {
-        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<DevModel>), CurrentDevice.Id.ToString(), $"{CurrentDevice.PluginName}_{typeof(DevModel).Name}");
+        var cacheDb = CacheDBUtil.GetCache(typeof(CacheDBItem<DevModel>), CurrentDevice.Name.ToString(), $"{CurrentDevice.PluginName}_{typeof(DevModel).Name}");
         if (!LocalDBCacheDevModelInited)
         {
             cacheDb.InitDb();
