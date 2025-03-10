@@ -148,7 +148,7 @@ public partial class OpcUaServer : BusinessBase
     protected override void Dispose(bool disposing)
     {
         GlobalData.VariableValueChangeEvent -= VariableValueChange;
-        m_application?.Stop();
+        m_server?.Stop();
         m_server?.SafeDispose();
         CollectVariableRuntimes?.Clear();
         IdVariableRuntimes?.Clear();
