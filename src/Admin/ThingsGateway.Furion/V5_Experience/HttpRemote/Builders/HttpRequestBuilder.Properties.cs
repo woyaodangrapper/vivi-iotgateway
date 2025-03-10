@@ -27,7 +27,7 @@ public sealed partial class HttpRequestBuilder
     /// <summary>
     ///     请求方式
     /// </summary>
-    public HttpMethod? Method { get; private set; }
+    public HttpMethod? HttpMethod { get; private set; }
 
     /// <summary>
     ///     跟踪标识
@@ -75,6 +75,17 @@ public sealed partial class HttpRequestBuilder
     /// </summary>
     /// <remarks>可为单次请求设置超时时间。</remarks>
     public TimeSpan? Timeout { get; private set; }
+
+    /// <summary>
+    ///     路径片段集合
+    /// </summary>
+    /// <remarks>请求地址中位于主机端口之后且 <c>?</c> 符号之前的部分。</remarks>
+    public List<string>? PathSegments { get; private set; }
+
+    /// <summary>
+    ///     需要从 URL 中移除的路径片段集合
+    /// </summary>
+    public HashSet<string>? PathSegmentsToRemove { get; private set; }
 
     /// <summary>
     ///     查询参数集合
@@ -130,6 +141,23 @@ public sealed partial class HttpRequestBuilder
     public long? MaxResponseContentBufferSize { get; private set; }
 
     /// <summary>
+    ///     身份验证凭据请求授权标头
+    /// </summary>
+    /// <remarks>可为单次请求设置身份验证凭据请求授权标头。</remarks>
+    public AuthenticationHeaderValue? AuthenticationHeader { get; private set; }
+
+    /// <summary>
+    ///     <see cref="HttpRequestMessage" /> 请求属性集合
+    /// </summary>
+    /// <remarks>用于添加 <see cref="HttpRequestMessage" /> 请求属性。该值将合并到 <c>HttpRequestMessage.Options</c> 属性中。</remarks>
+    public IDictionary<string, object?> Properties { get; } = new Dictionary<string, object?>();
+
+    /// <summary>
+    ///     请求基地址
+    /// </summary>
+    public Uri? BaseAddress { get; private set; }
+
+    /// <summary>
     ///     <see cref="HttpClient" /> 实例提供器
     /// </summary>
     /// <value>
@@ -169,23 +197,6 @@ public sealed partial class HttpRequestBuilder
     ///     用于处理在发送 HTTP 请求发生异常时的操作
     /// </summary>
     public Action<Exception, HttpResponseMessage?>? OnRequestFailed { get; private set; }
-
-    /// <summary>
-    ///     身份验证凭据请求授权标头
-    /// </summary>
-    /// <remarks>可为单次请求设置身份验证凭据请求授权标头。</remarks>
-    public AuthenticationHeaderValue? AuthenticationHeader { get; private set; }
-
-    /// <summary>
-    ///     <see cref="HttpRequestMessage" /> 请求属性集合
-    /// </summary>
-    /// <remarks>用于添加 <see cref="HttpRequestMessage" /> 请求属性。该值将合并到 <c>HttpRequestMessage.Options</c> 属性中。</remarks>
-    public IDictionary<string, object?> Properties { get; } = new Dictionary<string, object?>();
-
-    /// <summary>
-    ///     请求基地址
-    /// </summary>
-    public Uri? BaseAddress { get; private set; }
 
     /// <summary>
     ///     <inheritdoc cref="HttpMultipartFormDataBuilder" />

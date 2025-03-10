@@ -26,7 +26,7 @@ internal sealed class NoticeService : INoticeService
 
 
     /// <inheritdoc/>
-    public async Task NewMesage(IEnumerable<long>? clientIds, AppMessage message)
+    public async Task NewMesage(IEnumerable<string>? clientIds, AppMessage message)
     {
         //发送消息给用户
         if (clientIds != null)
@@ -39,7 +39,7 @@ internal sealed class NoticeService : INoticeService
     }
 
     /// <inheritdoc/>
-    public async Task UserLoginOut(IEnumerable<long>? clientIds, string message)
+    public async Task UserLoginOut(IEnumerable<string>? clientIds, string message)
     {
         //发送消息给用户
         if (clientIds != null)
@@ -54,7 +54,7 @@ internal sealed class NoticeService : INoticeService
 
 
     /// <inheritdoc/>
-    public async Task NavigationMesage(IEnumerable<long>? clientIds, string uri, string message)
+    public async Task NavigationMesage(IEnumerable<string>? clientIds, string uri, string message)
     {
         //发送消息给用户
         if (clientIds != null)

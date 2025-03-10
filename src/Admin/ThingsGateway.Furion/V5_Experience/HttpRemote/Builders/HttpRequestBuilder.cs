@@ -45,7 +45,7 @@ public sealed partial class HttpRequestBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(httpMethod);
 
-        Method = httpMethod;
+        HttpMethod = httpMethod;
         RequestUri = requestUri;
     }
 
@@ -68,13 +68,13 @@ public sealed partial class HttpRequestBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(httpRemoteOptions);
         ArgumentNullException.ThrowIfNull(httpContentProcessorFactory);
-        ArgumentNullException.ThrowIfNull(Method);
+        ArgumentNullException.ThrowIfNull(HttpMethod);
 
         // 构建最终的请求地址
         var finalRequestUri = BuildFinalRequestUri(clientBaseAddress, httpRemoteOptions.Configuration);
 
         // 初始化 HttpRequestMessage 实例
-        var httpRequestMessage = new HttpRequestMessage(Method, finalRequestUri);
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod, finalRequestUri);
 
         // 启用性能优化
         EnablePerformanceOptimization(httpRequestMessage);
@@ -113,30 +113,96 @@ public sealed partial class HttpRequestBuilder
     internal string BuildFinalRequestUri(Uri? clientBaseAddress, IConfiguration? configuration)
     {
         // 替换路径或配置参数，处理非标准 HTTP URI 的应用场景（如 {url}），此时需优先解决路径或配置参数问题
-        var newRequestUri = RequestUri is null or { OriginalString: null }
+        var processedRequestUri = RequestUri is null or { OriginalString: null }
             ? RequestUri
             : new Uri(ReplacePlaceholders(RequestUri.OriginalString, configuration), UriKind.RelativeOrAbsolute);
 
         // 初始化带局部 BaseAddress 的请求地址
         var requestUriWithBaseAddress = BaseAddress is null
-            ? newRequestUri!
-            : new Uri(BaseAddress, newRequestUri!);
+            ? processedRequestUri
+            : processedRequestUri is null
+                ? BaseAddress
+                : new Uri(BaseAddress, processedRequestUri);
+
+        // 初始化带全局（客户端） BaseAddress 的请求地址
+        var requestUriWithClientBaseAddress = clientBaseAddress is null
+            ? requestUriWithBaseAddress
+            : requestUriWithBaseAddress is null
+                ? clientBaseAddress
+                : new Uri(clientBaseAddress, requestUriWithBaseAddress);
+
+        // 空检查
+        ArgumentNullException.ThrowIfNull(requestUriWithClientBaseAddress);
 
         // 初始化 UriBuilder 实例
-        var uriBuilder = new UriBuilder(clientBaseAddress is null
-            ? requestUriWithBaseAddress
-            : new Uri(clientBaseAddress, requestUriWithBaseAddress));
+        var uriBuilder = new UriBuilder(requestUriWithClientBaseAddress);
 
-        // 追加片段标识符
-        AppendFragment(uriBuilder);
+        // 追加路径片段
+        AppendPathSegments(uriBuilder);
 
         // 追加查询参数
         AppendQueryParameters(uriBuilder);
+
+        // 追加片段标识符
+        AppendFragment(uriBuilder);
 
         // 替换路径或配置参数
         var finalRequestUri = ReplacePlaceholders(uriBuilder.Uri.ToString(), configuration);
 
         return finalRequestUri;
+    }
+
+    /// <summary>
+    ///     追加路径片段
+    /// </summary>
+    /// <param name="uriBuilder">
+    ///     <see cref="UriBuilder" />
+    /// </param>
+    internal void AppendPathSegments(UriBuilder uriBuilder)
+    {
+        // 解析 URL 中的路径片段列表
+        var pathSegments = uriBuilder.Path.Split('/', StringSplitOptions.RemoveEmptyEntries).Concat([]);
+
+        // 追加路径片段
+        pathSegments = pathSegments.Concat(PathSegments.ConcatIgnoreNull([]).Where(u => !string.IsNullOrWhiteSpace(u))
+            .Select(u => u.TrimStart('/').TrimEnd('/')));
+
+        // 构建路径片段赋值给 UriBuilder 的 Path 属性
+        uriBuilder.Path = '/' + string.Join('/',
+            // 过滤已标记为移除的路径片段
+            pathSegments.WhereIf(PathSegmentsToRemove is { Count: > 0 },
+                u => PathSegmentsToRemove?.TryGetValue(u, out _) == false));
+    }
+
+    /// <summary>
+    ///     追加查询参数
+    /// </summary>
+    /// <param name="uriBuilder">
+    ///     <see cref="UriBuilder" />
+    /// </param>
+    internal void AppendQueryParameters(UriBuilder uriBuilder)
+    {
+        // 解析 URL 中的查询字符串为键值对列表
+        var queryParameters = uriBuilder.Query.ParseFormatKeyValueString(['&'], '?');
+
+        // 追加查询参数
+        foreach (var (key, values) in QueryParameters.ConcatIgnoreNull([]))
+        {
+            queryParameters.AddRange(values.Select(value =>
+                new KeyValuePair<string, string?>(key, value)));
+        }
+
+        // 构建最终的查询参数
+        var finalQueryParameters = queryParameters
+            // 过滤已标记为移除的查询参数键
+            .WhereIf(QueryParametersToRemove is { Count: > 0 },
+                u => QueryParametersToRemove?.TryGetValue(u.Key, out _) == false).Select(u => $"{u.Key}={u.Value}")
+            .ToArray();
+
+        // 构建查询字符串赋值给 UriBuilder 的 Query 属性
+        uriBuilder.Query = finalQueryParameters.Length == 0
+            ? string.Empty
+            : '?' + string.Join('&', finalQueryParameters);
     }
 
     /// <summary>
@@ -154,40 +220,6 @@ public sealed partial class HttpRequestBuilder
         }
 
         uriBuilder.Fragment = Fragment;
-    }
-
-    /// <summary>
-    ///     追加查询参数
-    /// </summary>
-    /// <param name="uriBuilder">
-    ///     <see cref="UriBuilder" />
-    /// </param>
-    internal void AppendQueryParameters(UriBuilder uriBuilder)
-    {
-        // 空检查
-        if (QueryParameters.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        // 解析 URL 中的查询字符串为键值对列表
-        var queryParameters = uriBuilder.Query.ParseFormatKeyValueString(['&'], '?');
-
-        // 追加查询参数
-        foreach (var (key, values) in QueryParameters)
-        {
-            queryParameters.AddRange(values.Select(value =>
-                new KeyValuePair<string, string?>(key, value)));
-        }
-
-        // 构建查询字符串赋值给 UriBuilder 的 Query 属性
-        uriBuilder.Query =
-            "?" + string.Join('&',
-                queryParameters
-                    // 过滤已标记为移除的查询参数
-                    .WhereIf(QueryParametersToRemove is { Count: > 0 },
-                        u => QueryParametersToRemove?.TryGetValue(u.Key, out _) == false)
-                    .Select(u => $"{u.Key}={u.Value}"));
     }
 
     /// <summary>
@@ -307,7 +339,7 @@ public sealed partial class HttpRequestBuilder
         // 获取 Digest 摘要认证授权凭证
         var digestCredentials =
             DigestCredentials.GetDigestCredentials(httpRequestMessage.RequestUri?.OriginalString, parts[0], parts[1],
-                Method!);
+                HttpMethod!);
 
         // 设置身份验证凭据请求授权标头
         httpRequestMessage.Headers.Authorization =

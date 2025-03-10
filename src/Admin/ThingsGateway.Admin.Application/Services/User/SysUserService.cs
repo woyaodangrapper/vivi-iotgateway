@@ -771,7 +771,7 @@ internal sealed class SysUserService : BaseService<SysUser>, ISysUserService
     /// </summary>
     /// <param name="userId">用户ID</param>
     /// <param name="verificatInfoIds">Token列表</param>
-    private async Task UserLoginOut(long userId, List<long>? verificatInfoIds)
+    private async Task UserLoginOut(long userId, List<string>? verificatInfoIds)
     {
         await NoticeUtil.UserLoginOut(new UserLoginOutEvent
         {

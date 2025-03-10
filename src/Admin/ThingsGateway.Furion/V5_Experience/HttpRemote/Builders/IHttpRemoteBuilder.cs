@@ -40,6 +40,15 @@ public interface IHttpRemoteBuilder
     ///     <see cref="IHttpRemoteBuilder" />
     /// </returns>
     IHttpRemoteBuilder ConfigureOptions(Action<HttpRemoteOptions, IServiceProvider> configure);
+
+    /// <summary>
+    ///     为所有 <see cref="HttpClient" /> 添加配置
+    /// </summary>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="IHttpRemoteBuilder" />
+    /// </returns>
+    IHttpRemoteBuilder ConfigureHttpClientDefaults(Action<IHttpClientBuilder> configure);
 }
 
 /// <summary>
@@ -82,6 +91,17 @@ internal sealed class DefaultHttpRemoteBuilder : IHttpRemoteBuilder
         ArgumentNullException.ThrowIfNull(configure);
 
         Services.AddOptions<HttpRemoteOptions>().Configure(configure);
+
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IHttpRemoteBuilder ConfigureHttpClientDefaults(Action<IHttpClientBuilder> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        Services.ConfigureHttpClientDefaults(configure);
 
         return this;
     }

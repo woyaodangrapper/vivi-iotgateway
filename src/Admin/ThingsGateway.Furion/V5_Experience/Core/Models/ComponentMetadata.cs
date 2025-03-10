@@ -31,6 +31,10 @@ internal readonly struct ComponentMetadata
         Version = version?.ToString();
         Description = description;
 
+#pragma warning disable CA1863 // 使用 "CompositeFormat"
+        NuGetPage = string.Format(Constants.NUGET_PACKAGE_PAGE, name, version?.ToString() ?? string.Empty);
+        DocumentationPage = string.Format(Constants.FURION_COMPONENT_DOCS_PAGE, Name);
+#pragma warning restore CA1863 // 使用 "CompositeFormat"
     }
 
     /// <summary>
@@ -48,4 +52,13 @@ internal readonly struct ComponentMetadata
     /// </summary>
     internal string? Description { get; init; }
 
+    /// <summary>
+    ///     NuGet 地址
+    /// </summary>
+    internal string NuGetPage { get; init; }
+
+    /// <summary>
+    ///     文档地址
+    /// </summary>
+    internal string DocumentationPage { get; init; }
 }

@@ -107,7 +107,7 @@ internal sealed class VerificatInfoService : BaseService<VerificatInfo>, IVerifi
         return verificatInfo;
     }
 
-    public List<long>? GetClientIdListByUserId(long userId)
+    public List<string>? GetClientIdListByUserId(long userId)
     {
         using var db = GetDB();
         var verificatInfo = db.Queryable<VerificatInfo>().Where(u => u.UserId == userId).Select(a => a.ClientIds).ToList().SelectMany(a => a).ToList();

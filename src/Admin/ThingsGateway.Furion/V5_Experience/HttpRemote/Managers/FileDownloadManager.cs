@@ -86,11 +86,11 @@ internal sealed class FileDownloadManager
     /// </param>
     internal void Start(CancellationToken cancellationToken = default)
     {
-        // 创建关联的取消标识
-        using var progressCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        // 创建进度报告任务取消标识
+        using var progressCancellationTokenSource = new CancellationTokenSource();
 
         // 初始化进度报告任务
-        var reportProgressTask = ReportProgressAsync(progressCancellationTokenSource.Token);
+        var reportProgressTask = ReportProgressAsync(progressCancellationTokenSource.Token, cancellationToken);
 
         // 处理文件传输开始
         HandleTransferStarted();
@@ -199,11 +199,11 @@ internal sealed class FileDownloadManager
     /// </param>
     internal async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        // 创建关联的取消标识
-        using var progressCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        // 创建进度报告任务取消标识
+        using var progressCancellationTokenSource = new CancellationTokenSource();
 
         // 初始化进度报告任务
-        var reportProgressTask = ReportProgressAsync(progressCancellationTokenSource.Token);
+        var reportProgressTask = ReportProgressAsync(progressCancellationTokenSource.Token, cancellationToken);
 
         // 处理文件传输开始
         HandleTransferStarted();
@@ -246,7 +246,7 @@ internal sealed class FileDownloadManager
                 bufferSize, true);
 
             // 获取 HTTP 响应体中的内容流
-            using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using var contentStream = (await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false));
 
             // 循环读取数据直到取消请求或读取完毕
             int numBytesRead;
@@ -310,10 +310,14 @@ internal sealed class FileDownloadManager
     /// <summary>
     ///     文件传输进度报告任务
     /// </summary>
+    /// <param name="progressCancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
     /// <param name="cancellationToken">
     ///     <see cref="CancellationToken" />
     /// </param>
-    internal async Task ReportProgressAsync(CancellationToken cancellationToken)
+    internal async Task ReportProgressAsync(CancellationToken progressCancellationToken,
+        CancellationToken cancellationToken)
     {
         // 空检查
         if (_httpFileDownloadBuilder.OnProgressChanged is null && FileTransferEventHandler is null)
@@ -326,28 +330,23 @@ internal sealed class FileDownloadManager
             // 从进度通道中读取所有的进度信息
             await foreach (var fileTransferProgress in _progressChannel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
             {
-                try
-                {
-                    // 处理文件传输进度变化
-                    await HandleProgressChangedAsync(fileTransferProgress).ConfigureAwait(false);
+                // 如果请求了取消，则抛出 OperationCanceledException
+                cancellationToken.ThrowIfCancellationRequested();
 
-                    // 根据配置的进度更新（通知）的间隔时间延迟进度报告
-                    await Task.Delay(_httpFileDownloadBuilder.ProgressInterval, cancellationToken).ConfigureAwait(false);
-                }
-                // 捕获当通道关闭或操作被取消时的异常
-                catch (Exception e) when (cancellationToken.IsCancellationRequested ||
-                                          e is ChannelClosedException or OperationCanceledException)
+                // 检查是否已完成文件传输（确保最后一次进度能够被订阅）
+                if (progressCancellationToken.IsCancellationRequested && fileTransferProgress.PercentageComplete >= 1.0)
                 {
                     // 处理文件传输进度变化
                     await HandleProgressChangedAsync(fileTransferProgress).ConfigureAwait(false);
 
                     break;
                 }
-                catch (Exception e)
-                {
-                    // 输出调试事件
-                    Debugging.Error(e.Message);
-                }
+
+                // 处理文件传输进度变化
+                await HandleProgressChangedAsync(fileTransferProgress).ConfigureAwait(false);
+
+                // 根据配置的进度更新（通知）的间隔时间延迟进度报告
+                await Task.Delay(_httpFileDownloadBuilder.ProgressInterval, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (Exception e) when (cancellationToken.IsCancellationRequested || e is OperationCanceledException)

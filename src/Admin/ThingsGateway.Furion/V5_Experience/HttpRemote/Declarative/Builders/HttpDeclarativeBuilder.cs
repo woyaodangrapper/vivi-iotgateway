@@ -40,6 +40,7 @@ public sealed class HttpDeclarativeBuilder
         new(typeof(DisableCacheDeclarativeExtractor), new DisableCacheDeclarativeExtractor()),
         new(typeof(EnsureSuccessStatusCodeDeclarativeExtractor), new EnsureSuccessStatusCodeDeclarativeExtractor()),
         new(typeof(TimeoutDeclarativeExtractor), new TimeoutDeclarativeExtractor()),
+        new(typeof(PathSegmentDeclarativeExtractor), new PathSegmentDeclarativeExtractor()),
         new(typeof(QueryDeclarativeExtractor), new QueryDeclarativeExtractor()),
         new(typeof(PathDeclarativeExtractor), new PathDeclarativeExtractor()),
         new(typeof(CookieDeclarativeExtractor), new CookieDeclarativeExtractor()),
@@ -115,7 +116,8 @@ public sealed class HttpDeclarativeBuilder
         var httpMethodAttribute = Method.GetCustomAttribute<HttpMethodAttribute>(true)!;
 
         // 初始化 HttpRequestBuilder 实例并添加声明式方法签名
-        var httpRequestBuilder = HttpRequestBuilder.Create(httpMethodAttribute.Method, httpMethodAttribute.RequestUri)
+        var httpRequestBuilder = HttpRequestBuilder
+            .Create(httpMethodAttribute.HttpMethod, httpMethodAttribute.RequestUri)
             .WithProperty(Constants.DECLARATIVE_METHOD_KEY,
                 $"{Method.ToFriendlyString()} | {Method.DeclaringType.ToFriendlyString()}");
 

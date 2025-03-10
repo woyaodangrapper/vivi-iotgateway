@@ -27,7 +27,7 @@ public sealed class HttpLongPollingBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(httpMethod);
 
-        Method = httpMethod;
+        HttpMethod = httpMethod;
         RequestUri = requestUri;
     }
 
@@ -39,7 +39,7 @@ public sealed class HttpLongPollingBuilder
     /// <summary>
     ///     请求方式
     /// </summary>
-    public HttpMethod Method { get; }
+    public HttpMethod HttpMethod { get; }
 
     /// <summary>
     ///     超时时间
@@ -62,17 +62,17 @@ public sealed class HttpLongPollingBuilder
     /// <summary>
     ///     用于接收服务器返回 <c>200~299</c> 状态码的数据的操作
     /// </summary>
-    public Func<HttpResponseMessage, Task>? OnDataReceived { get; private set; }
+    public Func<HttpResponseMessage, CancellationToken, Task>? OnDataReceived { get; private set; }
 
     /// <summary>
     ///     用于接收服务器返回非 <c>200~299</c> 状态码的数据的操作
     /// </summary>
-    public Func<HttpResponseMessage, Task>? OnError { get; private set; }
+    public Func<HttpResponseMessage, CancellationToken, Task>? OnError { get; private set; }
 
     /// <summary>
     ///     用于响应标头包含 <c>X-End-Of-Stream</c> 时触发的操作
     /// </summary>
-    public Func<HttpResponseMessage, Task>? OnEndOfStream { get; private set; }
+    public Func<HttpResponseMessage, CancellationToken, Task>? OnEndOfStream { get; private set; }
 
     /// <summary>
     ///     实现 <see cref="IHttpLongPollingEventHandler" /> 的类型
@@ -162,7 +162,7 @@ public sealed class HttpLongPollingBuilder
     /// <returns>
     ///     <see cref="HttpLongPollingBuilder" />
     /// </returns>
-    public HttpLongPollingBuilder SetOnDataReceived(Func<HttpResponseMessage, Task> configure)
+    public HttpLongPollingBuilder SetOnDataReceived(Func<HttpResponseMessage, CancellationToken, Task> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
@@ -179,7 +179,7 @@ public sealed class HttpLongPollingBuilder
     /// <returns>
     ///     <see cref="HttpLongPollingBuilder" />
     /// </returns>
-    public HttpLongPollingBuilder SetOnError(Func<HttpResponseMessage, Task> configure)
+    public HttpLongPollingBuilder SetOnError(Func<HttpResponseMessage, CancellationToken, Task> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
@@ -196,7 +196,7 @@ public sealed class HttpLongPollingBuilder
     /// <returns>
     ///     <see cref="HttpLongPollingBuilder" />
     /// </returns>
-    public HttpLongPollingBuilder SetOnEndOfStream(Func<HttpResponseMessage, Task> configure)
+    public HttpLongPollingBuilder SetOnEndOfStream(Func<HttpResponseMessage, CancellationToken, Task> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
@@ -261,7 +261,7 @@ public sealed class HttpLongPollingBuilder
         ArgumentNullException.ThrowIfNull(httpRemoteOptions);
 
         // 初始化 HttpRequestBuilder 实例
-        var httpRequestBuilder = HttpRequestBuilder.Create(Method, RequestUri, configure).DisableCache();
+        var httpRequestBuilder = HttpRequestBuilder.Create(HttpMethod, RequestUri, configure).DisableCache();
 
         // 设置超时时间
         if (Timeout is not null)

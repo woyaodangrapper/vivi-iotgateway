@@ -10,7 +10,6 @@
 
 
 using ThingsGateway.Admin.Application;
-using ThingsGateway.Extension.Generic;
 
 namespace ThingsGateway.Admin.Razor;
 
@@ -34,39 +33,37 @@ public partial class LoginConnectionHub : ComponentBase, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        UpdateVerificat(ClientId, VerificatId, isConnect: false);
-        var clientId = ClientId.ToString();
-        NewMessage.UnSubscribe(clientId);
-        LoginOut.UnSubscribe(clientId);
-        NavigationUri.UnSubscribe(clientId);
+        VerificatInfoUtil.UpdateVerificat(ClientId, VerificatId, isConnect: false);
+        NewMessage.UnSubscribe(ClientId);
+        LoginOut.UnSubscribe(ClientId);
+        NavigationUri.UnSubscribe(ClientId);
     }
     private long VerificatId;
-    private long ClientId;
+    private string ClientId;
     protected override Task OnInitializedAsync()
     {
         try
         {
-            ClientId = CommonUtils.GetSingleId();
+            ClientId = CommonUtils.GetSingleId().ToString();
             VerificatId = UserManager.VerificatId;
-            var clientId = ClientId.ToString();
-            LoginOut.Subscribe(clientId, async (message) =>
+            LoginOut.Subscribe(ClientId, async (message) =>
             {
                 await InvokeAsync(async () => await ToastService.Warning(message.Message));
                 await Task.Delay(2000);
                 NavigationManager.NavigateTo(NavigationManager.Uri, true);
             });
-            NewMessage.Subscribe(clientId, async (message) =>
+            NewMessage.Subscribe(ClientId, async (message) =>
             {
                 if ((byte)message.LogLevel <= 2)
                     await InvokeAsync(async () => await ToastService.Information(message.Data));
                 else
                     await InvokeAsync(async () => await ToastService.Warning(message.Data));
             });
-            NavigationUri.Subscribe(clientId, async (message) =>
+            NavigationUri.Subscribe(ClientId, async (message) =>
             {
                 await ShowMessage(message);
             });
-            UpdateVerificat(ClientId, VerificatId, isConnect: true);
+            VerificatInfoUtil.UpdateVerificat(ClientId, VerificatId, isConnect: true);
         }
         catch (OperationCanceledException)
         {
@@ -97,38 +94,6 @@ public partial class LoginConnectionHub : ComponentBase, IDisposable
             }
         });
     }
-    /// <summary>
-    /// 更新cache
-    /// </summary>
-    /// <param name="clientId">用户id</param>
-    /// <param name="verificatId">上线时的验证id</param>
-    /// <param name="isConnect">上线</param>
-    private void UpdateVerificat(long clientId, long verificatId = 0, bool isConnect = true)
-    {
-        if (clientId != 0)
-        {
-            //获取cache当前用户的verificat信息列表
-            if (isConnect)
-            {
-                //获取cache中当前verificat
-                var verificatInfo = VerificatInfoService.GetOne(verificatId);
-                if (verificatInfo != null)
-                {
-                    verificatInfo.ClientIds.Add(clientId);//添加到客户端列表
-                    VerificatInfoService.Update(verificatInfo);//更新Cache
-                }
-            }
-            else
-            {
-                //获取当前客户端ID所在的verificat信息
-                var verificatInfo = VerificatInfoService.GetOne(verificatId);
-                if (verificatInfo != null)
-                {
-                    verificatInfo.ClientIds.RemoveWhere(it => it == clientId);//从客户端列表删除
-                    VerificatInfoService.Update(verificatInfo);//更新Cache
-                }
-            }
-        }
-    }
+
 
 }

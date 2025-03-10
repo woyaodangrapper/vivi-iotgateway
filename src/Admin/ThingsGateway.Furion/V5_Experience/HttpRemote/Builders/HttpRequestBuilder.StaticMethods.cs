@@ -448,17 +448,20 @@ public sealed partial class HttpRequestBuilder
     /// <summary>
     ///     创建 <see cref="HttpServerSentEventsBuilder" /> 构建器
     /// </summary>
+    /// <param name="httpMethod">请求方式</param>
     /// <param name="requestUri">请求地址</param>
     /// <param name="onMessage">用于在从事件源接收到数据时的操作</param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="HttpServerSentEventsBuilder" />
     /// </returns>
-    public static HttpServerSentEventsBuilder ServerSentEvents(Uri? requestUri,
-        Func<ServerSentEventsData, Task> onMessage, Action<HttpServerSentEventsBuilder>? configure = null)
+    public static HttpServerSentEventsBuilder ServerSentEvents(HttpMethod httpMethod, Uri? requestUri,
+        Func<ServerSentEventsData, CancellationToken, Task> onMessage,
+        Action<HttpServerSentEventsBuilder>? configure = null)
     {
         // 初始化 HttpServerSentEventsBuilder 实例
-        var httpServerSentEventsBuilder = new HttpServerSentEventsBuilder(requestUri).SetOnMessage(onMessage);
+        var httpServerSentEventsBuilder =
+            new HttpServerSentEventsBuilder(httpMethod, requestUri).SetOnMessage(onMessage);
 
         // 调用自定义配置委托
         configure?.Invoke(httpServerSentEventsBuilder);
@@ -475,8 +478,23 @@ public sealed partial class HttpRequestBuilder
     /// <returns>
     ///     <see cref="HttpServerSentEventsBuilder" />
     /// </returns>
+    public static HttpServerSentEventsBuilder ServerSentEvents(Uri? requestUri,
+        Func<ServerSentEventsData, CancellationToken, Task> onMessage,
+        Action<HttpServerSentEventsBuilder>? configure = null) =>
+        ServerSentEvents(HttpMethod.Get, requestUri, onMessage, configure);
+
+    /// <summary>
+    ///     创建 <see cref="HttpServerSentEventsBuilder" /> 构建器
+    /// </summary>
+    /// <param name="requestUri">请求地址</param>
+    /// <param name="onMessage">用于在从事件源接收到数据时的操作</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="HttpServerSentEventsBuilder" />
+    /// </returns>
     public static HttpServerSentEventsBuilder ServerSentEvents(string? requestUri,
-        Func<ServerSentEventsData, Task> onMessage, Action<HttpServerSentEventsBuilder>? configure = null) =>
+        Func<ServerSentEventsData, CancellationToken, Task> onMessage,
+        Action<HttpServerSentEventsBuilder>? configure = null) =>
         ServerSentEvents(string.IsNullOrWhiteSpace(requestUri)
             ? null
             : new Uri(requestUri, UriKind.RelativeOrAbsolute), onMessage, configure);
@@ -543,7 +561,8 @@ public sealed partial class HttpRequestBuilder
     ///     <see cref="HttpLongPollingBuilder" />
     /// </returns>
     public static HttpLongPollingBuilder LongPolling(HttpMethod httpMethod, Uri? requestUri,
-        Func<HttpResponseMessage, Task> onDataReceived, Action<HttpLongPollingBuilder>? configure = null)
+        Func<HttpResponseMessage, CancellationToken, Task> onDataReceived,
+        Action<HttpLongPollingBuilder>? configure = null)
     {
         // 初始化 HttpLongPollingBuilder 实例
         var httpLongPollingBuilder =
@@ -564,7 +583,8 @@ public sealed partial class HttpRequestBuilder
     /// <returns>
     ///     <see cref="HttpLongPollingBuilder" />
     /// </returns>
-    public static HttpLongPollingBuilder LongPolling(Uri? requestUri, Func<HttpResponseMessage, Task> onDataReceived,
+    public static HttpLongPollingBuilder LongPolling(Uri? requestUri,
+        Func<HttpResponseMessage, CancellationToken, Task> onDataReceived,
         Action<HttpLongPollingBuilder>? configure = null) =>
         LongPolling(HttpMethod.Get, requestUri, onDataReceived, configure);
 
@@ -577,7 +597,8 @@ public sealed partial class HttpRequestBuilder
     /// <returns>
     ///     <see cref="HttpLongPollingBuilder" />
     /// </returns>
-    public static HttpLongPollingBuilder LongPolling(string? requestUri, Func<HttpResponseMessage, Task> onDataReceived,
+    public static HttpLongPollingBuilder LongPolling(string? requestUri,
+        Func<HttpResponseMessage, CancellationToken, Task> onDataReceived,
         Action<HttpLongPollingBuilder>? configure = null) =>
         LongPolling(HttpMethod.Get,
             string.IsNullOrWhiteSpace(requestUri) ? null : new Uri(requestUri, UriKind.RelativeOrAbsolute),

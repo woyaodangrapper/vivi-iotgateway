@@ -216,7 +216,7 @@ internal sealed class UserCenterService : BaseService<SysUser>, IUserCenterServi
     /// </summary>
     /// <param name="userId">用户ID</param>
     /// <param name="clientIds">Token列表</param>
-    private async Task UserLoginOut(long userId, List<long> clientIds)
+    private async Task UserLoginOut(long userId, List<string> clientIds)
     {
         await NoticeUtil.UserLoginOut(new UserLoginOutEvent
         {

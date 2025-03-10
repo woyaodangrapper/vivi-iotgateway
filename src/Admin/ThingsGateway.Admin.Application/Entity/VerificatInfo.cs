@@ -29,7 +29,7 @@ public class VerificatInfo : PrimaryIdEntity
     /// </summary>
     [AutoGenerateColumn(Ignore = true)]
     [SugarColumn(ColumnDescription = "客户端ID列表", IsNullable = true, IsJson = true)]
-    public ConcurrentList<long> ClientIds { get; set; } = new();
+    public ConcurrentList<string> ClientIds { get; set; } = new();
 
     /// <summary>
     /// 验证Id

@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 
 using System.Net;
-using System.Reflection;
 using System.Security.Claims;
 
 using UAParser;
@@ -58,7 +57,7 @@ public class AppService : IAppService
         }
     }
 
- 
+
 
     public async Task LoginAsync(ClaimsIdentity identity, int expire)
     {

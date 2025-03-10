@@ -27,13 +27,13 @@ public static class HttpRemoteUtility
     /// </summary>
 #pragma warning disable SYSLIB0039
 #pragma warning disable CS0618 // 类型或成员已过时
-#pragma warning disable CA5397
+#pragma warning disable CA5397 // 请勿使用已弃用的 SslProtocols 值
 #pragma warning disable CA5398 // 避免硬编码的 SslProtocols 值
     public static SslProtocols AllSslProtocols => SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Ssl2 |
                                                   SslProtocols.Ssl3 | SslProtocols.Tls12 | SslProtocols.Tls13 |
                                                   SslProtocols.None;
 #pragma warning restore CA5398 // 避免硬编码的 SslProtocols 值
-#pragma warning restore CA5397
+#pragma warning restore CA5397 // 请勿使用已弃用的 SslProtocols 值
 #pragma warning restore CS0618 // 类型或成员已过时
 #pragma warning restore SYSLIB0039
 

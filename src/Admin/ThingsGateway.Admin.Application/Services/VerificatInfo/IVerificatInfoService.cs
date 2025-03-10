@@ -18,7 +18,7 @@ public interface IVerificatInfoService
 
     void Delete(List<long> ids);
 
-    List<long>? GetClientIdListByUserId(long userId);
+    List<string>? GetClientIdListByUserId(long userId);
 
     List<long>? GetIdListByUserId(long userId);
 

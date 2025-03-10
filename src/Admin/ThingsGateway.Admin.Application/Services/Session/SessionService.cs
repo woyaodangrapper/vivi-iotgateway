@@ -196,7 +196,7 @@ internal sealed class SessionService : BaseService<SysUser>, ISessionService
     /// 通知用户下线
     /// </summary>
     /// <returns></returns>
-    private async Task NoticeUserLoginOut(long userId, List<long> clientIds)
+    private async Task NoticeUserLoginOut(long userId, List<string> clientIds)
     {
         await NoticeUtil.UserLoginOut(new UserLoginOutEvent
         {

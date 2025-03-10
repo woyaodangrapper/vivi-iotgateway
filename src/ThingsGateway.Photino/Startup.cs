@@ -24,7 +24,6 @@ using Microsoft.Extensions.Options;
 
 using Newtonsoft.Json;
 
-using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -383,6 +382,7 @@ public class Startup : AppStartup
 #endif
 
         app.MapControllers();
+        app.MapHubs();
     }
 
     /// <summary>

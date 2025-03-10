@@ -15,7 +15,7 @@ public interface INoticeService
     /// <summary>
     /// 发送新消息通知给指定用户
     /// </summary>
-    Task NavigationMesage(IEnumerable<long>? clientIds, string uri, string message);
+    Task NavigationMesage(IEnumerable<string>? clientIds, string uri, string message);
 
     /// <summary>
     /// 发送新消息通知给指定用户
@@ -23,7 +23,7 @@ public interface INoticeService
     /// <param name="clientIds">客户端ID列表</param>
     /// <param name="message">消息内容</param>
     /// <returns>异步操作结果</returns>
-    Task NewMesage(IEnumerable<long>? clientIds, AppMessage message);
+    Task NewMesage(IEnumerable<string>? clientIds, AppMessage message);
 
     /// <summary>
     /// 发送用户下线通知给指定用户
@@ -31,5 +31,5 @@ public interface INoticeService
     /// <param name="clientIds">客户端ID列表</param>
     /// <param name="message">下线消息内容</param>
     /// <returns>异步操作结果</returns>
-    Task UserLoginOut(IEnumerable<long>? clientIds, string message);
+    Task UserLoginOut(IEnumerable<string>? clientIds, string message);
 }

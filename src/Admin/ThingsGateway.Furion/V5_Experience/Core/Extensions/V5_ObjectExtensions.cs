@@ -21,7 +21,7 @@ namespace ThingsGateway.Extensions;
 /// <summary>
 ///     <see cref="object" /> 拓展类
 /// </summary>
-internal static class NewObjectExtensions
+internal static class V5_ObjectExtensions
 {
     /// <summary>
     ///     获取对象所在的程序集

@@ -73,7 +73,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
 
            .WithKeepAlivePeriod(TimeSpan.FromSeconds(120.0));
 
-        if(_driverPropertys.TLS)
+        if (_driverPropertys.TLS)
         {
             var caCert = new X509Certificate2(_driverPropertys.CAFile);
             var clientCert = LoadCertificate(_driverPropertys.ClientCertificateFile, _driverPropertys.ClientKeyFile);

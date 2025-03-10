@@ -23,11 +23,6 @@ namespace ThingsGateway.HttpRemote;
 /// </summary>
 internal sealed class LongPollingManager
 {
-    /// <summary>
-    ///     数据接收传输的通道
-    /// </summary>
-    internal readonly Channel<HttpResponseMessage> _dataChannel;
-
     /// <inheritdoc cref="HttpLongPollingBuilder" />
     internal readonly HttpLongPollingBuilder _httpLongPollingBuilder;
 
@@ -53,9 +48,6 @@ internal sealed class LongPollingManager
 
         _httpRemoteService = httpRemoteService;
         _httpLongPollingBuilder = httpLongPollingBuilder;
-
-        // 初始化数据接收传输的通道
-        _dataChannel = Channel.CreateUnbounded<HttpResponseMessage>();
 
         // 解析 IHttpLongPollingEventHandler 事件处理程序
         LongPollingEventHandler = (httpLongPollingBuilder.LongPollingEventHandlerType is not null
@@ -91,14 +83,11 @@ internal sealed class LongPollingManager
     /// <exception cref="InvalidOperationException"></exception>
     internal void Start(CancellationToken cancellationToken = default)
     {
-        // 创建关联的取消标识
-        using var fetchCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        // 初始化数据接收传输的通道
+        var dataChannel = Channel.CreateUnbounded<HttpResponseMessage>();
 
         // 初始化接收服务器响应数据任务
-        var fetchResponseTask = FetchResponseAsync(fetchCancellationTokenSource.Token);
-
-        // 声明取消接收标识
-        var isCancelled = false;
+        var fetchResponseTask = FetchResponseAsync(dataChannel, cancellationToken);
 
         try
         {
@@ -109,7 +98,7 @@ internal sealed class LongPollingManager
                 var httpResponseMessage = _httpRemoteService.Send(RequestBuilder, cancellationToken);
 
                 // 发送响应数据对象到通道
-                _dataChannel.Writer.TryWrite(httpResponseMessage);
+                dataChannel.Writer.TryWrite(httpResponseMessage);
 
                 // 检查是否应该终止长轮询
                 if (ShouldTerminatePolling(httpResponseMessage))
@@ -128,9 +117,6 @@ internal sealed class LongPollingManager
         // 任务被取消
         catch (Exception e) when (cancellationToken.IsCancellationRequested || e is OperationCanceledException)
         {
-            // 标识客户端中止事件消息接收
-            isCancelled = true;
-
             throw;
         }
         catch (Exception e)
@@ -150,14 +136,10 @@ internal sealed class LongPollingManager
         }
         finally
         {
-            if (isCancelled)
-            {
-                // 关闭通道
-                _dataChannel.Writer.Complete();
-            }
+            // 关闭通道
+            dataChannel.Writer.Complete();
 
             // 等待接收服务器响应数据任务完成
-            fetchCancellationTokenSource.Cancel();
             fetchResponseTask.Wait(cancellationToken);
         }
     }
@@ -171,14 +153,11 @@ internal sealed class LongPollingManager
     /// <exception cref="InvalidOperationException"></exception>
     internal async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        // 创建关联的取消标识
-        using var fetchCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        // 初始化数据接收传输的通道
+        var dataChannel = Channel.CreateUnbounded<HttpResponseMessage>();
 
         // 初始化接收服务器响应数据任务
-        var fetchResponseTask = FetchResponseAsync(fetchCancellationTokenSource.Token);
-
-        // 声明取消接收标识
-        var isCancelled = false;
+        var fetchResponseTask = FetchResponseAsync(dataChannel, cancellationToken);
 
         try
         {
@@ -189,7 +168,7 @@ internal sealed class LongPollingManager
                 var httpResponseMessage = await _httpRemoteService.SendAsync(RequestBuilder, cancellationToken).ConfigureAwait(false);
 
                 // 发送响应数据对象到通道
-                await _dataChannel.Writer.WriteAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
+                await dataChannel.Writer.WriteAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
 
                 // 检查是否应该终止长轮询
                 if (ShouldTerminatePolling(httpResponseMessage))
@@ -208,9 +187,6 @@ internal sealed class LongPollingManager
         // 任务被取消
         catch (Exception e) when (cancellationToken.IsCancellationRequested || e is OperationCanceledException)
         {
-            // 标识客户端中止事件消息接收
-            isCancelled = true;
-
             throw;
         }
         catch (Exception e)
@@ -230,14 +206,10 @@ internal sealed class LongPollingManager
         }
         finally
         {
-            if (isCancelled)
-            {
-                // 关闭通道
-                _dataChannel.Writer.Complete();
-            }
+            // 关闭通道
+            dataChannel.Writer.Complete();
 
             // 等待接收服务器响应数据任务完成
-            await fetchCancellationTokenSource.CancelAsync().ConfigureAwait(false);
             await fetchResponseTask.ConfigureAwait(false);
         }
     }
@@ -310,11 +282,16 @@ internal sealed class LongPollingManager
     /// <summary>
     ///     接收服务器响应数据任务
     /// </summary>
+    /// <param name="dataChannel">数据接收传输的通道</param>
     /// <param name="cancellationToken">
     ///     <see cref="CancellationToken" />
     /// </param>
-    internal async Task FetchResponseAsync(CancellationToken cancellationToken)
+    internal async Task FetchResponseAsync(Channel<HttpResponseMessage> dataChannel,
+        CancellationToken cancellationToken)
     {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(dataChannel);
+
         // 空检查
         if (_httpLongPollingBuilder.OnDataReceived is null && _httpLongPollingBuilder.OnError is null &&
             LongPollingEventHandler is null)
@@ -325,27 +302,13 @@ internal sealed class LongPollingManager
         try
         {
             // 从数据接收传输的通道中读取所有的数据
-            await foreach (var httpResponseMessage in _dataChannel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
+            await foreach (var httpResponseMessage in dataChannel.Reader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
             {
-                try
-                {
-                    // 处理服务器响应数据
-                    await HandleResponseAsync(httpResponseMessage).ConfigureAwait(false);
-                }
-                // 捕获当通道关闭或操作被取消时的异常
-                catch (Exception e) when (cancellationToken.IsCancellationRequested ||
-                                          e is ChannelClosedException or OperationCanceledException)
-                {
-                    // 处理服务器响应数据
-                    await HandleResponseAsync(httpResponseMessage).ConfigureAwait(false);
+                // 如果请求了取消，则抛出 OperationCanceledException
+                cancellationToken.ThrowIfCancellationRequested();
 
-                    break;
-                }
-                catch (Exception e)
-                {
-                    // 输出调试事件
-                    Debugging.Error(e.Message);
-                }
+                // 处理服务器响应数据
+                await HandleResponseAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (Exception e) when (cancellationToken.IsCancellationRequested || e is OperationCanceledException)
@@ -365,7 +328,11 @@ internal sealed class LongPollingManager
     /// <param name="httpResponseMessage">
     ///     <see cref="HttpResponseMessage" />
     /// </param>
-    internal async Task HandleResponseAsync(HttpResponseMessage httpResponseMessage)
+    /// <param name="cancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
+    internal async Task HandleResponseAsync(HttpResponseMessage httpResponseMessage,
+        CancellationToken cancellationToken)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(httpResponseMessage);
@@ -373,20 +340,20 @@ internal sealed class LongPollingManager
         // 检查响应标头中是否存在长轮询结束符
         if (httpResponseMessage.Headers.TryGetValues(Constants.X_END_OF_STREAM_HEADER, out _))
         {
-            await HandleEndOfStreamAsync(httpResponseMessage).ConfigureAwait(false);
+            await HandleEndOfStreamAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
 
             return;
         }
 
-        // 处理服务器返回 <c>200~299</c> 状态码的数据
+        // 处理服务器返回 200~299 状态码的数据
         if (httpResponseMessage.IsSuccessStatusCode)
         {
-            await HandleDataReceivedAsync(httpResponseMessage).ConfigureAwait(false);
+            await HandleDataReceivedAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
         }
-        // 处理服务器返回非 <c>200~299</c> 状态码的数据
+        // 处理服务器返回非 200~299 状态码的数据
         else
         {
-            await HandleErrorAsync(httpResponseMessage).ConfigureAwait(false);
+            await HandleErrorAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -396,7 +363,11 @@ internal sealed class LongPollingManager
     /// <param name="httpResponseMessage">
     ///     <see cref="HttpResponseMessage" />
     /// </param>
-    internal async Task HandleDataReceivedAsync(HttpResponseMessage httpResponseMessage)
+    /// <param name="cancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
+    internal async Task HandleDataReceivedAsync(HttpResponseMessage httpResponseMessage,
+        CancellationToken cancellationToken)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(httpResponseMessage);
@@ -404,10 +375,11 @@ internal sealed class LongPollingManager
         // 空检查
         if (LongPollingEventHandler is not null)
         {
-            await DelegateExtensions.TryInvokeAsync(LongPollingEventHandler.OnDataReceivedAsync, httpResponseMessage).ConfigureAwait(false);
+            await DelegateExtensions.TryInvokeAsync(LongPollingEventHandler.OnDataReceivedAsync, httpResponseMessage,
+                cancellationToken).ConfigureAwait(false);
         }
 
-        await _httpLongPollingBuilder.OnDataReceived.TryInvokeAsync(httpResponseMessage).ConfigureAwait(false);
+        await _httpLongPollingBuilder.OnDataReceived.TryInvokeAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -416,7 +388,10 @@ internal sealed class LongPollingManager
     /// <param name="httpResponseMessage">
     ///     <see cref="HttpResponseMessage" />
     /// </param>
-    internal async Task HandleErrorAsync(HttpResponseMessage httpResponseMessage)
+    /// <param name="cancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
+    internal async Task HandleErrorAsync(HttpResponseMessage httpResponseMessage, CancellationToken cancellationToken)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(httpResponseMessage);
@@ -424,10 +399,11 @@ internal sealed class LongPollingManager
         // 空检查
         if (LongPollingEventHandler is not null)
         {
-            await DelegateExtensions.TryInvokeAsync(LongPollingEventHandler.OnErrorAsync, httpResponseMessage).ConfigureAwait(false);
+            await DelegateExtensions.TryInvokeAsync(LongPollingEventHandler.OnErrorAsync, httpResponseMessage,
+                cancellationToken).ConfigureAwait(false);
         }
 
-        await _httpLongPollingBuilder.OnError.TryInvokeAsync(httpResponseMessage).ConfigureAwait(false);
+        await _httpLongPollingBuilder.OnError.TryInvokeAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -436,7 +412,11 @@ internal sealed class LongPollingManager
     /// <param name="httpResponseMessage">
     ///     <see cref="HttpResponseMessage" />
     /// </param>
-    internal async Task HandleEndOfStreamAsync(HttpResponseMessage httpResponseMessage)
+    /// <param name="cancellationToken">
+    ///     <see cref="CancellationToken" />
+    /// </param>
+    internal async Task HandleEndOfStreamAsync(HttpResponseMessage httpResponseMessage,
+        CancellationToken cancellationToken)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(httpResponseMessage);
@@ -444,9 +424,10 @@ internal sealed class LongPollingManager
         // 空检查
         if (LongPollingEventHandler is not null)
         {
-            await DelegateExtensions.TryInvokeAsync(LongPollingEventHandler.OnEndOfStreamAsync, httpResponseMessage).ConfigureAwait(false);
+            await DelegateExtensions.TryInvokeAsync(LongPollingEventHandler.OnEndOfStreamAsync, httpResponseMessage,
+                cancellationToken).ConfigureAwait(false);
         }
 
-        await _httpLongPollingBuilder.OnEndOfStream.TryInvokeAsync(httpResponseMessage).ConfigureAwait(false);
+        await _httpLongPollingBuilder.OnEndOfStream.TryInvokeAsync(httpResponseMessage, cancellationToken).ConfigureAwait(false);
     }
 }
