@@ -20,15 +20,22 @@ public static class JsonExtensions
     /// <summary>
     /// 默认Json规则
     /// </summary>
-    public static JsonSerializerSettings Options;
+    public static JsonSerializerSettings IndentedOptions;
+    public static JsonSerializerSettings NoneIndentedOptions;
     static JsonExtensions()
     {
-        Options = new JsonSerializerSettings
+        IndentedOptions = new JsonSerializerSettings
         {
             Formatting = Formatting.Indented,// 使用缩进格式化输出
             NullValueHandling = NullValueHandling.Ignore, // 忽略空值属性
         };
-        Options.Converters.Add(new ByteArrayToNumberArrayConverter());
+        IndentedOptions.Converters.Add(new ByteArrayToNumberArrayConverter());
+        NoneIndentedOptions = new JsonSerializerSettings
+        {
+            Formatting = Formatting.None,// 不使用缩进格式化输出
+            NullValueHandling = NullValueHandling.Ignore, // 忽略空值属性
+        };
+        NoneIndentedOptions.Converters.Add(new ByteArrayToNumberArrayConverter());
     }
 
     /// <summary>
@@ -38,10 +45,12 @@ public static class JsonExtensions
     /// <param name="type"></param>
     /// <param name="jsonSerializerSettings"></param>
     /// <returns></returns>
-    public static object FromJsonNetString(this string json, Type type, JsonSerializerSettings? jsonSerializerSettings = null)
+    public static object FromJsonNetString(this string json, Type type, JsonSerializerSettings? jsonSerializerSettings)
     {
-        return Newtonsoft.Json.JsonConvert.DeserializeObject(json, type, jsonSerializerSettings ?? Options);
+        return Newtonsoft.Json.JsonConvert.DeserializeObject(json, type, jsonSerializerSettings ?? IndentedOptions);
     }
+
+
     /// <summary>
     /// 反序列化
     /// </summary>
@@ -53,14 +62,23 @@ public static class JsonExtensions
         return (T)FromJsonNetString(json, typeof(T), jsonSerializerSettings);
     }
 
+
     /// <summary>
     /// 序列化
     /// </summary>
     /// <param name="item"></param>
     /// <param name="jsonSerializerSettings"></param>
     /// <returns></returns>
-    public static string ToJsonNetString(this object item, JsonSerializerSettings? jsonSerializerSettings = null)
+    public static string ToJsonNetString(this object item, JsonSerializerSettings? jsonSerializerSettings)
     {
-        return Newtonsoft.Json.JsonConvert.SerializeObject(item, jsonSerializerSettings ?? Options);
+        return Newtonsoft.Json.JsonConvert.SerializeObject(item, jsonSerializerSettings ?? IndentedOptions);
+    }
+
+    /// <summary>
+    /// 序列化
+    /// </summary>
+    public static string ToJsonNetString(this object item, bool indented = true)
+    {
+        return Newtonsoft.Json.JsonConvert.SerializeObject(item, indented == false ? NoneIndentedOptions : IndentedOptions);
     }
 }

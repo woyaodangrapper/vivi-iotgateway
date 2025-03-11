@@ -71,7 +71,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
                     Json = new
                     {
                         device = deviceData.Name,
-                    }.ToJsonNetString()
+                    }.ToJsonNetString(_driverPropertys.JsonFormattingIndented)
                 };
                 topicJsonTBList.Add(topicJson);
             }
@@ -83,7 +83,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
                     Json = new
                     {
                         device = deviceData.Name,
-                    }.ToJsonNetString()
+                    }.ToJsonNetString(_driverPropertys.JsonFormattingIndented)
                 };
                 topicJsonTBList.Add(topicJson);
             }
@@ -341,11 +341,11 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
                     thingsBoardRpcResponseData.device = thingsBoardRpcData.device;
                     thingsBoardRpcResponseData.id = thingsBoardRpcData.data.id;
                     thingsBoardRpcResponseData.data.success = mqttRpcResult[thingsBoardRpcResponseData.device].All(b => b.Value.IsSuccess);
-                    thingsBoardRpcResponseData.data.message = mqttRpcResult[thingsBoardRpcResponseData.device].Select(a => a.Value.ErrorMessage).ToJsonNetString();
+                    thingsBoardRpcResponseData.data.message = mqttRpcResult[thingsBoardRpcResponseData.device].Select(a => a.Value.ErrorMessage).ToJsonNetString(_driverPropertys.JsonFormattingIndented);
 
                     var variableMessage = new MqttApplicationMessageBuilder()
 .WithTopic($"{args.ApplicationMessage.Topic}")
-.WithPayload(thingsBoardRpcResponseData.ToJsonNetString()).Build();
+.WithPayload(thingsBoardRpcResponseData.ToJsonNetString(_driverPropertys.JsonFormattingIndented)).Build();
                     await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
 
 
@@ -373,7 +373,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
 
                     var variableMessage = new MqttApplicationMessageBuilder()
 .WithTopic($"{args.ApplicationMessage.Topic}/Response")
-.WithPayload(mqttRpcResult.ToJsonNetString()).Build();
+.WithPayload(mqttRpcResult.ToJsonNetString(_driverPropertys.JsonFormattingIndented)).Build();
                     await _mqttClient.PublishAsync(variableMessage).ConfigureAwait(false);
 
 
@@ -404,7 +404,7 @@ public partial class MqttClient : BusinessBaseWithCacheIntervalScript<VariableBa
                         ResultCode = a.ResultCode.ToString()
                     }
                     )
-                    .ToJsonNetString()}");
+                    .ToJsonNetString(_driverPropertys.JsonFormattingIndented)}");
             }
         }
     }

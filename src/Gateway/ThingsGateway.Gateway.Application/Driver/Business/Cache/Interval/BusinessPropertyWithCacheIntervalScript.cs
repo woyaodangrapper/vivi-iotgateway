@@ -17,6 +17,13 @@ namespace ThingsGateway.Gateway.Application;
 /// </summary>
 public class BusinessPropertyWithCacheIntervalScript : BusinessPropertyWithCacheInterval
 {
+
+    /// <summary>
+    /// 缩进格式化
+    /// </summary>
+    [DynamicProperty]
+    public bool JsonFormattingIndented { get; set; } = true;
+
     /// <summary>
     /// 设备Topic
     /// </summary>

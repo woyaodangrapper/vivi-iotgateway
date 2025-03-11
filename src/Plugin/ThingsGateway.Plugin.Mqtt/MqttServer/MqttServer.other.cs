@@ -285,7 +285,7 @@ public partial class MqttServer : BusinessBaseWithCacheIntervalScript<VariableBa
         {
             var variableMessage = new MqttApplicationMessageBuilder()
 .WithTopic($"{args.ApplicationMessage.Topic}/Response")
-.WithPayload(mqttRpcResult.ToJsonNetString()).Build();
+.WithPayload(mqttRpcResult.ToJsonNetString(_driverPropertys.JsonFormattingIndented)).Build();
             await _mqttServer.InjectApplicationMessage(
                      new InjectedMqttApplicationMessage(variableMessage)).ConfigureAwait(false);
         }

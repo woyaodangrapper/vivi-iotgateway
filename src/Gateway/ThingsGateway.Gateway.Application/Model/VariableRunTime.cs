@@ -218,7 +218,7 @@ public class VariableRuntime : Variable, IVariable, IDisposable
                 else
                 {
                     if (_value != null)
-                        changed = data.ToJsonNetString() != _value.ToJsonNetString();
+                        changed = data.ToJsonNetString(false) != _value.ToJsonNetString(false);
                     else
                         changed = true;
                 }

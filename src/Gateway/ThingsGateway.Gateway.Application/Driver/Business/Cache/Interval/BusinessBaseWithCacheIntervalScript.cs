@@ -87,7 +87,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                     if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
                     {
                         // 如果是报警列表，则将整个分组转换为 JSON 字符串
-                        string json = group.Select(a => a).ToList().ToJsonNetString();
+                        string json = group.Select(a => a).ToList().ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                         // 将主题和 JSON 内容添加到列表中
                         topicJsonList.Add(new(topic, json));
                     }
@@ -96,7 +96,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                         // 如果不是报警列表，则将每个分组元素分别转换为 JSON 字符串
                         foreach (var gro in group)
                         {
-                            string json = JsonExtensions.ToJsonNetString(gro);
+                            string json = JsonExtensions.ToJsonNetString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                             // 将主题和 JSON 内容添加到列表中
                             topicJsonList.Add(new(topic, json));
                         }
@@ -108,14 +108,14 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
         {
             if (_businessPropertyWithCacheIntervalScript.IsAlarmList)
             {
-                string json = data.Select(a => a).ToList().ToJsonNetString();
+                string json = data.Select(a => a).ToList().ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.AlarmTopic, json));
             }
             else
             {
                 foreach (var group in data)
                 {
-                    string json = JsonExtensions.ToJsonNetString(group);
+                    string json = JsonExtensions.ToJsonNetString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                     topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.AlarmTopic, json));
                 }
             }
@@ -153,7 +153,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                         if (_businessPropertyWithCacheIntervalScript.IsDeviceList)
                         {
                             // 如果是设备列表，则将整个分组转换为 JSON 字符串
-                            string json = group.Select(a => a).ToList().ToJsonNetString();
+                            string json = group.Select(a => a).ToList().ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                             // 将主题和 JSON 内容添加到列表中
                             topicJsonList.Add(new(topic, json));
                         }
@@ -162,7 +162,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                             // 如果不是设备列表，则将每个分组元素分别转换为 JSON 字符串
                             foreach (var gro in group)
                             {
-                                string json = JsonExtensions.ToJsonNetString(gro);
+                                string json = JsonExtensions.ToJsonNetString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                                 // 将主题和 JSON 内容添加到列表中
                                 topicJsonList.Add(new(topic, json));
                             }
@@ -175,14 +175,14 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
         {
             if (_businessPropertyWithCacheIntervalScript.IsDeviceList)
             {
-                string json = data.Select(a => a).ToList().ToJsonNetString();
+                string json = data.Select(a => a).ToList().ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.DeviceTopic, json));
             }
             else
             {
                 foreach (var group in data)
                 {
-                    string json = JsonExtensions.ToJsonNetString(group);
+                    string json = JsonExtensions.ToJsonNetString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                     topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.DeviceTopic, json));
                 }
             }
@@ -218,7 +218,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                         if (_businessPropertyWithCacheIntervalScript.IsVariableList)
                         {
                             // 如果是变量列表，则将整个分组转换为 JSON 字符串
-                            string json = group.Select(a => a).ToList().ToJsonNetString();
+                            string json = group.Select(a => a).ToList().ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                             // 将主题和 JSON 内容添加到列表中
                             topicJsonList.Add(new(topic, json));
                         }
@@ -227,7 +227,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                             // 如果不是变量列表，则将每个分组元素分别转换为 JSON 字符串
                             foreach (var gro in group)
                             {
-                                string json = JsonExtensions.ToJsonNetString(gro);
+                                string json = JsonExtensions.ToJsonNetString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                                 // 将主题和 JSON 内容添加到列表中
                                 topicJsonList.Add(new(topic, json));
                             }
@@ -240,14 +240,14 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
         {
             if (_businessPropertyWithCacheIntervalScript.IsVariableList)
             {
-                string json = data.Select(a => a).ToList().ToJsonNetString();
+                string json = data.Select(a => a).ToList().ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.VariableTopic, json));
             }
             else
             {
                 foreach (var group in data)
                 {
-                    string json = JsonExtensions.ToJsonNetString(group);
+                    string json = JsonExtensions.ToJsonNetString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                     topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.VariableTopic, json));
                 }
             }
@@ -292,7 +292,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                         if (_businessPropertyWithCacheIntervalScript.IsVariableList)
                         {
                             // 如果是变量列表，则将整个分组转换为 JSON 字符串
-                            string json = group.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToJsonNetString();
+                            string json = group.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                             // 将主题和 JSON 内容添加到列表中
                             topicJsonList.Add(new(topic, json));
                         }
@@ -301,7 +301,7 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
                             // 如果不是变量列表，则将每个分组元素分别转换为 JSON 字符串
                             foreach (var gro in group)
                             {
-                                string json = JsonExtensions.ToJsonNetString(gro);
+                                string json = JsonExtensions.ToJsonNetString(gro, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                                 // 将主题和 JSON 内容添加到列表中
                                 topicJsonList.Add(new(topic, json));
                             }
@@ -314,14 +314,14 @@ public abstract partial class BusinessBaseWithCacheIntervalScript<VarModel, DevM
         {
             if (_businessPropertyWithCacheIntervalScript.IsVariableList)
             {
-                string json = data.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToJsonNetString();
+                string json = data.Select(a => a).GroupBy(a => a.DeviceName, b => b).ToDictionary(a => a.Key, b => b.ToList()).ToJsonNetString(_businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                 topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.VariableTopic, json));
             }
             else
             {
                 foreach (var group in data)
                 {
-                    string json = JsonExtensions.ToJsonNetString(group);
+                    string json = JsonExtensions.ToJsonNetString(group, _businessPropertyWithCacheIntervalScript.JsonFormattingIndented);
                     topicJsonList.Add(new(_businessPropertyWithCacheIntervalScript.VariableTopic, json));
                 }
             }

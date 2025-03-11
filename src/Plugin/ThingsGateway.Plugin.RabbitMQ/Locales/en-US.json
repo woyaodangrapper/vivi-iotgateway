@@ -9,6 +9,7 @@
     "VirtualHost": "VirtualHost",
     "ExchangeName": "ExchangeName",
 
+    "JsonFormattingIndented": "JsonFormattingIndented",
     "BigTextScriptDeviceModel": "BigTextScriptDeviceModel",
     "BigTextScriptVariableModel": "BigTextScriptVariableModel",
     "BigTextScriptAlarmModel": "BigTextScriptAlarmModel",

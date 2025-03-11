@@ -8,6 +8,7 @@
     "SecurityProtocol": "SecurityProtocol",
     "SaslMechanism": "SaslMechanism",
 
+    "JsonFormattingIndented": "JsonFormattingIndented",
     "BigTextScriptDeviceModel": "BigTextScriptDeviceModel",
     "BigTextScriptVariableModel": "BigTextScriptVariableModel",
     "BigTextScriptAlarmModel": "BigTextScriptAlarmModel",

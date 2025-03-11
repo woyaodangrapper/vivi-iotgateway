@@ -3,6 +3,7 @@
   },
   "ThingsGateway.Plugin.Webhook.WebhookProperty": {
     "DetailLog": "DetailLog",
+    "JsonFormattingIndented": "JsonFormattingIndented",
     "BigTextScriptDeviceModel": "BigTextScriptDeviceModel",
     "BigTextScriptVariableModel": "BigTextScriptVariableModel",
     "BigTextScriptAlarmModel": "BigTextScriptAlarmModel",

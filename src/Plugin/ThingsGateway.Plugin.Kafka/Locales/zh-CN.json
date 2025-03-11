@@ -8,6 +8,7 @@
     "SecurityProtocol": "SecurityProtocol",
     "SaslMechanism": "SaslMechanism",
 
+    "JsonFormattingIndented": "Json缩进格式化",
     "BigTextScriptDeviceModel": "设备上传脚本",
     "BigTextScriptVariableModel": "变量上传脚本",
     "BigTextScriptAlarmModel": "报警上传脚本",
