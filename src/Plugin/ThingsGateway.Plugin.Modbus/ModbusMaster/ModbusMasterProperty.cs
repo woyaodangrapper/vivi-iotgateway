@@ -23,12 +23,6 @@ public class ModbusMasterProperty : CollectPropertyBase
     public ModbusTypeEnum ModbusType { get; set; }
 
     /// <summary>
-    /// 心跳检测
-    /// </summary>
-    [DynamicProperty]
-    public string Heartbeat { get; set; } = "Heartbeat";
-
-    /// <summary>
     /// 默认站号
     /// </summary>
     [DynamicProperty]
@@ -65,14 +59,7 @@ public class ModbusMasterProperty : CollectPropertyBase
     [DynamicProperty]
     public ushort MaxPack { get; set; } = 100;
 
-    /// <summary>
-    /// 客户端连接滑动过期时间
-    /// </summary>
-    [DynamicProperty]
-    public int CheckClearTime { get; set; } = 120000;
-
     [DynamicProperty]
     public bool IsStringReverseByteWord { get; set; }
 
-    public override int MaxConcurrentCount { get; set; } = 1;
 }

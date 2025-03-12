@@ -168,6 +168,31 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [MinValue(1)]
     public override int MaxConcurrentCount { get; set; } = 1;
 
+    [SugarColumn(ColumnDescription = "最大连接数")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override int MaxClientCount { get; set; } = 10000;
+    [SugarColumn(ColumnDescription = "客户端滑动过期时间")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override int CheckClearTime { get; set; } = 120000;
+    [SugarColumn(ColumnDescription = "心跳内容")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override string Heartbeat { get; set; } = "Heartbeat";
+
+    #region dtu终端
+
+    [SugarColumn(ColumnDescription = "心跳间隔")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override int HeartbeatTime { get; set; } = 60000;
+    [SugarColumn(ColumnDescription = "DtuId")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override string DtuId { get; set; }
+
+    #endregion
+
+    [SugarColumn(ColumnDescription = "Dtu类型")]
+    [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
+    public override DtuSeviceType DtuSeviceType { get; set; }
+
     /// <summary>
     /// 创建者部门Id
     /// </summary>

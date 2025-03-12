@@ -36,14 +36,6 @@ public class ModbusSlaveProperty : BusinessPropertyBase
     [DynamicProperty]
     public bool IsStringReverseByteWord { get; set; }
 
-    [DynamicProperty]
-    public int CheckClearTime { get; set; } = 120000;
-
-    /// <summary>
-    /// 最大连接数
-    /// </summary>
-    [DynamicProperty]
-    public int MaxClientCount { get; set; } = 60000;
 
 
     /// <summary>
@@ -67,9 +59,4 @@ public class ModbusSlaveProperty : BusinessPropertyBase
     [DynamicProperty]
     public string DtuId { get; set; } = "DtuId";
 
-    [DynamicProperty]
-    public int HeartbeatTime { get; set; } = 5000;
-
-    [DynamicProperty]
-    public string Heartbeat { get; set; } = "Heartbeat";
 }

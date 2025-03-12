@@ -814,7 +814,7 @@ public class OpcUaMaster : IDisposable
         }
         catch (Exception ex)
         {
-            Log(3, ex, $"{monitoreditem.StartNodeId}Subscription processing error");
+            Log(3, ex, $"{monitoreditem.StartNodeId} - Subscription processing error");
         }
     }
 

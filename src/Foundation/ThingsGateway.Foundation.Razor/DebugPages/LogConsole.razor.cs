@@ -68,10 +68,17 @@ public partial class LogConsole : IDisposable
     [Inject]
     private IPlatformService PlatformService { get; set; }
 
+
+    private string logPath;
     protected override async Task OnParametersSetAsync()
     {
-        Messages = new List<LogMessage>();
-        await ExecuteAsync();
+        if (LogPath != logPath)
+        {
+            logPath = LogPath;
+            Messages = new List<LogMessage>();
+            await ExecuteAsync();
+        }
+
         await base.OnParametersSetAsync();
     }
 

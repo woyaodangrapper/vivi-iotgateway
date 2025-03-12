@@ -10,11 +10,10 @@
 
 namespace ThingsGateway.Foundation;
 
-/// <inheritdoc/>
-public interface ITcpService
+/// <summary>
+/// 协议基类
+/// </summary>
+public abstract class DtuServiceDeviceBase : DeviceBase, IDtu
 {
-    /// <summary>
-    /// 客户端连接滑动过期时间(TCP服务通道时)
-    /// </summary>
-    public int CheckClearTime { get; set; }
+    public string DtuId { get; set; }
 }

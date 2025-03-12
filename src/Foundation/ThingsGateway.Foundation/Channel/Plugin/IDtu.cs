@@ -11,15 +11,7 @@
 namespace ThingsGateway.Foundation;
 
 /// <inheritdoc/>
-public interface IDtu : ITcpService
+public interface IDtu
 {
-    /// <summary>
-    /// 心跳检测(utf8)
-    /// </summary>
-    public string Heartbeat { get; set; }
-
-    /// <summary>
-    /// 默认Dtu注册包(utf-8)
-    /// </summary>
     public string DtuId { get; set; }
 }

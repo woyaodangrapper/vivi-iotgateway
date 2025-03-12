@@ -44,7 +44,16 @@
     "RtsEnable": "RtsEnable",
     "CacheTimeout": "CacheTimeout",
     "ConnectTimeout": "ConnectTimeout",
-    "MaxConcurrentCount": "MaxConcurrentCount"
+    "MaxConcurrentCount": "MaxConcurrentCount",
+
+
+
+    "MaxClientCount": "MaxClientCount",
+    "CheckClearTime": "CheckClearTime",
+    "Heartbeat": "Heartbeat",
+    "HeartbeatTime": "HeartbeatTime",
+    "DtuId": "DtuId",
+    "DtuSeviceType": "DtuSeviceType"
   },
   "ThingsGateway.Debug.DeviceComponentBase": {
     "WriteSuccess": "WriteSuccess",

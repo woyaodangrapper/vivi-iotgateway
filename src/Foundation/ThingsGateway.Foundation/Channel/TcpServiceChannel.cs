@@ -126,14 +126,14 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
     /// <inheritdoc/>
     protected override Task OnTcpClosed(TClient socketClient, ClosedEventArgs e)
     {
-        Logger?.Debug($"{socketClient}  Closed");
+        Logger?.Debug($"{socketClient} Closed{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
         return base.OnTcpClosed(socketClient, e);
     }
 
     /// <inheritdoc/>
     protected override Task OnTcpClosing(TClient socketClient, ClosingEventArgs e)
     {
-        Logger?.Debug($"{socketClient} Closing");
+        Logger?.Debug($"{socketClient} Closing{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
         return base.OnTcpClosing(socketClient, e);
     }
 
@@ -155,7 +155,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
 /// <summary>
 /// Tcp服务器通道
 /// </summary>
-public class TcpServiceChannel : TcpServiceChannelBase<TcpSessionClientChannel>, IChannel
+public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChannel, ITcpServiceChannel where TClient : TcpSessionClientChannel, IClientChannel, IChannel, new()
 {
 
     /// <inheritdoc/>
@@ -208,36 +208,36 @@ public class TcpServiceChannel : TcpServiceChannelBase<TcpSessionClientChannel>,
         return $"{ChannelOptions.BindUrl} {ChannelOptions.RemoteUrl}";
     }
     /// <inheritdoc/>
-    protected override TcpSessionClientChannel NewClient()
+    protected override TClient NewClient()
     {
-        var data = new TcpSessionClientChannel();
+        var data = new TClient();
         data.WaitHandlePool.MaxSign = MaxSign;
         return data;
     }
     public int MaxSign { get; set; }
     /// <inheritdoc/>
-    protected override async Task OnTcpClosing(TcpSessionClientChannel socketClient, ClosingEventArgs e)
+    protected override async Task OnTcpClosing(TClient socketClient, ClosingEventArgs e)
     {
         await socketClient.OnChannelEvent(Stoping).ConfigureAwait(false);
         await base.OnTcpClosing(socketClient, e).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    protected override async Task OnTcpClosed(TcpSessionClientChannel socketClient, ClosedEventArgs e)
+    protected override async Task OnTcpClosed(TClient socketClient, ClosedEventArgs e)
     {
         await socketClient.OnChannelEvent(Stoped).ConfigureAwait(false);
         await base.OnTcpClosed(socketClient, e).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    protected override async Task OnTcpConnected(TcpSessionClientChannel socketClient, ConnectedEventArgs e)
+    protected override async Task OnTcpConnected(TClient socketClient, ConnectedEventArgs e)
     {
         await socketClient.OnChannelEvent(Started).ConfigureAwait(false);
         await base.OnTcpConnected(socketClient, e).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
-    protected override async Task OnTcpConnecting(TcpSessionClientChannel socketClient, ConnectingEventArgs e)
+    protected override async Task OnTcpConnecting(TClient socketClient, ConnectingEventArgs e)
     {
         await socketClient.OnChannelEvent(Starting).ConfigureAwait(false);
         await base.OnTcpConnecting(socketClient, e).ConfigureAwait(false);
@@ -246,7 +246,7 @@ public class TcpServiceChannel : TcpServiceChannelBase<TcpSessionClientChannel>,
 
 
     /// <inheritdoc/>
-    protected override async Task OnTcpReceived(TcpSessionClientChannel socketClient, ReceivedDataEventArgs e)
+    protected override async Task OnTcpReceived(TClient socketClient, ReceivedDataEventArgs e)
     {
         await base.OnTcpReceived(socketClient, e).ConfigureAwait(false);
 
@@ -268,9 +268,21 @@ public class TcpServiceChannel : TcpServiceChannelBase<TcpSessionClientChannel>,
 
     /// <inheritdoc/>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();
-    protected override void ClientInitialized(TcpSessionClientChannel client)
+
+    IEnumerable<TcpSessionClientChannel> ITcpServiceChannel.Clients => base.Clients;
+
+    protected override void ClientInitialized(TClient client)
     {
         client.ChannelOptions = ChannelOptions;
+
+        client.WaitLock = new NewLife.WaitLock(ChannelOptions.WaitLock.MaxCount);
         base.ClientInitialized(client);
+    }
+
+    public bool TryGetClient(string id, out TcpSessionClientChannel client)
+    {
+        bool result = ServiceExtension.TryGetClient<TClient>(this, id, out var tclient);
+        client = tclient;
+        return result;
     }
 }

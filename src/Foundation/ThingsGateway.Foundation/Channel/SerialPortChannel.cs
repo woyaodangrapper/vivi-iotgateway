@@ -67,6 +67,7 @@ public class SerialPortChannel : SerialPortClient, IClientChannel
 
     /// <inheritdoc/>
     public WaitLock WaitLock => ChannelOptions.WaitLock;
+    public virtual WaitLock GetLock(string key) => WaitLock;
 
     /// <inheritdoc/>
     public ConcurrentDictionary<long, Func<IClientChannel, ReceivedDataEventArgs, bool, Task>> ChannelReceivedWaitDict { get; } = new();

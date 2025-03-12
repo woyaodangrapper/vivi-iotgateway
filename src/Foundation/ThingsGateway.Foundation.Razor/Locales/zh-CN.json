@@ -49,7 +49,14 @@
     "RtsEnable": "Rts",
     "CacheTimeout": "接收缓存超时",
     "ConnectTimeout": "连接超时",
-    "MaxConcurrentCount": "最大并发数"
+    "MaxConcurrentCount": "最大并发数",
+
+    "MaxClientCount": "最大连接数",
+    "CheckClearTime": "客户端连接滑动过期时间",
+    "Heartbeat": "心跳内容(utf8)",
+    "HeartbeatTime": "心跳间隔",
+    "DtuId": "Dtu终端注册包(utf-8)",
+    "DtuSeviceType": "DTU服务类型"
   },
   "ThingsGateway.Debug.DeviceComponentBase": {
     "WriteSuccess": "写入成功",

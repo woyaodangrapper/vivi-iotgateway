@@ -153,7 +153,7 @@ public static class ChannelOptionsExtensions
     /// <param name="channelOptions">通道配置</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static TcpServiceChannel GetTcpServiceWithBindIPHost(this TouchSocketConfig config, IChannelOptions channelOptions)
+    public static IChannel GetTcpServiceWithBindIPHost(this TouchSocketConfig config, IChannelOptions channelOptions)
     {
         var bindUrl = channelOptions.BindUrl;
         bindUrl.ThrowIfNull(nameof(bindUrl));
@@ -161,9 +161,18 @@ public static class ChannelOptionsExtensions
 
         var urls = bindUrl.SplitStringBySemicolon();
         config.SetListenIPHosts(IPHost.ParseIPHosts(urls));
-        //载入配置
-        TcpServiceChannel tcpServiceChannel = new TcpServiceChannel(channelOptions);
-        return tcpServiceChannel;
+
+        switch (channelOptions.DtuSeviceType)
+        {
+
+            case DtuSeviceType.DDP:
+                return new TcpServiceChannel<DDPTcpSessionClientChannel>(channelOptions);
+
+            case DtuSeviceType.Default:
+            default:
+                return new TcpServiceChannel<TcpSessionClientChannel>(channelOptions);
+        }
+
     }
 
     /// <summary>
@@ -189,14 +198,33 @@ public static class ChannelOptionsExtensions
         else
             config.SetBindIPHost(new IPHost(0));
 
-        //载入配置
-        UdpSessionChannel udpSessionChannel = new UdpSessionChannel(channelOptions);
-#if NETSTANDARD || NET6_0_OR_GREATER
-        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+
+        switch (channelOptions.DtuSeviceType)
         {
-            config.UseUdpConnReset();
-        }
+
+            case DtuSeviceType.DDP:
+                //载入配置
+                var ddpUdp = new DDPUdpSessionChannel(channelOptions);
+#if NETSTANDARD || NET6_0_OR_GREATER
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                {
+                    config.UseUdpConnReset();
+                }
 #endif
-        return udpSessionChannel;
+                return ddpUdp;
+
+            case DtuSeviceType.Default:
+            default:
+                //载入配置
+                var udpSessionChannel = new UdpSessionChannel(channelOptions);
+#if NETSTANDARD || NET6_0_OR_GREATER
+                if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                {
+                    config.UseUdpConnReset();
+                }
+#endif
+                return udpSessionChannel;
+        }
+
     }
 }

@@ -78,13 +78,9 @@ public class ModbusSlave : BusinessBase
         _plc.IsStringReverseByteWord = _driverPropertys.IsStringReverseByteWord;
         _plc.Station = _driverPropertys.Station;
         _plc.IsWriteMemory = _driverPropertys.IsWriteMemory;
-        _plc.CheckClearTime = _driverPropertys.CheckClearTime;
         _plc.MulStation = _driverPropertys.MulStation;
         _plc.ModbusType = _driverPropertys.ModbusType;
-        _plc.MaxClientCount = _driverPropertys.MaxClientCount;
         _plc.DtuId = _driverPropertys.DtuId;
-        _plc.HeartbeatTime = _driverPropertys.HeartbeatTime;
-        _plc.Heartbeat = _driverPropertys.Heartbeat;
         _plc.InitChannel(channel, LogMessage);
         await base.InitChannelAsync(channel).ConfigureAwait(false);
 

@@ -8,30 +8,14 @@
 //  QQ群：605534569
 //------------------------------------------------------------------------------
 
-using ThingsGateway.NewLife;
+using System.Net;
 
 namespace ThingsGateway.Foundation;
 
-/// <summary>
-/// 终端通道
-/// </summary>
-public interface IClientChannel : IChannel, ISender, IClient, IClientSender, IOnlineClient
+public interface IDtuUdpSessionChannel : IClientChannel, IUdpSession
 {
-    /// <summary>
-    /// 当前通道的数据处理适配器
-    /// </summary>
-    DataHandlingAdapter ReadOnlyDataHandlingAdapter { get; }
+    public bool TryGetId(EndPoint endPoint, out string id);
+    public bool TryGetEndPoint(string id, out EndPoint endPoint);
 
-    /// <summary>
-    /// 通道等待池
-    /// </summary>
-    WaitHandlePool<MessageBase> WaitHandlePool { get; }
-
-    WaitLock GetLock(string key);
-
-    /// <summary>
-    /// 设置数据处理适配器
-    /// </summary>
-    /// <param name="adapter">适配器</param>
-    void SetDataHandlingAdapter(DataHandlingAdapter adapter);
+    public EndPoint DefaultEndpoint { get; }
 }

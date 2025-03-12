@@ -21,7 +21,7 @@ namespace ThingsGateway.Foundation.Modbus;
 public delegate ValueTask<OperResult> ModbusServerWriteEventHandler(ModbusAddress modbusAddress, IThingsGatewayBitConverter bitConverter, IClientChannel channel);
 
 /// <inheritdoc/>
-public class ModbusSlave : DeviceBase, ITcpService, IDtuClient
+public class ModbusSlave : DtuServiceDeviceBase
 {
     /// <summary>
     /// 继电器
@@ -63,25 +63,9 @@ public class ModbusSlave : DeviceBase, ITcpService, IDtuClient
     private ModbusTypeEnum modbusType;
 
     /// <summary>
-    /// 客户端连接滑动过期时间(TCP服务通道时)
-    /// </summary>
-    public int CheckClearTime { get; set; } = 120000;
-
-    public string DtuId { get; set; } = "DtuId";
-
-    public string Heartbeat { get; set; } = "Heartbeat";
-
-    public int HeartbeatTime { get; set; } = 5000;
-
-    /// <summary>
     /// 写入内存
     /// </summary>
     public bool IsWriteMemory { get; set; }
-
-    /// <summary>
-    /// 最大连接数
-    /// </summary>
-    public int MaxClientCount { get; set; } = 10000;
 
     /// <summary>
     /// Modbus类型
@@ -108,21 +92,6 @@ public class ModbusSlave : DeviceBase, ITcpService, IDtuClient
     /// 接收外部写入时，传出变量地址/写入字节组/转换规则/客户端
     /// </summary>
     public ModbusServerWriteEventHandler WriteData { get; set; }
-
-    /// <inheritdoc/>
-    public override Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
-    {
-        config.SetMaxCount(MaxClientCount);
-        switch (Channel.ChannelType)
-        {
-            case ChannelTypeEnum.TcpService:
-                return PluginUtil.GetTcpServicePlugin(this);
-
-            case ChannelTypeEnum.TcpClient:
-                return PluginUtil.GetDtuClientPlugin(this);
-        }
-        return base.ConfigurePlugins(config);
-    }
 
     /// <inheritdoc/>
     public override string GetAddressDescription()
@@ -222,6 +191,16 @@ public class ModbusSlave : DeviceBase, ITcpService, IDtuClient
         ModbusServer02ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
         ModbusServer03ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
         ModbusServer04ByteBlocks.GetOrAdd(mAddress.Station, a => new ValueByteBlock(new byte[ushort.MaxValue * 2]));
+    }
+
+    public override Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
+    {
+        switch (Channel.ChannelType)
+        {
+            case ChannelTypeEnum.TcpClient:
+                return (PluginUtil.GetDtuClientPlugin(Channel.ChannelOptions) + base.ConfigurePlugins(config));
+        }
+        return base.ConfigurePlugins(config);
     }
 
     #region 核心

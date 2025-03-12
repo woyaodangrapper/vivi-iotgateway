@@ -10,11 +10,12 @@
 
 namespace ThingsGateway.Foundation;
 
-/// <inheritdoc/>
-public interface IDtuClient : IDtu
+public interface ITcpServiceChannel : IChannel
 {
-    /// <summary>
-    /// 心跳时间
-    /// </summary>
-    public int HeartbeatTime { get; set; }
+    IEnumerable<TcpSessionClientChannel> Clients { get; }
+
+    Task ClientDisposeAsync(string id);
+
+    public bool TryGetClient(string id, out TcpSessionClientChannel client);
+
 }

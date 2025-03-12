@@ -23,7 +23,6 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <inheritdoc/>
     public TcpSessionClientChannel()
     {
-
         WaitHandlePool.MaxSign = ushort.MaxValue;
     }
 
@@ -61,7 +60,8 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     public WaitHandlePool<MessageBase> WaitHandlePool { get; private set; } = new();
 
     /// <inheritdoc/>
-    public WaitLock WaitLock => ChannelOptions.WaitLock;
+    public WaitLock WaitLock { get; internal set; } = new();
+    public virtual WaitLock GetLock(string key) => WaitLock;
 
     /// <inheritdoc/>
     public override Task CloseAsync(string msg)
@@ -102,7 +102,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <inheritdoc/>
     protected override async Task OnTcpClosed(ClosedEventArgs e)
     {
-        Logger?.Debug($"{ToString()} Closed{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
+        //Logger?.Debug($"{ToString()} Closed{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
         await this.OnChannelEvent(Stoped).ConfigureAwait(false);
         await base.OnTcpClosed(e).ConfigureAwait(false);
     }
@@ -110,7 +110,7 @@ public class TcpSessionClientChannel : TcpSessionClient, IClientChannel
     /// <inheritdoc/>
     protected override async Task OnTcpClosing(ClosingEventArgs e)
     {
-        Logger?.Debug($"{ToString()} Closing{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
+        //Logger?.Debug($"{ToString()} Closing{(e.Message.IsNullOrEmpty() ? string.Empty : $"-{e.Message}")}");
         await this.OnChannelEvent(Stoping).ConfigureAwait(false);
         await base.OnTcpClosing(e).ConfigureAwait(false);
     }

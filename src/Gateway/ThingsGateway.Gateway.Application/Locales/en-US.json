@@ -362,6 +362,15 @@
     "CacheTimeout": "CacheTimeout",
     "ConnectTimeout": "ConnectTimeout",
     "MaxConcurrentCount": "MaxConcurrentCount",
+
+
+    "MaxClientCount": "MaxClientCount",
+    "CheckClearTime": "CheckClearTime",
+    "Heartbeat": "Heartbeat",
+    "HeartbeatTime": "HeartbeatTime",
+    "DtuId": "DtuId",
+    "DtuSeviceType": "DtuSeviceType",
+
     "SaveChannel": "Add/Modify Channel",
     "CopyChannel": "Copy Channel",
     "DeleteChannel": "Delete Channel",
@@ -395,6 +404,17 @@
     "StopBits": "StopBits",
     "DtrEnable": "DtrEnable",
     "RtsEnable": "RtsEnable",
+
+    "CacheTimeout": "CacheTimeout",
+    "ConnectTimeout": "ConnectTimeout",
+    "MaxConcurrentCount": "MaxConcurrentCount",
+    "MaxClientCount": "MaxClientCount",
+    "CheckClearTime": "CheckClearTime",
+    "Heartbeat": "Heartbeat",
+    "HeartbeatTime": "HeartbeatTime",
+    "DtuId": "DtuId",
+    "DtuSeviceType": "DtuSeviceType",
+
 
     "SaveChannel": "Add/Modify Channel",
     "CopyChannel": "Copy Channel",

@@ -16,7 +16,7 @@ using TouchSocket.Core;
 namespace ThingsGateway.Foundation.Dlt645;
 
 /// <inheritdoc/>
-public class Dlt645_2007Master : DeviceBase, IDtu
+public class Dlt645_2007Master : DtuServiceDeviceBase
 {
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)
     {
@@ -26,23 +26,8 @@ public class Dlt645_2007Master : DeviceBase, IDtu
     }
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new Dlt645_2007BitConverter(EndianType.Big) { };
 
-    /// <summary>
-    /// 客户端连接滑动过期时间(TCP服务通道时)
-    /// </summary>
-    public int CheckClearTime { get; set; } = 120000;
-
-    /// <summary>
-    /// Dtu注册包(utf-8)
-    /// </summary>
-    public string DtuId { get; set; } = "DtuId";
-
     /// <inheritdoc/>
     public string FEHead { get; set; } = "FEFEFEFE";
-
-    /// <summary>
-    /// 心跳检测(utf-8)
-    /// </summary>
-    public string Heartbeat { get; set; } = "Heartbeat";
 
     /// <inheritdoc/>
     public string OperCode { get; set; }
@@ -77,17 +62,6 @@ public class Dlt645_2007Master : DeviceBase, IDtu
     }
 
     /// <inheritdoc/>
-    public override Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
-    {
-        switch (Channel.ChannelType)
-        {
-            case ChannelTypeEnum.TcpService:
-                return PluginUtil.GetDtuPlugin(this);
-        }
-        return base.ConfigurePlugins(config);
-    }
-
-    /// <inheritdoc/>
     public async ValueTask<OperResult<byte[]>> Dlt645RequestAsync(Dlt645_2007Address dAddress, ControlCode controlCode, string feHead, byte[] codes = default, string[] datas = default, CancellationToken cancellationToken = default)
     {
         try
@@ -106,8 +80,8 @@ public class Dlt645_2007Master : DeviceBase, IDtu
         try
         {
 
-            await SendAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken).ConfigureAwait(false);
-            return OperResult.Success;
+            return await SendAsync(GetSendMessage(dAddress, controlCode, feHead, codes, datas), cancellationToken).ConfigureAwait(false);
+
         }
         catch (Exception ex)
         {

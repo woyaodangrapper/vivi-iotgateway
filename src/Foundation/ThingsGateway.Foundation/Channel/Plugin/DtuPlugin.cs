@@ -38,7 +38,7 @@ public class DtuPlugin : PluginBase, ITcpReceivingPlugin
     public async Task OnTcpReceiving(ITcpSession client, ByteBlockEventArgs e)
     {
         var len = HeartbeatByte.Count;
-        if (client is TcpSessionClientChannel socket && socket.Service is TcpServiceChannel tcpServiceChannel)
+        if (client is TcpSessionClientChannel socket && socket.Service is ITcpServiceChannel tcpServiceChannel)
         {
             if (!socket.Id.StartsWith("ID="))
             {

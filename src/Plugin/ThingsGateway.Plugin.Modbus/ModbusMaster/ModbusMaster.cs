@@ -70,9 +70,7 @@ public class ModbusMaster : CollectBase
         _plc.SendDelayTime = _driverPropertys.SendDelayTime;
         _plc.Station = _driverPropertys.Station;
         _plc.Timeout = _driverPropertys.Timeout;
-        _plc.CheckClearTime = _driverPropertys.CheckClearTime;
         _plc.ModbusType = _driverPropertys.ModbusType;
-        _plc.Heartbeat = _driverPropertys.Heartbeat;
         _plc.InitChannel(channel, LogMessage);
         await base.InitChannelAsync(channel).ConfigureAwait(false);
 

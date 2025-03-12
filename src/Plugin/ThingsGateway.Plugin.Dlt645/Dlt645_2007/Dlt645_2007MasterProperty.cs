@@ -18,18 +18,6 @@ namespace ThingsGateway.Plugin.Dlt645;
 public class Dlt645_2007MasterProperty : CollectPropertyBase
 {
     /// <summary>
-    /// 客户端连接滑动过期时间
-    /// </summary>
-    [DynamicProperty]
-    public int CheckClearTime { get; set; } = 120000;
-
-    /// <summary>
-    /// 心跳检测
-    /// </summary>
-    [DynamicProperty]
-    public string Heartbeat { get; set; } = "Heartbeat";
-
-    /// <summary>
     /// 读写超时时间
     /// </summary>
     [DynamicProperty]

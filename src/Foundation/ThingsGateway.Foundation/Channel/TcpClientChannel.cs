@@ -61,6 +61,7 @@ public class TcpClientChannel : TcpClient, IClientChannel
     /// 等待池
     /// </summary>
     public WaitHandlePool<MessageBase> WaitHandlePool { get; } = new();
+    public virtual WaitLock GetLock(string key) => WaitLock;
 
 
     /// <inheritdoc/>

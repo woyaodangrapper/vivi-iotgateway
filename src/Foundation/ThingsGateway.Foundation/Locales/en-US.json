@@ -19,6 +19,7 @@
     "Disconnected": "Disconnected",
     "Disconnecting": "Disconnecting",
     "DtuConnected": "Dtu identifier {0} connection successful",
+    "DtuDisconnecting": "Dtu identifier {0} Disconnecting",
     "DtuNoConnectedWaining": "The Client(Dtu) is not connected, id: {0}",
     "ErrorMessage": "Error message",
     "EventError": "Error occurred in event {0}",
@@ -66,7 +67,15 @@
     "RtsEnable": "RtsEnable",
     "CacheTimeout": "CacheTimeout",
     "ConnectTimeout": "ConnectTimeout",
-    "MaxConcurrentCount": "MaxConcurrentCount"
+    "MaxConcurrentCount": "MaxConcurrentCount",
+
+
+    "MaxClientCount": "MaxClientCount",
+    "CheckClearTime": "CheckClearTime",
+    "Heartbeat": "Heartbeat",
+    "HeartbeatTime": "HeartbeatTime",
+    "DtuId": "DtuId",
+    "DtuSeviceType": "DtuSeviceType"
   },
   "ThingsGateway.Foundation.VariableClass": {
     "RegisterAddress": "RegisterAddress"

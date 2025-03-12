@@ -11,7 +11,7 @@
 namespace ThingsGateway.Foundation.Modbus;
 
 /// <inheritdoc/>
-public partial class ModbusMaster : DeviceBase, IDtu
+public partial class ModbusMaster : DtuServiceDeviceBase
 {
 
     public override void InitChannel(IChannel channel, ILog? deviceLog = null)
@@ -24,21 +24,6 @@ public partial class ModbusMaster : DeviceBase, IDtu
     public override IThingsGatewayBitConverter ThingsGatewayBitConverter { get; protected set; } = new ThingsGatewayBitConverter(EndianType.Big) { };
 
     /// <summary>
-    /// 客户端连接滑动过期时间(TCP服务通道时)
-    /// </summary>
-    public int CheckClearTime { get; set; } = 120000;
-
-    /// <summary>
-    /// 默认Dtu注册包(utf-8)
-    /// </summary>
-    public string DtuId { get; set; } = "DtuId";
-
-    /// <summary>
-    /// 心跳检测(utf-8)
-    /// </summary>
-    public string Heartbeat { get; set; } = "Heartbeat";
-
-    /// <summary>
     /// Modbus类型，在initChannelAsync之前设置
     /// </summary>
     public ModbusTypeEnum ModbusType { get; set; }
@@ -47,17 +32,6 @@ public partial class ModbusMaster : DeviceBase, IDtu
     /// 站号
     /// </summary>
     public byte Station { get; set; } = 1;
-
-    /// <inheritdoc/>
-    public override Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
-    {
-        switch (Channel.ChannelType)
-        {
-            case ChannelTypeEnum.TcpService:
-                return PluginUtil.GetDtuPlugin(this);
-        }
-        return base.ConfigurePlugins(config);
-    }
 
     /// <inheritdoc/>
     public override string GetAddressDescription()

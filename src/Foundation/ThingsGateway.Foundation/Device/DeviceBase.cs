@@ -10,12 +10,12 @@
 
 using Newtonsoft.Json.Linq;
 
+using System.Net;
+
 using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.Extension.String;
 using ThingsGateway.NewLife;
 using ThingsGateway.NewLife.Extension;
-
-using TouchSocket.Resources;
 
 namespace ThingsGateway.Foundation;
 
@@ -79,7 +79,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                     }
                     clientChannel.SetDataHandlingAdapter(GetDataAdapter());
                 }
-                else if (Channel is TcpServiceChannel serviceChannel)
+                else if (Channel is ITcpServiceChannel serviceChannel)
                 {
                     channel.Config.SetTcpDataHandlingAdapter(() =>
                     {
@@ -317,7 +317,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
     }
     protected volatile bool AutoConnect = true;
     /// <inheritdoc/>
-    private async ValueTask<OperResult> SendAsync(ISendMessage sendMessage, IClientChannel channel = default, CancellationToken token = default)
+    private async ValueTask<OperResult> SendAsync(ISendMessage sendMessage, IClientChannel channel = default, EndPoint endPoint = default, CancellationToken token = default)
     {
         try
         {
@@ -327,8 +327,14 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 channel = clientChannel;
             }
 
-
-            await channel.SendAsync(sendMessage).ConfigureAwait(false);
+            if (channel is IDtuUdpSessionChannel udpSession)
+            {
+                await udpSession.SendAsync(endPoint, sendMessage).ConfigureAwait(false);
+            }
+            else
+            {
+                await channel.SendAsync(sendMessage).ConfigureAwait(false);
+            }
 
             return OperResult.Success;
         }
@@ -379,23 +385,26 @@ public abstract class DeviceBase : DisposableObject, IDevice
     {
         try
         {
-
-            var channelResult = await GetChannelAsync(this is IDtu dtu ? dtu.DtuId : null).ConfigureAwait(false);
+            var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
+            var channelResult = await GetChannelAsync(dtuId).ConfigureAwait(false);
             if (!channelResult.IsSuccess) return new OperResult<byte[]>(channelResult);
+            WaitLock? waitLock = null;
+            EndPoint? endPoint = GetUdpEndpoint(dtuId);
+            waitLock = GetWaitLock(channelResult.Content, waitLock, dtuId);
 
             try
             {
 
                 await BefortSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
 
-                await channelResult.Content.WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+                await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
 
-                return await SendAsync(sendMessage, channelResult.Content, cancellationToken).ConfigureAwait(false);
+                return await SendAsync(sendMessage, channelResult.Content, endPoint, cancellationToken).ConfigureAwait(false);
             }
             finally
             {
-                channelResult.Content.WaitLock.Release();
+                waitLock.Release();
             }
         }
         catch (Exception ex)
@@ -411,16 +420,16 @@ public abstract class DeviceBase : DisposableObject, IDevice
         if (string.IsNullOrWhiteSpace(socketId))
             return new OperResult<IClientChannel>() { Content = (IClientChannel)Channel };
 
-        if (Channel is TcpServiceChannel serviceChannel)
+        if (Channel is ITcpServiceChannel serviceChannel)
         {
-            if (serviceChannel.TryGetClient($"ID={socketId}", out TcpSessionClientChannel? client))
+            if (serviceChannel.TryGetClient($"ID={socketId}", out var client))
             {
                 return new OperResult<IClientChannel>() { Content = client };
             }
             else
             {
                 await Task.Delay(1000).ConfigureAwait(false);
-                if (serviceChannel.TryGetClient($"ID={socketId}", out TcpSessionClientChannel? client1))
+                if (serviceChannel.TryGetClient($"ID={socketId}", out var client1))
                 {
                     return new OperResult<IClientChannel>() { Content = client1 };
                 }
@@ -430,6 +439,36 @@ public abstract class DeviceBase : DisposableObject, IDevice
         else
             return new OperResult<IClientChannel>() { Content = (IClientChannel)Channel };
     }
+
+    /// <inheritdoc/>
+    public virtual EndPoint GetUdpEndpoint(string socketId)
+    {
+        if (Channel is IDtuUdpSessionChannel udpSessionChannel)
+        {
+
+            if (string.IsNullOrWhiteSpace(socketId))
+                return udpSessionChannel.DefaultEndpoint;
+
+            {
+                if (udpSessionChannel.TryGetEndPoint($"ID={socketId}", out var endPoint))
+                {
+                    return endPoint;
+                }
+                else
+                {
+                    if (udpSessionChannel.TryGetEndPoint($"ID={socketId}", out var endPoint1))
+                    {
+                        return endPoint1;
+                    }
+                    throw new Exception(DefaultResource.Localizer["DtuNoConnectedWaining", socketId]);
+                }
+            }
+
+        }
+
+        return null;
+    }
+
 
     /// <inheritdoc/>
     public virtual async ValueTask<OperResult<byte[]>> SendThenReturnAsync(ISendMessage sendMessage, CancellationToken cancellationToken = default)
@@ -484,15 +523,22 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
         var waitData = clientChannel.WaitHandlePool.GetWaitDataAsync(out var sign);
         command.Sign = sign;
+        WaitLock? waitLock = null;
+        var dtuId = this is IDtu dtu1 ? dtu1.DtuId : null;
+        EndPoint? endPoint = GetUdpEndpoint(dtuId);
         try
         {
             await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
-            await clientChannel.WaitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+            waitLock = GetWaitLock(clientChannel, waitLock, dtuId);
+            await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             waitData.SetCancellationToken(cancellationToken);
 
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
-            await SendAsync(command, clientChannel, cancellationToken).ConfigureAwait(false);
+            var sendOperResult = await SendAsync(command, clientChannel, endPoint, cancellationToken).ConfigureAwait(false);
+            if (!sendOperResult.IsSuccess)
+                throw sendOperResult.Exception ?? new(sendOperResult.ErrorMessage);
+
             await waitData.WaitAsync(timeout).ConfigureAwait(false);
 
             var result = waitData.Check();
@@ -503,16 +549,26 @@ public abstract class DeviceBase : DisposableObject, IDevice
             }
             else
             {
-                throw result.Exception ?? new(TouchSocketCoreResource.UnknownError);
+                throw result.Exception ?? new(result.ErrorMessage);
             }
 
         }
         finally
         {
-            clientChannel.WaitLock.Release();
+            waitLock.Release();
             clientChannel.WaitHandlePool.Destroy(waitData);
             Channel.ChannelReceivedWaitDict.TryRemove(sign, out _);
         }
+    }
+
+    private static WaitLock GetWaitLock(IClientChannel clientChannel, WaitLock? waitLock, string dtuId)
+    {
+        if (clientChannel is IDtuUdpSessionChannel udpSessionChannel)
+        {
+            waitLock = udpSessionChannel.GetLock(dtuId);
+        }
+        waitLock ??= clientChannel.GetLock(null);
+        return waitLock;
     }
 
     #endregion 设备异步返回
@@ -869,7 +925,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
 
                 if (Channel.Collects.Count == 1)
                 {
-                    if (Channel is TcpServiceChannel tcpServiceChannel)
+                    if (Channel is ITcpServiceChannel tcpServiceChannel)
                     {
                         tcpServiceChannel.Clients.ForEach(a =>
                         {
@@ -893,7 +949,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 }
                 else
                 {
-                    if (Channel is TcpServiceChannel tcpServiceChannel && this is IDtu dtu)
+                    if (Channel is ITcpServiceChannel tcpServiceChannel && this is IDtu dtu)
                     {
                         if (tcpServiceChannel.TryGetClient(dtu.DtuId, out var client))
                         {
@@ -917,6 +973,17 @@ public abstract class DeviceBase : DisposableObject, IDevice
     /// <inheritdoc/>
     public virtual Action<IPluginManager> ConfigurePlugins(TouchSocketConfig config)
     {
+        switch (Channel.ChannelType)
+        {
+            case ChannelTypeEnum.TcpService:
+                {
+                    if (Channel.ChannelOptions.DtuSeviceType == DtuSeviceType.Default)
+                        return PluginUtil.GetDtuPlugin(Channel.ChannelOptions);
+                    else
+                        return PluginUtil.GetTcpServicePlugin(Channel.ChannelOptions);
+                }
+
+        }
         return a => { };
     }
 }

@@ -97,6 +97,15 @@
                     <EditorItem @bind-Field="@context.ConnectTimeout" Ignore=@(context.ChannelType==ChannelTypeEnum.UdpSession||context.ChannelType==ChannelTypeEnum.TcpService||context.ChannelType==ChannelTypeEnum.Other) />
                     <EditorItem @bind-Field="@context.MaxConcurrentCount" Ignore=@(context.ChannelType==ChannelTypeEnum.Other) />
 
+                    
+                    <EditorItem @bind-Field="@context.MaxClientCount" Ignore=@(context.ChannelType!=ChannelTypeEnum.TcpService) />
+                    <EditorItem @bind-Field="@context.CheckClearTime" Ignore=@(context.ChannelType!=ChannelTypeEnum.TcpService) />
+                    <EditorItem @bind-Field="@context.Heartbeat" Ignore=@(context.ChannelType!=ChannelTypeEnum.TcpService&&context.ChannelType!=ChannelTypeEnum.TcpClient&&context.ChannelType!=ChannelTypeEnum.UdpSession) />
+                    <EditorItem @bind-Field="@context.HeartbeatTime" Ignore=@(context.ChannelType!=ChannelTypeEnum.TcpClient&&context.ChannelType!=ChannelTypeEnum.UdpSession) />
+                    <EditorItem @bind-Field="@context.DtuId" Ignore=@(context.ChannelType!=ChannelTypeEnum.TcpClient&&context.ChannelType!=ChannelTypeEnum.UdpSession) />
+                    <EditorItem @bind-Field="@context.DtuSeviceType" Ignore=@(context.ChannelType!=ChannelTypeEnum.TcpService&&context.ChannelType!=ChannelTypeEnum.UdpSession) />
+
+
                 </FieldItems>
                 <Buttons>
                     <Button ButtonType="ButtonType.Submit" Icon="fa-solid fa-floppy-disk" IsAsync Text=@RazorLocalizer["Save"] />

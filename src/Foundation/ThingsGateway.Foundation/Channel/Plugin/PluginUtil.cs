@@ -13,76 +13,76 @@ namespace ThingsGateway.Foundation;
 /// <inheritdoc/>
 public static class PluginUtil
 {
-    /// <inheritdoc/>
-    public static Action<IPluginManager> GetDtuClientPlugin(IDtuClient dtuClient)
+    /// <summary>
+    /// 作为DTU终端
+    /// </summary>
+    public static Action<IPluginManager> GetDtuClientPlugin(IChannelOptions channelOptions)
+    {
+        if (!channelOptions.DtuId.IsNullOrWhiteSpace())
+        {
+            Action<IPluginManager> action = a => { };
+
+            action += a =>
+            {
+                var plugin = a.Add<HeartbeatAndReceivePlugin>();
+                plugin.Heartbeat = channelOptions.Heartbeat;
+                plugin.DtuId = channelOptions.DtuId;
+                plugin.HeartbeatTime = channelOptions.HeartbeatTime;
+            };
+
+            if (channelOptions.ChannelType == ChannelTypeEnum.TcpClient)
+            {
+                action += a => a.UseTcpReconnection();
+            }
+            return action;
+        }
+        return a => { };
+    }
+
+    /// <summary>
+    /// 作为DTU服务
+    /// </summary>
+    public static Action<IPluginManager> GetDtuPlugin(IChannelOptions channelOptions)
     {
         Action<IPluginManager> action = a => { };
 
-        action += a =>
+        action += GetTcpServicePlugin(channelOptions);
+        if (!channelOptions.Heartbeat.IsNullOrWhiteSpace())
         {
-            var plugin = a.Add<HeartbeatAndReceivePlugin>();
-            plugin.Heartbeat = dtuClient.Heartbeat;
-            plugin.DtuId = dtuClient.DtuId;
-            plugin.HeartbeatTime = dtuClient.HeartbeatTime;
-        };
+            action += a =>
+            {
+                var plugin = a.Add<DtuPlugin>();
+                plugin.Heartbeat = channelOptions.Heartbeat;
+            };
+        }
         return action;
     }
 
-    /// <inheritdoc/>
-    public static Action<IPluginManager> GetDtuPlugin(IDtu dtu)
+    /// <summary>
+    /// 作为TCP服务
+    /// </summary>
+    /// <param name="channelOptions"></param>
+    /// <returns></returns>
+    public static Action<IPluginManager> GetTcpServicePlugin(IChannelOptions channelOptions)
     {
         Action<IPluginManager> action = a => { };
-
-        action += a =>
+        if (channelOptions.CheckClearTime > 0)
         {
-            a.UseCheckClear()
-    .SetCheckClearType(CheckClearType.All)
-    .SetTick(TimeSpan.FromMilliseconds(dtu.CheckClearTime))
-    .SetOnClose((c, t) =>
-    {
-        c.TryShutdown();
-        c.SafeClose($"{dtu.CheckClearTime}ms Timeout");
-    });
-        };
-
-        action += a =>
+            action += a =>
+            {
+                a.UseCheckClear()
+        .SetCheckClearType(CheckClearType.All)
+        .SetTick(TimeSpan.FromMilliseconds(channelOptions.CheckClearTime))
+        .SetOnClose((c, t) =>
         {
-            var plugin = a.Add<DtuPlugin>();
-            plugin.Heartbeat = dtu.Heartbeat;
-        };
+            c.TryShutdown();
+            c.SafeClose($"{channelOptions.CheckClearTime}ms Timeout");
+        });
+            };
+
+        }
         return action;
     }
 
-    /// <inheritdoc/>
-    public static Action<IPluginManager> GetTcpServicePlugin(ITcpService tcpService)
-    {
-        Action<IPluginManager> action = a => { };
 
-        action += a =>
-        {
-            a.UseCheckClear()
-    .SetCheckClearType(CheckClearType.All)
-    .SetTick(TimeSpan.FromMilliseconds(tcpService.CheckClearTime))
-    .SetOnClose((c, t) =>
-    {
-        c.TryShutdown();
-        c.SafeClose($"{tcpService.CheckClearTime}ms Timeout");
-    });
-        };
-
-        return action;
-    }
-
-    /// <inheritdoc/>
-    public static Action<IPluginManager> GetTcpReconnectionPlugin(ITcpClient tcpClient)
-    {
-        Action<IPluginManager> action = a => { };
-
-        action += a =>
-        {
-            a.UseTcpReconnection();
-        };
-
-        return action;
-    }
 }

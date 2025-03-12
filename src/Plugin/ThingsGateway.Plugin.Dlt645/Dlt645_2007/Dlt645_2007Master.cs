@@ -57,9 +57,7 @@ public class Dlt645_2007Master : CollectBase
         _plc.FEHead = _driverPropertys.FEHead;
         _plc.OperCode = _driverPropertys.OperCode;
         _plc.Password = _driverPropertys.Password;
-        _plc.CheckClearTime = _driverPropertys.CheckClearTime;
         _plc.Station = _driverPropertys.Station;
-        _plc.Heartbeat = _driverPropertys.Heartbeat;
         _plc.InitChannel(channel, LogMessage);
 
         await base.InitChannelAsync(channel).ConfigureAwait(false);

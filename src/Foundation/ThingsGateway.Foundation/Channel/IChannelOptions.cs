@@ -96,4 +96,36 @@ public interface IChannelOptions
     WaitLock WaitLock { get; }
 
     TouchSocketConfig Config { get; set; }
+
+
+    /// <summary>
+    /// 最大连接数
+    /// </summary>
+    int MaxClientCount { get; set; }
+
+    /// <summary>
+    /// 客户端连接滑动过期时间(TCP服务通道时)
+    /// </summary>
+    int CheckClearTime { get; set; }
+
+    /// <summary>
+    /// 心跳检测(utf8)
+    /// </summary>
+    string Heartbeat { get; set; }
+
+
+    #region dtu终端
+    /// <summary>
+    /// 心跳时间
+    /// </summary>
+    public int HeartbeatTime { get; set; }
+
+    /// <summary>
+    /// 默认Dtu注册包(utf-8)
+    /// </summary>
+    public string DtuId { get; set; }
+
+    #endregion
+
+    public DtuSeviceType DtuSeviceType { get; set; }
 }
