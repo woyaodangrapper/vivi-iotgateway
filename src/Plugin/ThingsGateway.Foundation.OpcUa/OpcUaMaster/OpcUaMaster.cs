@@ -992,9 +992,38 @@ public class OpcUaMaster : IDisposable
             }
         }
         NodeId nodeToRead = new(nodeIdStr);
-        var node = (VariableNode)m_session.ReadNode(nodeToRead, NodeClass.Variable, false);
-        _variableDicts.AddOrUpdate(nodeIdStr, a => node, (a, b) => node);
-        return node;
+
+
+        uint[] attributes = new uint[] { Attributes.NodeId, Attributes.DataType };
+
+        // build list of values to read.
+        ReadValueIdCollection itemsToRead = new ReadValueIdCollection();
+        foreach (uint attributeId in attributes)
+        {
+            ReadValueId itemToRead = new ReadValueId
+            {
+                NodeId = nodeToRead,
+                AttributeId = attributeId
+            };
+            itemsToRead.Add(itemToRead);
+        }
+
+        // read from server.
+        DataValueCollection values = null;
+        DiagnosticInfoCollection diagnosticInfos = null;
+
+        ResponseHeader responseHeader = m_session.Read(
+            null,
+            0,
+            TimestampsToReturn.Neither,
+            itemsToRead,
+            out values,
+            out diagnosticInfos);
+
+        VariableNode variableNode = GetVariableNodes(itemsToRead, values, diagnosticInfos, responseHeader).FirstOrDefault();
+
+        _variableDicts.AddOrUpdate(nodeIdStr, a => variableNode, (a, b) => variableNode);
+        return variableNode;
     }
 
     /// <summary>
@@ -1009,12 +1038,83 @@ public class OpcUaMaster : IDisposable
                 return value;
             }
         }
+
         NodeId nodeToRead = new(nodeIdStr);
-        var node = (VariableNode)await m_session.ReadNodeAsync(nodeToRead, NodeClass.Variable, false, cancellationToken).ConfigureAwait(false);
+
+
+        uint[] attributes = new uint[] { Attributes.NodeId, Attributes.DataType };
+
+        // build list of values to read.
+        ReadValueIdCollection itemsToRead = new ReadValueIdCollection();
+        foreach (uint attributeId in attributes)
+        {
+            ReadValueId itemToRead = new ReadValueId
+            {
+                NodeId = nodeToRead,
+                AttributeId = attributeId
+            };
+            itemsToRead.Add(itemToRead);
+        }
+
+        // read from server.
+        ReadResponse readResponse = await m_session.ReadAsync(
+            null,
+            0,
+            TimestampsToReturn.Neither,
+            itemsToRead, cancellationToken).ConfigureAwait(false);
+
+        DataValueCollection values = readResponse.Results;
+        DiagnosticInfoCollection diagnosticInfos = readResponse.DiagnosticInfos;
+        var responseHeader = readResponse.ResponseHeader;
+        VariableNode variableNode = GetVariableNodes(itemsToRead, values, diagnosticInfos, responseHeader).FirstOrDefault();
+
         if (OpcUaProperty.LoadType)
-            await typeSystem.LoadType(node.DataType, ct: cancellationToken).ConfigureAwait(false);
-        _variableDicts.AddOrUpdate(nodeIdStr, a => node, (a, b) => node);
-        return node;
+            await typeSystem.LoadType(variableNode.DataType, ct: cancellationToken).ConfigureAwait(false);
+        _variableDicts.AddOrUpdate(nodeIdStr, a => variableNode, (a, b) => variableNode);
+        return variableNode;
+    }
+
+    private static List<VariableNode> GetVariableNodes(ReadValueIdCollection itemsToRead, DataValueCollection values, DiagnosticInfoCollection diagnosticInfos, ResponseHeader responseHeader, int count = 1)
+    {
+        ClientBase.ValidateResponse(values, itemsToRead);
+        ClientBase.ValidateDiagnosticInfos(diagnosticInfos, itemsToRead);
+        List<VariableNode> variableNodes = new();
+        for (int i = 0; i < count; i++)
+        {
+
+            VariableNode variableNode = new VariableNode();
+            DataValue value;
+
+            if (!DataValue.IsGood(values[1 + 2 * i]))
+            {
+                throw ServiceResultException.Create(values[+2 * i].StatusCode, +2 * i, diagnosticInfos, responseHeader.StringTable);
+            }
+            // DataType Attribute
+            value = values[1+2 * i];
+
+            if (value == null)
+            {
+                throw ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Variable does not support the DataType attribute.");
+            }
+
+            variableNode.DataType = (NodeId)value.GetValue(typeof(NodeId));
+
+            // NodeId Attribute
+            if (!DataValue.IsGood(values[0 + 2 * i]))
+            {
+                throw ServiceResultException.Create(values[0 + 2 * i].StatusCode, 0 + 2 * i, diagnosticInfos, responseHeader.StringTable);
+            }
+            value = values[0 + 2 * i];
+            if (value == null)
+            {
+                throw ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Node does not support the NodeId attribute.");
+            }
+
+            variableNode.NodeId = (NodeId)value.GetValue(typeof(NodeId));
+            variableNodes.Add(variableNode);
+        }
+
+        return variableNodes;
     }
 
     /// <summary>
@@ -1025,28 +1125,44 @@ public class OpcUaMaster : IDisposable
         List<Node> result = new(nodeIdStrs.Length);
         foreach (var items in nodeIdStrs.ChunkBetter(OpcUaProperty.GroupSize))
         {
-            List<NodeId> nodeIds = new List<NodeId>();
+            uint[] attributes = new uint[] { Attributes.NodeId, Attributes.DataType };
 
+            // build list of values to read.
+            ReadValueIdCollection itemsToRead = new ReadValueIdCollection();
             foreach (var item in items)
             {
-                NodeId nodeToRead = new(item);
-                nodeIds.Add(nodeToRead);
+
+                foreach (uint attributeId in attributes)
+                {
+                    ReadValueId itemToRead = new ReadValueId
+                    {
+                        NodeId = item,
+                        AttributeId = attributeId
+                    };
+                    itemsToRead.Add(itemToRead);
+                }
             }
-            (IList<Node>, IList<ServiceResult>) nodes = await m_session.ReadNodesAsync(nodeIds, NodeClass.Variable, false, cancellationToken).ConfigureAwait(false);
-            for (int i = 0; i < nodes.Item1.Count; i++)
+
+            // read from server.
+            ReadResponse readResponse = await m_session.ReadAsync(
+                null,
+                0,
+                TimestampsToReturn.Neither,
+                itemsToRead, cancellationToken).ConfigureAwait(false);
+
+            DataValueCollection values = readResponse.Results;
+            DiagnosticInfoCollection diagnosticInfos = readResponse.DiagnosticInfos;
+            var responseHeader = readResponse.ResponseHeader;
+
+            var variableNodes = GetVariableNodes(itemsToRead, values, diagnosticInfos, responseHeader, nodeIdStrs.Length);
+
+            for (int i = 0; i < variableNodes.Count; i++)
             {
-                if (StatusCode.IsGood(nodes.Item2[i].StatusCode))
-                {
-                    var node = ((VariableNode)nodes.Item1[i]);
-                    await typeSystem.LoadType(node.DataType, ct: cancellationToken).ConfigureAwait(false);
-                    _variableDicts.AddOrUpdate(nodeIdStrs[i], a => node, (a, b) => node);
-                }
-                else
-                {
-                    Log(3, null, $"Failed to obtain server node information： {nodes.Item2[i]}");
-                }
+                var node = variableNodes[i];
+                await typeSystem.LoadType(node.DataType, ct: cancellationToken).ConfigureAwait(false);
+                _variableDicts.AddOrUpdate(nodeIdStrs[i], a => node, (a, b) => node);
+                result.Add(node);
             }
-            result.AddRange(nodes.Item1);
         }
 
         return result;
