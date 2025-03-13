@@ -198,9 +198,11 @@ public class ModbusSlave : DtuServiceDeviceBase
         switch (Channel.ChannelType)
         {
             case ChannelTypeEnum.TcpClient:
-                return (PluginUtil.GetDtuClientPlugin(Channel.ChannelOptions) + base.ConfigurePlugins(config));
+                return PluginUtil.GetDtuClientPlugin(Channel.ChannelOptions);
+            case ChannelTypeEnum.TcpService:
+                return PluginUtil.GetTcpServicePlugin(Channel.ChannelOptions);
         }
-        return base.ConfigurePlugins(config);
+        return a => { };
     }
 
     #region 核心
