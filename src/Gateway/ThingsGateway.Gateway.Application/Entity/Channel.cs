@@ -174,7 +174,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "客户端滑动过期时间")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public override int CheckClearTime { get; set; } = 120000;
-    [SugarColumn(ColumnDescription = "心跳内容")]
+    [SugarColumn(ColumnDescription = "心跳内容", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public override string Heartbeat { get; set; } = "Heartbeat";
 
@@ -183,7 +183,7 @@ public class Channel : ChannelOptionsBase, IPrimaryIdEntity, IBaseDataEntity, IB
     [SugarColumn(ColumnDescription = "心跳间隔")]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public override int HeartbeatTime { get; set; } = 60000;
-    [SugarColumn(ColumnDescription = "DtuId")]
+    [SugarColumn(ColumnDescription = "DtuId", IsNullable = true)]
     [AutoGenerateColumn(Visible = true, Filterable = true, Sortable = true)]
     public override string DtuId { get; set; }
 
