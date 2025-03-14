@@ -151,7 +151,7 @@ public partial class ModbusMaster : DtuServiceDeviceBase
 
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {

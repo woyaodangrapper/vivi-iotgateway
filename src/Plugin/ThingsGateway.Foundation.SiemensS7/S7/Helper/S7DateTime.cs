@@ -14,7 +14,7 @@ namespace ThingsGateway.Foundation.SiemensS7;
 /// https://github.com/S7NetPlus/s7netplus/blob/develop/S7.Net/Types/DateTime.cs
 /// Contains the methods to convert between <see cref="System.DateTime"/> and S7 representation of datetime values.
 /// </summary>
-internal static class S7DateTime
+public static class S7DateTime
 {
     /// <summary>
     /// The maximum <see cref="System.DateTime"/> value supported by the specification.
@@ -34,7 +34,7 @@ internal static class S7DateTime
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the length of
     ///   <paramref name="bytes"/> is not 8 or any value in <paramref name="bytes"/>
     ///   is outside the valid range of values.</exception>
-    public static System.DateTime FromByteArray(byte[]? bytes)
+    public static System.DateTime FromByteArray(this byte[]? bytes)
     {
         return FromByteArrayImpl(bytes);
     }
@@ -70,7 +70,7 @@ internal static class S7DateTime
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the value of
     ///   <paramref name="dateTime"/> is before <see cref="SpecMinimumDateTime"/>
     ///   or after <see cref="SpecMaximumDateTime"/>.</exception>
-    public static byte[] ToByteArray(System.DateTime dateTime)
+    public static byte[] ToByteArray(this System.DateTime dateTime)
     {
         byte EncodeBcd(int value)
         {

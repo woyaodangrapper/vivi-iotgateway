@@ -252,7 +252,7 @@ public interface IDevice : IDisposable
     /// <summary>
     /// 写入原始的byte数组数据到指定的地址，返回结果
     /// </summary>
-    ValueTask<OperResult> WriteAsync(string address, byte[] value, CancellationToken cancellationToken = default);
+    ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 写入bool数组数据，返回结果

@@ -107,13 +107,13 @@ internal sealed partial class SiemensHelper
         }
     }
 
-    internal static async ValueTask<OperResult> WriteAsync(SiemensS7Master plc, string address, string value, Encoding encoding)
+    internal static async ValueTask<OperResult> WriteAsync(SiemensS7Master plc, string address, string value, Encoding encoding, CancellationToken cancellationToken = default)
     {
         value ??= string.Empty;
         byte[] inBytes = encoding.GetBytes(value);
         if (plc.SiemensS7Type != SiemensTypeEnum.S200Smart)
         {
-            var result = await plc.ReadAsync(address, 2).ConfigureAwait(false);
+            var result = await plc.ReadAsync(address, 2, cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccess) return result;
             if (result.Content[0] == byte.MaxValue) return new OperResult<string>(SiemensS7Resource.Localizer["NotString"]);
             if (result.Content[0] == 0) result.Content[0] = 254;
@@ -122,8 +122,8 @@ internal sealed partial class SiemensHelper
                 address,
                 DataTransUtil.SpliceArray([result.Content[0], (byte)value.Length],
                 inBytes
-                )).ConfigureAwait(false);
+                ), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
         }
-        return await plc.WriteAsync(address, DataTransUtil.SpliceArray([(byte)value.Length], inBytes)).ConfigureAwait(false);
+        return await plc.WriteAsync(address, DataTransUtil.SpliceArray([(byte)value.Length], inBytes), DataTypeEnum.String, cancellationToken).ConfigureAwait(false);
     }
 }

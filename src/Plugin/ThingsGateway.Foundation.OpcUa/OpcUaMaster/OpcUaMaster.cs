@@ -18,7 +18,7 @@ namespace ThingsGateway.Foundation.OpcUa;
 /// 订阅委托
 /// </summary>
 /// <param name="value"></param>
-public delegate void DataChangedEventHandler((VariableNode variableNode, DataValue dataValue, JToken jToken) value);
+public delegate void DataChangedEventHandler((VariableNode variableNode, MonitoredItem monitoredItem, DataValue dataValue, JToken jToken) value);
 
 /// <summary>
 /// 日志输出
@@ -259,7 +259,7 @@ public class OpcUaMaster : IDisposable
             {
                 var item = new MonitoredItem
                 {
-                    StartNodeId = loadType ? variableNodes[i].NodeId : items[i],
+                    StartNodeId = items[i],
                     AttributeId = Attributes.Value,
                     DisplayName = items[i],
                     Filter = OpcUaProperty.DeadBand == 0 ? null : new DataChangeFilter() { DeadbandValue = OpcUaProperty.DeadBand, DeadbandType = (int)DeadbandType.Absolute, Trigger = DataChangeTrigger.StatusValue },
@@ -802,12 +802,12 @@ public class OpcUaMaster : IDisposable
                             Log(3, null, $"{monitoreditem.StartNodeId}Conversion error, original value is{value.Value}");
                             var data1 = JsonUtils.Encode(m_session.MessageContext, TypeInfo.GetBuiltInType(variableNode.DataType, m_session.SystemContext.TypeTable), value.Value);
                         }
-                        DataChangedHandler?.Invoke((variableNode, value, data!));
+                        DataChangedHandler?.Invoke((variableNode, monitoreditem, value, data!));
                     }
                     else
                     {
                         var data = JValue.CreateNull();
-                        DataChangedHandler?.Invoke((variableNode, value, data));
+                        DataChangedHandler?.Invoke((variableNode, monitoreditem, value, data));
                     }
                 }
             }
@@ -1087,17 +1087,20 @@ public class OpcUaMaster : IDisposable
 
             if (!DataValue.IsGood(values[1 + 2 * i]))
             {
-                throw ServiceResultException.Create(values[+2 * i].StatusCode, +2 * i, diagnosticInfos, responseHeader.StringTable);
+                //throw ServiceResultException.Create(values[1+2 * i].StatusCode, 1+2 * i, diagnosticInfos, responseHeader.StringTable);
             }
             // DataType Attribute
-            value = values[1+2 * i];
+            value = values[1 + 2 * i];
 
             if (value == null)
             {
-                throw ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Variable does not support the DataType attribute.");
+                //throw ServiceResultException.Create(StatusCodes.BadUnexpectedError, "Variable does not support the DataType attribute.");
+                variableNode.DataType = NodeId.Null;
             }
-
-            variableNode.DataType = (NodeId)value.GetValue(typeof(NodeId));
+            else
+            {
+                variableNode.DataType = (NodeId)value.GetValue(typeof(NodeId));
+            }
 
             // NodeId Attribute
             if (!DataValue.IsGood(values[0 + 2 * i]))

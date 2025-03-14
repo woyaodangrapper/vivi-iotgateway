@@ -27,7 +27,12 @@ public partial class ChannelComponent : ComponentBase
     [Parameter]
     public EventCallback OnDisConnectClick { get; set; }
 
-    private ChannelOptionsDefault? Model { get; set; } = new();
+    public ChannelOptionsDefault? Model { get; set; } = new();
+
+    public void PublicStateHasChanged()
+    {
+        StateHasChanged();
+    }
 
     private IChannel? Channel { get; set; }
 

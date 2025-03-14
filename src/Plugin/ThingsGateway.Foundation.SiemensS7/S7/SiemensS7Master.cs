@@ -295,7 +295,7 @@ public partial class SiemensS7Master : DeviceBase
     }
 
     /// <inheritdoc/>
-    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, CancellationToken cancellationToken = default)
+    public override async ValueTask<OperResult> WriteAsync(string address, byte[] value, DataTypeEnum dataType, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -485,7 +485,7 @@ public partial class SiemensS7Master : DeviceBase
     /// <returns></returns>
     public ValueTask<OperResult> WriteDateTimeAsync(string address, System.DateTime dateTime, CancellationToken cancellationToken)
     {
-        return WriteAsync(address, S7DateTime.ToByteArray(dateTime), cancellationToken);
+        return WriteAsync(address, S7DateTime.ToByteArray(dateTime), DataTypeEnum.Byte, cancellationToken);
     }
 
     #endregion 其他方法
@@ -524,7 +524,7 @@ public partial class SiemensS7Master : DeviceBase
         bitConverter ??= ThingsGatewayBitConverter.GetTransByAddress(address);
         if (bitConverter.IsVariableStringLength)
         {
-            return SiemensHelper.WriteAsync(this, address, value, bitConverter.Encoding);
+            return SiemensHelper.WriteAsync(this, address, value, bitConverter.Encoding, cancellationToken);
         }
         else
         {

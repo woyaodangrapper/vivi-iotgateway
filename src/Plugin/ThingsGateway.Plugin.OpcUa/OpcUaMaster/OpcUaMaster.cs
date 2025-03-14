@@ -11,6 +11,7 @@
 using Newtonsoft.Json.Linq;
 
 using Opc.Ua;
+using Opc.Ua.Client;
 
 using ThingsGateway.Foundation.Extension.Generic;
 using ThingsGateway.Foundation.OpcUa;
@@ -317,7 +318,7 @@ public class OpcUaMaster : CollectBase
 
     private Dictionary<string, List<VariableRuntime>> VariableAddresDicts { get; set; } = new();
 
-    private void DataChangedHandler((VariableNode variableNode, DataValue dataValue, JToken jToken) data)
+    private void DataChangedHandler((VariableNode variableNode, MonitoredItem monitoredItem, DataValue dataValue, JToken jToken) data)
     {
         DateTime time = DateTime.Now;
         try
@@ -333,12 +334,12 @@ public class OpcUaMaster : CollectBase
                 return;
             }
 
-            LogMessage.Trace($"{ToString()} Change: {Environment.NewLine} {data.variableNode.NodeId} : {data.jToken?.ToString()}");
+            LogMessage.Trace($"{ToString()} Change: {Environment.NewLine} {data.monitoredItem.StartNodeId} : {data.jToken?.ToString()}");
 
             //尝试固定点位的数据类型
             var type = TypeInfo.GetSystemType(TypeInfo.GetBuiltInType(data.variableNode.DataType, _plc.Session.SystemContext.TypeTable), data.variableNode.ValueRank);
 
-            if (!VariableAddresDicts.TryGetValue(data.variableNode.NodeId.ToString(), out var itemReads)) return;
+            if (!VariableAddresDicts.TryGetValue(data.monitoredItem.StartNodeId.ToString(), out var itemReads)) return;
 
             object value;
             if (data.jToken is JValue jValue)
@@ -375,7 +376,7 @@ public class OpcUaMaster : CollectBase
                 else
                 {
                     item.SetValue(null, time, false);
-                    item.VariableSource.LastErrorMessage = data.Item2.StatusCode.ToString();
+                    item.VariableSource.LastErrorMessage = data.dataValue.StatusCode.ToString();
                 }
             }
             success = true;
