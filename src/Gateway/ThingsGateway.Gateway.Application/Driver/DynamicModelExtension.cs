@@ -90,7 +90,7 @@ public static class DynamicModelExtension
     private static PropertyInfo[] GetProperties(this IEnumerable<dynamic> value, params string[] names)
     {
         // 获取动态对象集合的类型
-        var type = value.GetType().GetGenericArguments().LastOrDefault() ?? throw new ArgumentNullException(nameof(value));
+        var type = value.GetType().GetGenericArguments().FirstOrDefault() ?? throw new ArgumentNullException(nameof(value));
 
         var namesStr = Newtonsoft.Json.JsonConvert.SerializeObject(names);
         // 构建缓存键，包括属性名和类型信息
