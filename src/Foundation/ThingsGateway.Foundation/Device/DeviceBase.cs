@@ -327,6 +327,9 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 channel = clientChannel;
             }
 
+            if (SendDelayTime != 0)
+                await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
+
             if (channel is IDtuUdpSessionChannel udpSession)
             {
                 await udpSession.SendAsync(endPoint, sendMessage).ConfigureAwait(false);
@@ -361,23 +364,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         if (token.IsCancellationRequested)
             throw new OperationCanceledException();
 
-
-        if (SendDelayTime != 0)
-            await Task.Delay(SendDelayTime, token).ConfigureAwait(false);
-
-        try
-        {
-            if (AutoConnect && !Channel.Online)
-                await Channel.ConnectAsync(Channel.ChannelOptions.ConnectTimeout, token).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            await Task.Delay(1000, token).ConfigureAwait(false);
-            throw ex;
-        }
-
-        if (token.IsCancellationRequested)
-            throw new OperationCanceledException();
+       
     }
 
     /// <inheritdoc/>
@@ -398,7 +385,6 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 await BefortSendAsync(channelResult.Content, cancellationToken).ConfigureAwait(false);
 
                 await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
-
 
                 return await SendAsync(sendMessage, channelResult.Content, endPoint, cancellationToken).ConfigureAwait(false);
             }
@@ -528,10 +514,12 @@ public abstract class DeviceBase : DisposableObject, IDevice
         EndPoint? endPoint = GetUdpEndpoint(dtuId);
         try
         {
+            waitLock = GetWaitLock(clientChannel, waitLock, dtuId);
+    
             await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
-            waitLock = GetWaitLock(clientChannel, waitLock, dtuId);
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+
             waitData.SetCancellationToken(cancellationToken);
 
             Channel.ChannelReceivedWaitDict.TryAdd(sign, ChannelReceived);
