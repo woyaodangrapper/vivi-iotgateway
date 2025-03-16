@@ -393,10 +393,6 @@ internal sealed class DeviceThreadManage : IAsyncDisposable, IDeviceThreadManage
                     // 初始化驱动程序对象，并加载源读取
                     await driver.InitChannelAsync(Channel).ConfigureAwait(false);
 
-                    if (Channel != null && Drivers.Count <= 1)
-                    {
-                        await Channel.SetupAsync(Channel.Config.Clone()).ConfigureAwait(false);
-                    }
                 }
                 catch (Exception ex)
                 {

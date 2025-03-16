@@ -10,6 +10,8 @@
 
 using System.Collections.Concurrent;
 
+using ThingsGateway.NewLife;
+
 namespace ThingsGateway.Foundation;
 
 /// <summary>
@@ -27,6 +29,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
     /// </summary>
     public bool ShutDownEnable { get; set; } = true;
 
+
     /// <inheritdoc/>
     public override async Task ClearAsync()
     {
@@ -35,7 +38,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             try
             {
                 if (ShutDownEnable)
-                    client.TryShutdown();
+                    await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
 
                 await client.CloseAsync().ConfigureAwait(false);
                 client.SafeDispose();
@@ -52,13 +55,13 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         if (this.TryGetClient(id, out var client))
         {
             if (ShutDownEnable)
-                client.TryShutdown();
+                await client.ShutdownAsync(System.Net.Sockets.SocketShutdown.Both).ConfigureAwait(false);
             await client.CloseAsync().ConfigureAwait(false);
             client.SafeDispose();
         }
     }
 
-    //private readonly WaitLock _connectLock = new WaitLock();
+    private readonly WaitLock _connectLock = new WaitLock();
     /// <inheritdoc/>
     public override async Task StartAsync()
     {
@@ -66,7 +69,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         {
             try
             {
-                //await _connectLock.WaitAsync().ConfigureAwait(false);
+                await _connectLock.WaitAsync().ConfigureAwait(false);
 
                 if (ServerState != ServerState.Running)
                 {
@@ -85,7 +88,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             }
             finally
             {
-                //_connectLock.Release();
+                _connectLock.Release();
             }
         }
     }
@@ -97,7 +100,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
         {
             try
             {
-                //await _connectLock.WaitAsync().ConfigureAwait(false);
+                await _connectLock.WaitAsync().ConfigureAwait(false);
                 if (Monitors.Any())
                 {
 
@@ -111,7 +114,7 @@ public abstract class TcpServiceChannelBase<TClient> : TcpService<TClient>, ITcp
             }
             finally
             {
-                //_connectLock.Release();
+                _connectLock.Release();
             }
 
         }
@@ -276,6 +279,8 @@ public class TcpServiceChannel<TClient> : TcpServiceChannelBase<TClient>, IChann
         client.ChannelOptions = ChannelOptions;
 
         client.WaitLock = new NewLife.WaitLock(ChannelOptions.WaitLock.MaxCount);
+
+
         base.ClientInitialized(client);
     }
 

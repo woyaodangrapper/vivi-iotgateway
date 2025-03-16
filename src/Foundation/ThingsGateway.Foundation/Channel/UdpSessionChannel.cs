@@ -19,7 +19,7 @@ namespace ThingsGateway.Foundation;
 /// </summary>
 public class UdpSessionChannel : UdpSession, IClientChannel
 {
-    //private readonly WaitLock _connectLock = new WaitLock();
+    private readonly WaitLock _connectLock = new WaitLock();
 
     /// <inheritdoc/>
     public UdpSessionChannel(IChannelOptions channelOptions)
@@ -100,7 +100,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         {
             try
             {
-                //await _connectLock.WaitAsync().ConfigureAwait(false);
+                await _connectLock.WaitAsync().ConfigureAwait(false);
 
                 if (ServerState != ServerState.Running)
                 {
@@ -121,7 +121,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
             }
             finally
             {
-                //_connectLock.Release();
+                _connectLock.Release();
             }
         }
     }
@@ -133,7 +133,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
         {
             try
             {
-                //await _connectLock.WaitAsync().ConfigureAwait(false);
+                await _connectLock.WaitAsync().ConfigureAwait(false);
                 if (Monitor != null)
                 {
                     await this.OnChannelEvent(Stoping).ConfigureAwait(false);
@@ -151,7 +151,7 @@ public class UdpSessionChannel : UdpSession, IClientChannel
             }
             finally
             {
-                //_connectLock.Release();
+                _connectLock.Release();
             }
         }
         else

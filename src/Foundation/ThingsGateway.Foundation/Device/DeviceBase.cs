@@ -40,7 +40,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
             return;
         Channel = channel;
         _deviceLogger = deviceLog;
-        lock (Channel)
+        lock (channel)
         {
             if (channel.Collects.Contains(this))
                 return;
@@ -364,7 +364,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         if (token.IsCancellationRequested)
             throw new OperationCanceledException();
 
-       
+
     }
 
     /// <inheritdoc/>
@@ -515,7 +515,7 @@ public abstract class DeviceBase : DisposableObject, IDevice
         try
         {
             waitLock = GetWaitLock(clientChannel, waitLock, dtuId);
-    
+
             await BefortSendAsync(clientChannel, cancellationToken).ConfigureAwait(false);
 
             await waitLock.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -939,10 +939,9 @@ public abstract class DeviceBase : DisposableObject, IDevice
                 {
                     if (Channel is ITcpServiceChannel tcpServiceChannel && this is IDtu dtu)
                     {
-                        if (tcpServiceChannel.TryGetClient(dtu.DtuId, out var client))
+                        if (tcpServiceChannel.TryGetClient($"ID={dtu.DtuId}", out var client))
                         {
                             client.WaitHandlePool?.SafeDispose();
-                            client.TryShutdown();
                             client.SafeClose();
                         }
 

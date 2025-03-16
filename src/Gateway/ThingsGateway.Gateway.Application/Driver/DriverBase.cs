@@ -462,7 +462,7 @@ public abstract class DriverBase : DisposableObject, IDriver
     /// <param name="channel">通道，当通道类型为<see cref="ChannelTypeEnum.Other"/>时，传入null</param>
     internal protected virtual async Task InitChannelAsync(IChannel? channel = null)
     {
-        if (channel != null)
+        if (channel != null && channel.PluginManager == null)
             await channel.SetupAsync(channel.Config.Clone()).ConfigureAwait(false);
         await AfterVariablesChangedAsync().ConfigureAwait(false);
     }
