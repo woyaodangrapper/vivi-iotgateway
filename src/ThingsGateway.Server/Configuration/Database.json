@@ -10,7 +10,7 @@
       "ConfigId": "DB_Admin", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
       //"DbType": "MySql", //数据库类型
-      "ConnectionString": "Data Source=Admin.db;", //连接字符串
+      "ConnectionString": "Data Source=./DB/Admin.db;", //连接字符串
       "DbType": "Sqlite", //数据库类型
       "LanguageType": "Chinese", //中文提示
       "IsAutoCloseConnection": true, //是否自动释放
@@ -23,7 +23,7 @@
       "ConfigId": "DB_Log", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
       //"DbType": "MySql", //数据库类型
-      "ConnectionString": "Data Source=Log.db", //连接字符串
+      "ConnectionString": "Data Source=./DB/Log.db", //连接字符串
       "DbType": "Sqlite", //数据库类型
       "LanguageType": "Chinese", //中文提示
       "IsAutoCloseConnection": true, //是否自动释放
@@ -36,7 +36,7 @@
       "ConfigId": "DB_TokenCache", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
       //"DbType": "MySql", //数据库类型
-      "ConnectionString": "Data Source=TokenCache.db", //连接字符串
+      "ConnectionString": "Data Source=./DB/TokenCache.db", //连接字符串
       "DbType": "Sqlite", //数据库类型
       "LanguageType": "Chinese", //中文提示
       "IsAutoCloseConnection": true, //是否自动释放
@@ -49,7 +49,7 @@
       "ConfigId": "DB_HardwareInfo", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
       //"DbType": "MySql", //数据库类型
-      "ConnectionString": "Data Source=HardwareInfo.db", //连接字符串
+      "ConnectionString": "Data Source=./DB/HardwareInfo.db", //连接字符串
       "DbType": "Sqlite", //数据库类型
       "LanguageType": "Chinese", //中文提示
       "IsAutoCloseConnection": true, //是否自动释放
@@ -62,7 +62,7 @@
       "ConfigId": "DB_Custom", //ID
       //"ConnectionString": "server=localhost;Database=test;Uid=root;Pwd=111111;AllowLoadLocalInfile=true;", //连接字符串
       //"DbType": "MySql", //数据库类型
-      "ConnectionString": "Data Source=ThingsGateway.db", //连接字符串
+      "ConnectionString": "Data Source=./DB/ThingsGateway.db", //连接字符串
       "DbType": "Sqlite", //数据库类型
       "LanguageType": "Chinese", //中文提示
       "IsAutoCloseConnection": true, //是否自动释放

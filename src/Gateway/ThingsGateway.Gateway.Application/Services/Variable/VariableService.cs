@@ -752,7 +752,7 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                     var type = typeof(Variable);
                     // 获取目标类型的所有属性，并根据是否需要过滤 IgnoreExcelAttribute 进行筛选
                     var variableProperties = type.GetRuntimeProperties().Where(a => (a.GetCustomAttribute<IgnoreExcelAttribute>() == null) && a.CanWrite)
-                                                .ToDictionary(a => type.GetPropertyDisplayName(a.Name));
+                                                .ToDictionary(a => type.GetPropertyDisplayName(a.Name), a => (a, a.IsNullableType()));
 
                     var dbVariableDicts = await GetVariableImportData().ConfigureAwait(false);
 
@@ -785,7 +785,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                             var validationContext = new ValidationContext(variable);
                             var validationResults = new List<ValidationResult>();
                             validationContext.ValidateProperty(validationResults);
-
                             // 构建验证结果的错误信息
                             StringBuilder stringBuilder = new();
                             foreach (var validationResult in validationResults.Where(v => !string.IsNullOrEmpty(v.ErrorMessage)))
@@ -795,7 +794,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                                     stringBuilder.Append(validationResult.ErrorMessage!);
                                 }
                             }
-
                             // 如果有验证错误，则添加错误信息到导入预览结果并返回
                             if (stringBuilder.Length > 0)
                             {
@@ -817,7 +815,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                                 variable.CreateOrgId = UserManager.OrgId;
                                 variable.CreateUserId = UserManager.UserId;
                             }
-
                             if (device.IsUp && ((dataScope != null && dataScope?.Count > 0 && !dataScope.Contains(variable.CreateOrgId)) || dataScope?.Count == 0 && variable.CreateUserId != UserManager.UserId))
                             {
                                 importPreviewOutput.Results.Add((row++, false, "Operation not permitted"));
@@ -827,7 +824,6 @@ internal sealed class VariableService : BaseService<Variable>, IVariableService
                                 variables.Add(variable);
                                 importPreviewOutput.Results.Add((Interlocked.Add(ref row, 1), true, null));
                             }
-
                         }
                         catch (Exception ex)
                         {

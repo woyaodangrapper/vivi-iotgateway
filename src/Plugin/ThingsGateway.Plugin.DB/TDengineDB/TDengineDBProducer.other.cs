@@ -13,6 +13,9 @@ using Mapster;
 using SqlSugar;
 using SqlSugar.TDengine;
 
+using System.Diagnostics;
+using System.Text;
+
 using ThingsGateway.Foundation;
 using ThingsGateway.Plugin.DB;
 
@@ -76,22 +79,56 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
                 }
                 else
                 {
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
                     var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).ExecuteCommandAsync().ConfigureAwait(false);
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    stopwatch.Stop();
                     if (result > 0)
                     {
-                        LogMessage.Trace($"HistoryTable Data Count：{result}");
+                        LogMessage.Trace($"HistoryTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                     }
                 }
             }
             else
             {
-                var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
+                Stopwatch stopwatch = new();
+                stopwatch.Start();
+                //var result = await db.Insertable(dbInserts).SetTDengineChildTableName((stableName, it) => $"{stableName}_{it.DeviceName}_{it.Name}").ExecuteCommandAsync().ConfigureAwait(false);//不要加分表
 
-                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
-                if (result > 0)
+                StringBuilder stringBuilder = new();
+                stringBuilder.Append($"INSERT INTO");
+                //(`id`,`createtime`,`collecttime`,`isonline`,`value`) 
+                foreach (var deviceGroup in dbInserts.GroupBy(a => a.DeviceName))
                 {
-                    LogMessage.Trace($"TableName：{_driverPropertys.TableName}，Count：{result}");
+                    foreach (var variableGroup in deviceGroup.GroupBy(a => a.Name))
+                    {
+                        stringBuilder.Append($"""
+
+                     {_driverPropertys.TableName}_{deviceGroup.Key}_{variableGroup.Key} 
+                     USING {_driverPropertys.TableName} TAGS ("{deviceGroup.Key}", "{variableGroup.Key}") 
+                    VALUES 
+
+                    """);
+
+                        foreach (var item in variableGroup)
+                        {
+                            stringBuilder.Append($"""(NOW,"{item.CollectTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}",{item.Id},{item.IsOnline},"{item.Value}"),""");
+                        }
+                        stringBuilder.Remove(stringBuilder.Length - 1, 1);
+                    }
+
+                }
+                stringBuilder.Append(';');
+                stringBuilder.AppendLine();
+
+                await db.Ado.ExecuteCommandAsync(stringBuilder.ToString(), default, cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                stopwatch.Stop();
+                //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                //if (result > 0)
+                {
+                    LogMessage.Trace($"TableName：{_driverPropertys.TableName}，Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
             return OperResult.Success;

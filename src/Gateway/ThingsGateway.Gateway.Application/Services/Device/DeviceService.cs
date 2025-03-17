@@ -536,7 +536,7 @@ internal sealed class DeviceService : BaseService<Device>, IDeviceService
                     var type = typeof(Device);
                     // 获取目标类型的所有属性，并根据是否需要过滤 IgnoreExcelAttribute 进行筛选
                     var deviceProperties = type.GetRuntimeProperties().Where(a => (a.GetCustomAttribute<IgnoreExcelAttribute>() == null) && a.CanWrite)
-                                                .ToDictionary(a => type.GetPropertyDisplayName(a.Name));
+                                                .ToDictionary(a => type.GetPropertyDisplayName(a.Name), a => (a, a.IsNullableType()));
 
                     // 遍历每一行数据
                     rows.ForEach(item =>

@@ -49,28 +49,29 @@ public static class ExpandoObjectExtensions
     /// <param name="expandoObject">动态对象</param>
     /// <param name="properties"></param>
     /// <returns>转换后的实体对象</returns>
-    public static T ConvertToEntity<T>(this ExpandoObject expandoObject, Dictionary<string, PropertyInfo> properties) where T : new()
+    public static T ConvertToEntity<T>(this ExpandoObject expandoObject, Dictionary<string, (PropertyInfo, bool)> properties) where T : new()
     {
         var entity = new T(); // 创建目标类型的实例
 
         // 遍历动态对象的属性
         expandoObject.ForEach(keyValuePair =>
         {
+
             // 检查动态对象的属性是否存在于目标类型的属性中
             if (properties.TryGetValue(keyValuePair.Key, out var property))
             {
                 var value = keyValuePair.Value; // 获取动态属性的值
                 // 将动态属性值转换为目标属性类型并设置到目标对象的属性中
-                if (value == null && property.IsNullableType())
+                if (value == null && property.Item2)
                 {
-                    property.SetValue(entity, null);
+                    property.Item1.SetValue(entity, null);
                 }
-                else if (value == null && !property.IsNullableType())
+                else if (value == null && !property.Item2)
                 {
                 }
                 else
                 {
-                    property.SetValue(entity, ThingsGatewayStringConverter.Default.Deserialize(null, value?.ToString(), property.PropertyType));
+                    property.Item1.SetValue(entity, ThingsGatewayStringConverter.Default.Deserialize(null, value?.ToString(), property.Item1.PropertyType));
                 }
             }
         });

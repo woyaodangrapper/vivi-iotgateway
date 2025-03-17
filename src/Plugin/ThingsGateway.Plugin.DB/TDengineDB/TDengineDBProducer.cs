@@ -161,7 +161,16 @@ public partial class TDengineDBProducer : BusinessBaseWithCacheIntervalVariableM
         }
         else
         {
-            db.CodeFirst.InitTables(typeof(TDengineDBHistoryValue));
+
+            var sql = $"""
+                CREATE STABLE IF NOT EXISTS  `{_driverPropertys.TableName}`(
+                `createtime` TIMESTAMP   ,
+                `collecttime` TIMESTAMP   ,
+                `id` BIGINT   ,
+                `isonline` BOOL   ,
+                `value` VARCHAR(255)    ) TAGS(`devicename`  VARCHAR(100) ,`name`  VARCHAR(100))
+                """;
+            await db.Ado.ExecuteCommandAsync(sql, default, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         await base.ProtectedStartAsync(cancellationToken).ConfigureAwait(false);
     }

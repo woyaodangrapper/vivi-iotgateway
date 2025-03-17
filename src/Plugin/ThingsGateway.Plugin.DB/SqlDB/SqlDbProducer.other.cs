@@ -10,6 +10,8 @@
 
 using Mapster;
 
+using System.Diagnostics;
+
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife;
 using ThingsGateway.Plugin.DB;
@@ -80,21 +82,27 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                 }
                 else
                 {
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
                     var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    stopwatch.Stop();
                     if (result > 0)
                     {
-                        LogMessage.Trace($"HistoryTable Data Count：{result}");
+                        LogMessage.Trace($"HistoryTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                     }
                 }
             }
             else
             {
+                Stopwatch stopwatch = new();
+                stopwatch.Start();
                 var result = await db.Fastest<SQLHistoryValue>().PageSize(50000).SplitTable().BulkCopyAsync(dbInserts).ConfigureAwait(false);
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                stopwatch.Stop();
                 if (result > 0)
                 {
-                    LogMessage.Trace($"HistoryTable Data Count：{result}");
+                    LogMessage.Trace($"HistoryTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
 
@@ -130,9 +138,12 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                     {
                         if (datas?.Count > 0)
                         {
+                            Stopwatch stopwatch = new();
+                            stopwatch.Start();
                             var result = db.StorageableByObject(getDeviceModel.GetList(datas)).ExecuteCommand();
+                            stopwatch.Stop();
                             if (result > 0)
-                                LogMessage.Trace($"RealTable Data Count：{result}");
+                                LogMessage.Trace($"RealTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                             _initRealData = true;
                             return OperResult.Success;
                         }
@@ -142,9 +153,12 @@ public partial class SqlDBProducer : BusinessBaseWithCacheIntervalVariableModel<
                     {
                         if (datas?.Count > 0)
                         {
+                            Stopwatch stopwatch = new();
+                            stopwatch.Start();
                             var result = await db.UpdateableByObject(getDeviceModel.GetList(datas)).ExecuteCommandAsync().ConfigureAwait(false);
+                            stopwatch.Stop();
                             if (result > 0)
-                                LogMessage.Trace($"RealTable Data Count：{result}");
+                                LogMessage.Trace($"RealTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                             return OperResult.Success;
                         }
                         return OperResult.Success;

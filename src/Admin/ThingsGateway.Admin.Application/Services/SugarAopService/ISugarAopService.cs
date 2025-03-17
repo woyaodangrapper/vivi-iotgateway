@@ -22,7 +22,7 @@ public interface ISugarAopService
     /// <summary>
     /// Aop设置
     /// </summary>
-    public void AopSetting(ISqlSugarClient db, bool isShowSql = false);
+    public void AopSetting(ISqlSugarClient db, bool? isShowSql = null);
 
 }
 /// <summary>

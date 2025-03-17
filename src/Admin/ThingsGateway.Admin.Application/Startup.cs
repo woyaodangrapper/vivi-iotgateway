@@ -25,6 +25,8 @@ public class Startup : AppStartup
 {
     public void ConfigureAdminApp(IServiceCollection services)
     {
+        Directory.CreateDirectory("DB");
+
         services.AddConfigurableOptions<SqlSugarOptions>();
         services.AddConfigurableOptions<AdminLogOptions>();
         services.AddConfigurableOptions<TenantOptions>();

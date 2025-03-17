@@ -10,6 +10,8 @@
 
 using Mapster;
 
+using System.Diagnostics;
+
 using ThingsGateway.Foundation;
 using ThingsGateway.NewLife.Threading;
 
@@ -42,17 +44,21 @@ public partial class SqlHistoryAlarm : BusinessBaseWithCacheVariableModel<Histor
 
             int result = 0;
             //.SplitTable()
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
 
             if (db.CurrentConnectionConfig.DbType == SqlSugar.DbType.QuestDB)
                 result = await db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
             else
                 result = await db.Fastest<HistoryAlarm>().AS(_driverPropertys.TableName).PageSize(50000).BulkCopyAsync(dbInserts).ConfigureAwait(false);
 
+
+            stopwatch.Stop();
             //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
             if (result > 0)
             {
                 CurrentDevice.SetDeviceStatus(TimerX.Now, false);
-                LogMessage.Trace($"上传成功，数量：{dbInserts.Count}");
+                LogMessage.Trace($"Count：{dbInserts.Count}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
             }
             return OperResult.Success;
         }

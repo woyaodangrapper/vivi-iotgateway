@@ -36,6 +36,9 @@
     RenderFragment Render(SqlDBPageInput model) =>
     @<div class="row form-inline g-2">
         <div class="col-12 ">
+            <BootstrapInput @bind-Value="model.DeviceName" ShowLabel="true" />
+        </div>
+        <div class="col-12 ">
             <BootstrapInput @bind-Value="model.VariableName" ShowLabel="true" />
         </div>
         <div class="col-12 ">

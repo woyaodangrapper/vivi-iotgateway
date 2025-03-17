@@ -10,6 +10,8 @@
 
 using Mapster;
 
+using System.Diagnostics;
+
 using ThingsGateway.Foundation;
 using ThingsGateway.Plugin.DB;
 
@@ -70,22 +72,29 @@ public partial class QuestDBProducer : BusinessBaseWithCacheIntervalVariableMode
                 }
                 else
                 {
+                    Stopwatch stopwatch = new();
+                    stopwatch.Start();
                     var result = await db.InsertableByObject(getDeviceModel.GetList(dbInserts)).ExecuteCommandAsync().ConfigureAwait(false);
                     //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
+                    stopwatch.Stop();
                     if (result > 0)
                     {
-                        LogMessage.Trace($"HistoryTable Data Count：{result}");
+                        LogMessage.Trace($"HistoryTable Data Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                     }
                 }
             }
             else
             {
+                Stopwatch stopwatch = new();
+                stopwatch.Start();
+
                 var result = await db.Insertable(dbInserts).AS(_driverPropertys.TableName).ExecuteCommandAsync(cancellationToken).ConfigureAwait(false);//不要加分表
+                stopwatch.Stop();
 
                 //var result = await db.Insertable(dbInserts).SplitTable().ExecuteCommandAsync().ConfigureAwait(false);
                 if (result > 0)
                 {
-                    LogMessage.Trace($"TableName：{_driverPropertys.TableName}，Count：{result}");
+                    LogMessage.Trace($"TableName：{_driverPropertys.TableName}，Count：{result}，watchTime:  {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
 

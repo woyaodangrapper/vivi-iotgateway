@@ -26,11 +26,16 @@ public class SqlDBPageInput : ITableSearchModel
     /// </summary>
     public virtual string? VariableName { get; set; }
 
+    /// <summary>
+    /// 设备名称
+    /// </summary>
+    public virtual string? DeviceName { get; set; }
     /// <inheritdoc/>
     public IEnumerable<IFilterAction> GetSearches()
     {
         var ret = new List<IFilterAction>();
         ret.AddIF(!string.IsNullOrEmpty(VariableName), () => new SearchFilterAction(nameof(IDBHistoryValue.Name), VariableName));
+        ret.AddIF(!string.IsNullOrEmpty(DeviceName), () => new SearchFilterAction(nameof(IDBHistoryValue.DeviceName), DeviceName));
         ret.AddIF(SearchDate != null, () => new SearchFilterAction(nameof(IDBHistoryValue.CreateTime), SearchDate!.Start, FilterAction.GreaterThanOrEqual));
         ret.AddIF(SearchDate != null, () => new SearchFilterAction(nameof(IDBHistoryValue.CreateTime), SearchDate!.End, FilterAction.LessThanOrEqual));
         return ret;
@@ -41,5 +46,6 @@ public class SqlDBPageInput : ITableSearchModel
     {
         SearchDate = null;
         VariableName = null;
+        DeviceName = null;
     }
 }

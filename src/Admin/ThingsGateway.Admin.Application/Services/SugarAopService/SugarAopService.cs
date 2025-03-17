@@ -9,6 +9,8 @@
 //------------------------------------------------------------------------------
 
 
+using Microsoft.Extensions.Hosting;
+
 using SqlSugar;
 
 namespace ThingsGateway.Admin.Application;
@@ -23,11 +25,11 @@ public class SugarAopService : ISugarAopService
     /// <summary>
     /// Aop设置
     /// </summary>
-    public void AopSetting(ISqlSugarClient db, bool isShowSql = false)
+    public void AopSetting(ISqlSugarClient db, bool? isShowSql = null)
     {
         var config = db.CurrentConnectionConfig;
 
-        if (isShowSql)
+        if ((isShowSql == null && App.HostEnvironment.IsDevelopment()) || isShowSql == true)
         {
             // 打印SQL语句
             db.Aop.OnLogExecuting = (sql, pars) =>

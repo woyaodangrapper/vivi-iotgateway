@@ -35,11 +35,15 @@ public class HistoryAlarmPageInput : ITableSearchModel
     /// 变量名称
     /// </summary>
     public virtual string? VariableName { get; set; }
-
+    /// <summary>
+    /// 设备名称
+    /// </summary>
+    public virtual string? DeviceName { get; set; }
     /// <inheritdoc/>
     public IEnumerable<IFilterAction> GetSearches()
     {
         var ret = new List<IFilterAction>();
+        ret.AddIF(!string.IsNullOrEmpty(DeviceName), () => new SearchFilterAction(nameof(HistoryAlarm.DeviceName), DeviceName));
         ret.AddIF(!string.IsNullOrEmpty(VariableName), () => new SearchFilterAction(nameof(HistoryAlarm.Name), VariableName));
         ret.AddIF(SearchDate != null, () => new SearchFilterAction(nameof(HistoryAlarm.EventTime), SearchDate!.Start, FilterAction.GreaterThanOrEqual));
         ret.AddIF(SearchDate != null, () => new SearchFilterAction(nameof(HistoryAlarm.EventTime), SearchDate!.End, FilterAction.LessThanOrEqual));
@@ -54,6 +58,7 @@ public class HistoryAlarmPageInput : ITableSearchModel
     {
         SearchDate = null;
         VariableName = null;
+        DeviceName = null;
         EventType = null;
         AlarmType = null;
     }

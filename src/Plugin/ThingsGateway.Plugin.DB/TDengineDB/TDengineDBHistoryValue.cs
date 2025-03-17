@@ -16,7 +16,7 @@ using SqlSugar.TDengine;
 namespace ThingsGateway.Plugin.TDengineDB;
 
 [SugarTable("historyValue")]
-[STableAttribute(STableName = "historyValue", Tag1 = nameof(Name))]
+[STableAttribute(STableName = "historyValue", Tag1 = nameof(DeviceName), Tag2 = nameof(Name))]
 public class TDengineDBHistoryValue : STable, IPrimaryIdEntity, IDBHistoryValue
 {
     public long Id { get; set; }
@@ -31,15 +31,17 @@ public class TDengineDBHistoryValue : STable, IPrimaryIdEntity, IDBHistoryValue
 
 
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
+    public bool IsOnline { get; set; }
+
+    [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
+    public string Value { get; set; }
+
+
+
+    [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public string DeviceName { get; set; }
 
 
     [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
     public string Name { get; set; }
-
-    [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
-    public bool IsOnline { get; set; }
-
-    [AutoGenerateColumn(Order = 1, Visible = true, Sortable = true, Filterable = false)]
-    public string Value { get; set; }
 }
