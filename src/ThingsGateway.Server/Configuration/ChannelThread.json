@@ -1,7 +1,0 @@
-﻿{
-  "ChannelThread": {
-    "MinCycleInterval": 10, //最小循环间隔
-    "MaxCycleInterval": 200, //最大循环间隔
-    "CheckInterval": 1800000 //检查间隔
-  }
-}

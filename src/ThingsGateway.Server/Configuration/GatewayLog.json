@@ -1,6 +1,0 @@
-{
-  "GatewayLog": {
-    "RpcLogDaysAgo": 30,
-    "BackendLogDaysAgo": 30
-  }
-}
