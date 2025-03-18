@@ -1,0 +1,3 @@
+[submodule "src/Application Core/Domain/Common/RTU_Solution"]
+	path = src/Application Core/Domain/Common/RTU_Solution
+	url = https://github.com/woyaodangrapper/RTU_Solution.git

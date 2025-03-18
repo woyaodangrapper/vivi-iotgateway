@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\build\common.props" />
+
+	<ItemGroup>
+		<PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
+		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="9.103.7.2" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Gravity.Infrastructure.Core\Gravity.Infrastructure.Core.csproj" />
+		<ProjectReference Include="..\Gravity.Infrastructure.Repository\Gravity.Infrastructure.Repository.csproj" />
+	</ItemGroup>
+</Project>

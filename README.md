@@ -1,6 +1,10 @@
 
 <p align="center">
-  <img width="512px" height="auto" src="https://raw.githubusercontent.com/woyaodangrapper/gravity-iotgateway/main/doc/image/mascot.svg"/><br/>
+  <img width="512px" height="auto" style=" filter:
+    drop-shadow( 1px  1px 0px white) 
+    drop-shadow(-1px -1px 0px white) 
+    drop-shadow( 1px -1px 0px white) 
+    drop-shadow(-1px  1px 0px white);" src="https://raw.githubusercontent.com/woyaodangrapper/gravity-iotgateway/develop/docs/image/mascot.svg"/><br/>
 </p>
 <!-- PROJECT SHIELDS -->
 
@@ -10,7 +14,7 @@
 [![问题][issues-shield]][issues-url] 
 [![MIT 许可证][license-shield]][license-url]
 
-**声明：** Gravity 是基于 [**ThingsGateway**](https://github.com/ThingsGateway/ThingsGateway) 分叉设计 。目的在于在物联网寻找更好的链接应用方案。
+<!-- **声明：** Gravity 是基于 [**ThingsGateway**](https://github.com/ThingsGateway/ThingsGateway) 分叉设计。目的在于在物联网寻找更好的链接应用方案。 -->
 
 <!-- PROJECT LOGO -->
 
@@ -20,7 +24,7 @@
  English -->
 </p>
 
-<div  align="center">
+<!-- <div  align="center">
 
 [**开发人员文档**](https://github.com/woyaodangrapper/gravity-iotgateway/issues) :earth_asia: [**报告Bug**](https://github.com/woyaodangrapper/gravity-iotgateway/issues) :earth_asia: [**查看发布**](https://github.com/woyaodangrapper/gravity-iotgateway/releases) :earth_asia: [**建议新功能**](https://github.com/woyaodangrapper/gravity-iotgateway/issues) :earth_asia:
 
@@ -47,7 +51,7 @@
 - 贡献代码：如果你是开发者，可以提交代码或改进现有功能。
 - 提供反馈：分享你的使用体验和建议，以帮助我们改进软件。
 
-感谢你的支持！每一份贡献都让这个项目变得更好。😊
+感谢你的支持！每一份贡献都让这个项目变得更好。😊 -->
 
 ## 许可证声明
 

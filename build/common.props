@@ -1,0 +1,28 @@
+﻿<Project>
+	<Import Project="version.props" />
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
+		<TieredPGO>true</TieredPGO>
+		<!--<RuntimeIdentifiers>win-x86;win-x64;linux-x64;osx-x64</RuntimeIdentifiers>-->
+		<!--<WarningsAsErrors>nullable</WarningsAsErrors>-->
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+		<Authors></Authors>
+		<Product>PeckerAI</Product>
+		<PackagePrefix>PeckerAI</PackagePrefix>
+		<PackageIcon>http://nwzimg.wezhan.cn/contents/sitefiles2026/10134911/images/5367573.png</PackageIcon>
+		<RepositoryUrl>http://www.peckerai.com/</RepositoryUrl>
+		<PackageProjectUrl>http://www.peckerai.com/</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
+		<SatelliteResourceLanguages>zh-Hant</SatelliteResourceLanguages>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<NoWarn>$(NoWarn);1591;0436</NoWarn>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	</PropertyGroup>
+</Project>
