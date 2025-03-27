@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\build\common.props" />
+
+	<ItemGroup>
+		<PackageReference Include="Dapper" Version="2.1.66" />
+		<PackageReference Include="MySqlConnector" Version="2.4.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Vivi.Infrastructure.Repository\Vivi.Infrastructure.Repository.csproj" />
+	</ItemGroup>
+</Project>

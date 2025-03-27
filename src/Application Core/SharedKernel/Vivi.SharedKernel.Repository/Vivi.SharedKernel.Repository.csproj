@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\..\build\common.props" />
+	<PropertyGroup>
+		<DocumentationFile>./Vivi.SharedKernel.Repository.xml</DocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Remove="Vivi.SharedKernel.Repository.xml" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository\Vivi.Infrastructure.Repository.csproj" />
+		<ProjectReference Include="..\Vivi.SharedKernel\Vivi.SharedKernel.csproj" />
+	</ItemGroup>
+</Project>

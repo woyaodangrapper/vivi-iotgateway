@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Vivi.Dcs.Contracts</name>
+    </assembly>
+    <members>
+        <member name="T:Vivi.Dcs.Contracts.Dtos.HelloDto">
+            <summary>
+            系统通知
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.Dtos.HelloDto.Content">
+            <summary>
+            内容
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.Dtos.HelloDto.Title">
+            <summary>
+            标题
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.Dtos.HelloDto.Type">
+            <summary>
+            类型
+            </summary>
+        </member>
+    </members>
+</doc>

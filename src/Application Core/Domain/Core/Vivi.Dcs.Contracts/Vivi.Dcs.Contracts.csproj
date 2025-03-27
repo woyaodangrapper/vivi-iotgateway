@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\..\..\build\common.props" />
+	<PropertyGroup>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DocumentationFile>./Vivi.Dcs.Contracts.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\SharedKernel\Vivi.SharedKernel.Contracts\Vivi.SharedKernel.Contracts.csproj" />
+		<ProjectReference Include="..\..\..\SharedKernel\Vivi.SharedKernel\Vivi.SharedKernel.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Vivi.Dcs.Contracts.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>
