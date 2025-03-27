@@ -69,7 +69,7 @@ git submodule update --recursive  # 拉取所有子模块
 
 ## 许可证声明
 
-**本人将在遵守原始 Apache-2.0 许可证的前提下，对 ThingsGateway 项目的修改部分以 MIT 许可证发布。**
+**项目组将在遵守原始 Apache-2.0 许可证的前提下，对 ThingsGateway 项目的修改部分以 MIT 许可证发布。**
 [MIT License](https://mit-license.org/) 被授予此作品修改部分. 请参阅 [LICENSE-MIT](LICENSE-MIT) / [LICENSE](LICENSE)  
 
 
