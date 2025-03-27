@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\..\build\common.props" />
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository\Vivi.Infrastructure.Repository.csproj" />
+
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
+		<PackageReference Include="NLog" Version="5.4.0" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.4.0" />
+	</ItemGroup>
+
+</Project>

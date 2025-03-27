@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\..\..\build\common.props" />
+	<PropertyGroup>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DocumentationFile>./Vivi.Dcs.Application.xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\SharedKernel\Vivi.SharedKernel.Application\Vivi.SharedKernel.Application.csproj" />
+		<ProjectReference Include="..\Vivi.Dcs.Contracts\Vivi.Dcs.Contracts.csproj" />
+		<ProjectReference Include="..\Vivi.Dcs.Repository\Vivi.Dcs.Repository.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Vivi.Dcs.Application.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\build\common.props" />
+
+	<ItemGroup>
+		<PackageReference Include="Polly" Version="8.5.2" />
+		<PackageReference Include="Castle.Core.AsyncInterceptor" Version="2.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Vivi.Infrastructure.Core\Vivi.Infrastructure.Core.csproj" />
+		<ProjectReference Include="..\Vivi.Infrastructure.Redis\Vivi.Infrastructure.Redis.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Core\" />
+	</ItemGroup>
+</Project>

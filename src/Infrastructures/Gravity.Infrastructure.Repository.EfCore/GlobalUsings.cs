@@ -1,9 +1,0 @@
-﻿global using Gravity.Infrastructure.Entities;
-global using Gravity.Infrastructure.IRepositories;
-global using Gravity.Infrastructure.Repository.EfCore.Internal;
-global using Microsoft.EntityFrameworkCore;
-global using Microsoft.EntityFrameworkCore.ChangeTracking;
-global using Microsoft.EntityFrameworkCore.Storage;
-global using System.Data;
-global using System.Linq.Expressions;
-global using Z.EntityFramework.Plus;

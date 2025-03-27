@@ -1,0 +1,9 @@
+﻿global using Vivi.Infrastructure.Entities;
+global using Vivi.Infrastructure.IRepositories;
+global using Vivi.Infrastructure.Repository.EfCore.Internal;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+global using Microsoft.EntityFrameworkCore.Storage;
+global using System.Data;
+global using System.Linq.Expressions;
+global using Z.EntityFramework.Plus;

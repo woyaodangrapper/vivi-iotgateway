@@ -1,6 +1,6 @@
 
-<p align="center">
-  <img width="512px" height="auto" style=" filter:
+<p>
+  <img width="64px" height="auto" style=" filter:
     drop-shadow( 1px  1px 0px white) 
     drop-shadow(-1px -1px 0px white) 
     drop-shadow( 1px -1px 0px white) 
@@ -24,6 +24,20 @@
  English -->
 </p>
 
+## 本项目中使用的第三方存储库和库
+
+- [**RTU Solution Library**](https://github.com/woyaodangrapper/RTU_Solution) by woyaodangrapper
+
+
+## 🔄 初始化 Git 子模块
+- [Git](https://git-scm.com/)
+在克隆 Vivi 项目后，**如果包含子模块**，请先执行命令初始化和更新子模块：
+
+````bash
+git submodule init
+git submodule update --recursive  # 拉取所有子模块
+# git submodule foreach --recursive git pull origin main  # 更新子模块至最新版本
+````
 <!-- <div  align="center">
 
 [**开发人员文档**](https://github.com/woyaodangrapper/gravity-iotgateway/issues) :earth_asia: [**报告Bug**](https://github.com/woyaodangrapper/gravity-iotgateway/issues) :earth_asia: [**查看发布**](https://github.com/woyaodangrapper/gravity-iotgateway/releases) :earth_asia: [**建议新功能**](https://github.com/woyaodangrapper/gravity-iotgateway/issues) :earth_asia:

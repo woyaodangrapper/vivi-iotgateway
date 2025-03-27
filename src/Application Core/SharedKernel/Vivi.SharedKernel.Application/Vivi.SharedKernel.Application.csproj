@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\..\..\build\common.props" />
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Core\Vivi.Infrastructure.Core.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Helper\Vivi.Infrastructure.Helper.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Kafka\Vivi.Infrastructure.Kafka.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Mapper\Vivi.Infrastructure.Mapper.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.Dapper\Vivi.Infrastructure.Repository.Dapper.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.EfCore.TimescaleDB\Vivi.Infrastructure.Repository.EfCore.TimescaleDB.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.EfCore.PostgreSQL\Vivi.Infrastructure.Repository.EfCore.PostgreSQL.csproj" />
+		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.EfCore\Vivi.Infrastructure.Repository.EfCore.csproj" />
+		<ProjectReference Include="..\Vivi.SharedKernel.Contracts\Vivi.SharedKernel.Contracts.csproj" />
+		<ProjectReference Include="..\Vivi.SharedKernel.Repository\Vivi.SharedKernel.Repository.csproj" />
+		<ProjectReference Include="..\Vivi.SharedKernel\Vivi.SharedKernel.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+		<PackageReference Include="Grpc.Net.Client.Web" Version="2.70.0" />
+		<PackageReference Include="Grpc.Net.ClientFactory" Version="2.70.0" />
+		<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.3" />
+		<PackageReference Include="DotNetCore.CAP.RabbitMQ" Version="8.3.3" />
+		<PackageReference Include="DotNetCore.CAP.Dashboard" Version="8.3.3" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.3" />
+		<PackageReference Include="prometheus-net" Version="8.2.1" />
+		<PackageReference Include="SkyAPM.Diagnostics.CAP" Version="2.2.0" />
+		<PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
+		<PackageReference Include="prometheus-net.DotNetRuntime" Version="4.4.1" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.3.1" />
+		<PackageReference Include="System.ValueTuple" Version="4.6.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.3.1" />
+		<PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.1.0" />
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+		<PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.5.4" />
+		<PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.5.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
+
+		<PackageReference Include="Castle.Core.AsyncInterceptor" Version="2.1.0" />
+
+
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="NLog\nlog-console.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="NLog\nlog-loki.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="NLog\nlog-mongodb.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+</Project>
