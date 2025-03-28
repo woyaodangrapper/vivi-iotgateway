@@ -16,7 +16,7 @@ public abstract partial class AbstractWebApiDependencyRegistrar
             if (applicationRegistrarType is not null)
             {
                 var applicationRegistrar = Activator.CreateInstance(applicationRegistrarType, Services) as IDependencyRegistrar;
-                applicationRegistrar?.AddDcs();
+                applicationRegistrar?.AddServes();
             }
         }
     }

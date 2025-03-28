@@ -4,5 +4,5 @@ public interface IDependencyRegistrar
 {
     public string Name { get; }
 
-    public void AddDcs();
+    public void AddServes();
 }

@@ -21,7 +21,7 @@ public abstract partial class AbstractWebApiDependencyRegistrar : IDependencyReg
     /// <summary>
     /// 注册服务入口方法
     /// </summary>
-    public abstract void AddDcs();
+    public abstract void AddServes();
 
 
     /// <summary>

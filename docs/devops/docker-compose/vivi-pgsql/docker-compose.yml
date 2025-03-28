@@ -1,0 +1,22 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=vivi@123..
+      - APP_DB_USER=root
+      - APP_DB_PASS=vivi@123..
+      - APP_DB_NAME=app
+    volumes:
+      - ./db_backups:/docker-entrypoint-initdb.d/
+      - ../vivi/postgres:/var/lib/postgresql/data
+    ports:
+      - 9032:5432

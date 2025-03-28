@@ -1,0 +1,85 @@
+version: '3.1'
+
+services:
+
+  # kafka
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: "vivi-kafka"
+    ports:
+      - "9092:9092"
+    volumes:
+      - "./vivi:/bitnami"
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+  # kafka end
+
+  # postgres
+  postgres:
+    image: postgres:latest
+    container_name: vivi-postgres
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=vivi@123..
+      - APP_DB_USER=root
+      - APP_DB_PASS=vivi@123..
+      - APP_DB_NAME=app
+    volumes:
+      - ./vivi-pgsql/db_backups:/docker-entrypoint-initdb.d/
+      - ./vivi/postgres:/var/lib/postgresql/data
+    ports:
+      - 9032:5432
+  # postgres end
+
+  # timescaledb
+  timescaledb:
+    image: timescale/timescaledb:latest-pg12
+    container_name: vivi-timescaledb
+    ports:
+      - "9432:5432"
+    environment:
+      POSTGRES_PASSWORD: vivi@123..
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./vivi/timescaledb:/var/lib/postgresql/data
+  # timescaledb end
+  # mariadb
+  mariadb:
+    image: mariadb:latest
+    container_name: "vivi-mariadb"
+    restart: always
+    environment:
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "123456"
+      MYSQL_ROOT_PASSWORD: "123456"
+      TZ: "Asia/Shanghai"
+    ports:
+      - "9076:3306"
+    volumes:
+      - ./vivi/mysql/data:/var/lib/mysql
+      - ./vivi/mysql/log:/var/log/mysql
+      - ./vivi-mysql/db_backups:/docker-entrypoint-initdb.d
+    command: --init-file /docker-entrypoint-initdb.d/bootstrap.sql
+# mariadb end
+volumes:
+  vivi:
+    driver: local
+  timescaledb:
+    driver: local
+
+

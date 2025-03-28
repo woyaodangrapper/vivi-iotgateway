@@ -3,23 +3,14 @@
     public abstract class EfFullAuditEntity : EfEntity, IFullAuditInfo
     {
         /// <summary>
-        /// 创建人
+        /// 创建时间
         /// </summary>
-        public long CreateBy { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 创建时间/注册时间
+        /// 更新时间
         /// </summary>
-        public DateTime CreateTime { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
-        /// <summary>
-        /// 最后更新人
-        /// </summary>
-        public long? ModifyBy { get; set; }
-
-        /// <summary>
-        /// 最后更新时间
-        /// </summary>
-        public DateTime? ModifyTime { get; set; }
     }
 }

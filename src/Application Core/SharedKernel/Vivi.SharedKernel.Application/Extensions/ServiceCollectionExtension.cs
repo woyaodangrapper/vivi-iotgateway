@@ -20,7 +20,7 @@ public static class ServiceCollectionExtension
             throw new NullReferenceException(nameof(IDependencyRegistrar));
 
         var webapiRegistar = Activator.CreateInstance(webApiRegistarType, services) as IDependencyRegistrar;
-        webapiRegistar?.AddDcs();
+        webapiRegistar?.AddServes();
 
         return services;
     }

@@ -2,5 +2,5 @@
 
 public interface IMiddlewareRegistrar
 {
-    public void UseDcs();
+    public void UseService();
 }

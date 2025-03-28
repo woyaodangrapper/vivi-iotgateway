@@ -8,30 +8,22 @@ namespace Vivi.SharedKernel.Application.Extensions;
 public static class WebApplicationBuilderExtension
 {
     /// <summary>
-    /// Configure Configuration/ServiceCollection/Logging
+    /// Configure Configuration/ServiceCollection/Logging/AOP
     /// <param name="builder"></param>
     /// <param name="serviceInfo"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static WebApplicationBuilder ConfigureDcsDefault(this WebApplicationBuilder builder, IServiceInfo serviceInfo)
+    public static WebApplicationBuilder Default(this WebApplicationBuilder builder, IServiceInfo serviceInfo) // 
     {
+        Console.WriteLine($"Environment:{builder.Environment.EnvironmentName}");
+
         if (builder is null)
             throw new ArgumentNullException(nameof(builder));
         if (serviceInfo is null)
             throw new ArgumentNullException(nameof(serviceInfo));
 
-        // Configuration
-        var initialData = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("ServiceName", serviceInfo.ServiceName) };
-        builder.Configuration.AddInMemoryCollection(initialData);
-
-        //builder.Configuration.AddJsonFile($"{AppContext.BaseDirectory}/appsettings.shared.{builder.Environment.EnvironmentName}.json", true, true);
-
-        if (builder.Environment.IsDevelopment())
-        {
-            builder.Configuration.AddJsonFile($"{AppContext.BaseDirectory}/appsettings.shared.{builder.Environment.EnvironmentName}.json", true, true);
-        }
-
-        builder.Configuration.AddJsonFile($"{AppContext.BaseDirectory}/appsettings.{builder.Environment.EnvironmentName}.json", true, true);
+        // Add Default Configuration
+        builder.Configuration.AddInMemoryCollection([new("ServiceName", serviceInfo.ServiceName)]);
 
         //if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
 
@@ -42,10 +34,13 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddSingleton(typeof(IServiceInfo), serviceInfo);
         builder.Services.AddVivi(serviceInfo);
 
+
         //Logging
         builder.Logging.ClearProviders();
         var logContainer = builder.Configuration.GetValue(NodeConsts.Logging_LogContainer, "console");
-        LogManager.LoadConfiguration($"{AppContext.BaseDirectory}/NLog/nlog-{logContainer}.config");
+        string path = $"\"{AppContext.BaseDirectory}/NLog/nlog-{logContainer}.config\"";
+        LogManager.Setup().LoadConfigurationFromFile(path).GetCurrentClassLogger(); ;
+
         builder.Host.UseNLog();
 
         return builder;

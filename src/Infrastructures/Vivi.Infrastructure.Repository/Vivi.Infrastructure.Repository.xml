@@ -4,34 +4,24 @@
         <name>Vivi.Infrastructure.Repository</name>
     </assembly>
     <members>
-        <member name="P:Vivi.Infrastructure.Entities.EfBasicAuditEntity.CreateBy">
+        <member name="P:Vivi.Infrastructure.Entities.EfBasicAuditEntity.CreatedAt">
             <summary>
-            创建人
+            创建时间
             </summary>
         </member>
-        <member name="P:Vivi.Infrastructure.Entities.EfBasicAuditEntity.CreateTime">
+        <member name="P:Vivi.Infrastructure.Entities.EfBasicAuditEntity.UpdatedAt">
             <summary>
-            创建时间/注册时间
+            更新时间
             </summary>
         </member>
-        <member name="P:Vivi.Infrastructure.Entities.EfFullAuditEntity.CreateBy">
+        <member name="P:Vivi.Infrastructure.Entities.EfFullAuditEntity.CreatedAt">
             <summary>
-            创建人
+            创建时间
             </summary>
         </member>
-        <member name="P:Vivi.Infrastructure.Entities.EfFullAuditEntity.CreateTime">
+        <member name="P:Vivi.Infrastructure.Entities.EfFullAuditEntity.UpdatedAt">
             <summary>
-            创建时间/注册时间
-            </summary>
-        </member>
-        <member name="P:Vivi.Infrastructure.Entities.EfFullAuditEntity.ModifyBy">
-            <summary>
-            最后更新人
-            </summary>
-        </member>
-        <member name="P:Vivi.Infrastructure.Entities.EfFullAuditEntity.ModifyTime">
-            <summary>
-            最后更新时间
+            更新时间
             </summary>
         </member>
         <member name="T:Vivi.Infrastructure.Entities.Extensions.PocoLoadingExtension">
@@ -39,12 +29,12 @@
             延时加载扩展方法
             </summary>
         </member>
-        <member name="P:Vivi.Infrastructure.Entities.IBasicAuditInfo.CreateBy">
+        <member name="P:Vivi.Infrastructure.Entities.IBasicAuditInfo.CreatedAt">
             <summary>
-            创建人
+            更新时间
             </summary>
         </member>
-        <member name="P:Vivi.Infrastructure.Entities.IBasicAuditInfo.CreateTime">
+        <member name="P:Vivi.Infrastructure.Entities.IBasicAuditInfo.UpdatedAt">
             <summary>
             创建时间/注册时间
             </summary>
@@ -52,16 +42,6 @@
         <member name="P:Vivi.Infrastructure.Entities.IConcurrency.RowVersion">
             <summary>
             并发控制列
-            </summary>
-        </member>
-        <member name="P:Vivi.Infrastructure.Entities.IFullAuditInfo.ModifyBy">
-            <summary>
-            最后更新人
-            </summary>
-        </member>
-        <member name="P:Vivi.Infrastructure.Entities.IFullAuditInfo.ModifyTime">
-            <summary>
-            最后更新时间
             </summary>
         </member>
         <member name="T:Vivi.Infrastructure.Entities.MongoEntity">

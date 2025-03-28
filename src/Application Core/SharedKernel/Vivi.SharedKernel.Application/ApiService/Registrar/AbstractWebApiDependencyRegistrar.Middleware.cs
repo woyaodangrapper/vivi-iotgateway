@@ -15,7 +15,7 @@ public abstract partial class AbstractWebApiDependencyRegistrar : IMiddlewareReg
     /// 注册中间件入口方法
     /// </summary>
     /// <param name="app"></param>
-    public abstract void UseDcs();
+    public abstract void UseService();
 
     /// <summary>
     /// 注册webapi通用中间件
@@ -51,7 +51,7 @@ public abstract partial class AbstractWebApiDependencyRegistrar : IMiddlewareReg
                 c.RouteTemplate = $"/{serviceInfo.ShortName}/swagger/{{documentName}}/swagger.json";
                 c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
                 {
-                    swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"/", Description = serviceInfo.Description } };
+                    swaggerDoc.Servers = [new() { Url = $"/", Description = serviceInfo.Description }];
                 });
             })
             .UseSwaggerUI(c =>

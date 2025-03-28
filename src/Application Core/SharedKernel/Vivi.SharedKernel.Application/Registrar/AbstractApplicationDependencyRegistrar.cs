@@ -14,8 +14,8 @@ public abstract partial class AbstractApplicationDependencyRegistrar : IDependen
     protected IConfiguration Configuration { get; init; }
     protected IServiceInfo ServiceInfo { get; init; }
     protected IConfigurationSection CachingSection { get; init; }
-    protected IConfigurationSection MysqlSection { get; init; }
-    protected IConfigurationSection SqlServerSection { get; init; }
+    protected IConfigurationSection TSdbSection { get; init; }
+    protected IConfigurationSection PGsqlSection { get; init; }
 
 
     protected AbstractApplicationDependencyRegistrar(IServiceCollection services)
@@ -24,15 +24,15 @@ public abstract partial class AbstractApplicationDependencyRegistrar : IDependen
         Configuration = services.GetConfiguration() ?? throw new ArgumentException("Configuration is null.");
         ServiceInfo = services.GetServiceInfo() ?? throw new ArgumentException("ServiceInfo is null.");
         CachingSection = Configuration.GetSection(NodeConsts.Caching);
-        MysqlSection = Configuration.GetSection(NodeConsts.Mysql);
-        SqlServerSection = Configuration.GetSection(NodeConsts.SqlServer);
+        PGsqlSection = Configuration.GetSection(NodeConsts.PostgreSQL);
+        TSdbSection = Configuration.GetSection(NodeConsts.TimescaleDB);
         SkyApm = Services.AddSkyApmExtensions();
     }
 
     /// <summary>
     /// 注册所有服务
     /// </summary>
-    public abstract void AddDcs();
+    public abstract void AddServes();
 
     /// <summary>
     /// application通用服务
