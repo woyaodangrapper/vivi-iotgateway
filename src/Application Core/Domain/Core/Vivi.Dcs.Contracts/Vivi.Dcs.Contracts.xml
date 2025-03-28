@@ -4,24 +4,34 @@
         <name>Vivi.Dcs.Contracts</name>
     </assembly>
     <members>
-        <member name="T:Vivi.Dcs.Contracts.Dtos.HelloDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO">
             <summary>
-            系统通知
+            智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.Dtos.HelloDto.Content">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Name">
             <summary>
-            内容
+            设备名称，如中央空调、风机盘管等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.Dtos.HelloDto.Title">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Model">
             <summary>
-            标题
+            设备型号
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.Dtos.HelloDto.Type">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Manufacturer">
             <summary>
-            类型
+            设备生产厂家
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.InstallationLocation">
+            <summary>
+            设备安装位置
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Status">
+            <summary>
+            设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
             </summary>
         </member>
     </members>

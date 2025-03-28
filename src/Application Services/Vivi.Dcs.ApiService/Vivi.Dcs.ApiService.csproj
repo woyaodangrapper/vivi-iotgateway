@@ -12,5 +12,9 @@
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Application Core\Domain\Core\Vivi.Dcs.Application\Vivi.Dcs.Application.csproj" />
+	  <ProjectReference Include="..\..\Application Core\Domain\Core\Vivi.Dcs.Contracts\Vivi.Dcs.Contracts.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: "vivi-mariadb"
+    restart: always
+    environment:
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "123456"
+      MYSQL_ROOT_PASSWORD: "123456"
+      TZ: "Asia/Shanghai"
+    ports:
+      - "9076:3306"
+    volumes:
+      - ../vivi/mysql/data:/var/lib/mysql
+      - ../vivi/mysql/log:/var/log/mysql
+      - ./db_backups:/docker-entrypoint-initdb.d
+    command: --init-file /docker-entrypoint-initdb.d/bootstrap.sql

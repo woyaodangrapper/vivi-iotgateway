@@ -1,5 +1,5 @@
-﻿using Vivi.SharedKernel.Application.Extensions;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Vivi.SharedKernel.Application.Extensions;
 using ProblemDetails = Microsoft.AspNetCore.Mvc.ProblemDetails;
 
 namespace Vivi.SharedKernel.ApiService.Registrar;
@@ -12,15 +12,14 @@ public abstract partial class AbstractWebApiDependencyRegistrar
     /// FluentValidation 注册
     /// ApiBehaviorOptions 配置
     /// </summary>
-    [Obsolete]
     protected virtual void AddControllers()
     {
         Services
             .AddControllers(options => options.Filters.Add(typeof(CustomExceptionFilterAttribute)))
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
-                options.JsonSerializerOptions.Converters.Add(new DateTimeNullableConverter());
+                //options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+                //options.JsonSerializerOptions.Converters.Add(new DateTimeNullableConverter());
                 options.JsonSerializerOptions.Encoder = SystemTextJson.GetDefaultEncoder();
                 //该值指示是否允许、不允许或跳过注释。
                 options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
@@ -30,8 +29,10 @@ public abstract partial class AbstractWebApiDependencyRegistrar
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                 //匿名类型
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            })
-            .AddFluentValidation(cfg =>
+            });
+
+        Services
+            .AddFluentValidationAutoValidation(cfg =>
             {
                 //Continue 验证失败，继续验证其他项
                 ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Continue;

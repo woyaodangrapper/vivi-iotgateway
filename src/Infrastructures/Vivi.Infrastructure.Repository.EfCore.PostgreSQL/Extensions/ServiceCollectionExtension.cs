@@ -20,7 +20,7 @@ public static class ServiceCollectionExtension
 
     public static IServiceCollection AddInfraEfCorePostgreSQL(this IServiceCollection services, IConfigurationSection section)
     {
-        var connectionString = section.GetValue<string>("ConnectionString");
+        var connectionString = section.GetValue<string>("DefaultConnection");
         var serviceInfo = services.GetServiceInfo();
 
         return AddInfraEfCorePostgreSQL(services, options =>

@@ -1,15 +1,15 @@
-﻿namespace Vivi.Infrastructure.Entities
+﻿
+namespace Vivi.Infrastructure.Entities
 {
     public abstract class EfBasicAuditEntity : EfEntity, IBasicAuditInfo
     {
         /// <summary>
-        /// 创建人
+        /// 创建时间
         /// </summary>
-        public long CreateBy { get; set; }
-
+        public DateTime CreatedAt { get; set; }
         /// <summary>
-        /// 创建时间/注册时间
+        /// 更新时间
         /// </summary>
-        public DateTime CreateTime { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

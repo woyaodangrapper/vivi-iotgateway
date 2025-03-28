@@ -10,6 +10,10 @@ public static class NodeConsts
     public static readonly string Mysql_ConnectionString = "Mysql:ConnectionString";
     public static readonly string SqlServer = "SqlServer";
     public static readonly string SqlServer_ConnectionString = "SqlServer:ConnectionString";
+    public static readonly string PostgreSQL = "PostgreSQL";
+    public static readonly string PostgreSQL_ConnectionString = "PostgreSQL:DefaultConnection";
+    public static readonly string TimescaleDB = "TimescaleDB";
+    public static readonly string TimescaleDB_ConnectionString = "TimescaleDB:DefaultConnection";
     public static readonly string Caching = "Caching";
     public static readonly string Consul = "Consul";
     public static readonly string RabbitMq = "RabbitMq";

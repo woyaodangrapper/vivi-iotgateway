@@ -1,7 +1,7 @@
-﻿using Vivi.Infrastructure.Repository.EfCore.TimescaleDB;
-using Vivi.Infrastructure.Repository.EfCore.TimescaleDB.Transaction;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Vivi.Infrastructure.Repository.EfCore.TimescaleDB;
+using Vivi.Infrastructure.Repository.EfCore.TimescaleDB.Transaction;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -22,7 +22,7 @@ public static class ServiceCollectionExtension
 
     public static IServiceCollection AddInfraEfCoreTimescaleDB(this IServiceCollection services, IConfigurationSection section)
     {
-        var connectionString = section.GetValue<string>("ConnectionString");
+        var connectionString = section.GetValue<string>("DefaultConnection");
         var serviceInfo = services.GetServiceInfo();
 
         return AddInfraEfCoreTimescaleDB(services, options =>

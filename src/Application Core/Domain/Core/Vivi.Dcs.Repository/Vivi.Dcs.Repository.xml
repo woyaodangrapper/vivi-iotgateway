@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Vivi.Dcs.Repository</name>
+    </assembly>
+    <members>
+        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Name">
+            <summary>
+            设备名称，如中央空调、风机盘管等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Model">
+            <summary>
+            设备型号
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Manufacturer">
+            <summary>
+            设备生产厂家
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.InstallationLocation">
+            <summary>
+            设备安装位置
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Status">
+            <summary>
+            设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
+            </summary>
+        </member>
+    </members>
+</doc>

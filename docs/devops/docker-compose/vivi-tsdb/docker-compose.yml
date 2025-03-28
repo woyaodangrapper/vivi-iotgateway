@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg12
+    container_name: timescaledb
+    ports:
+      - "9432:5432"
+    environment:
+      POSTGRES_PASSWORD: vivi@123..
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ../vivi/timescaledb:/var/lib/postgresql/data
+volumes:
+  timescaledb:

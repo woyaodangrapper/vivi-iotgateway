@@ -1,12 +1,20 @@
-var builder = WebApplication.CreateBuilder(args);
+using System.Reflection;
+using Vivi.Infrastructure.Core;
+using Vivi.SharedKernel.Application.Extensions;
 
+var builder = WebApplication.CreateBuilder(args);
+var webApiAssembly = Assembly.GetExecutingAssembly();
+var serviceInfo = ServiceInfo.CreateInstance(webApiAssembly);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
-var app = builder.Build();
+var app = builder
+    .Default(serviceInfo)
+    .Build();
+
+//Middlewares
+app.UseVivi();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
