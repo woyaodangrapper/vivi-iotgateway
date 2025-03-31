@@ -23,7 +23,7 @@ public abstract partial class AbstractApplicationDependencyRegistrar
     protected virtual void AddEfCoreContext()
     {
         Services.AddInfraEfCorePostgreSQL(PGsqlSection);
-        Services.AddInfraEfCoreTimescaleDB(TSdbSection);
+        //Services.AddInfraEfCoreTimescaleDB(TSdbSection);
     }
 
 }

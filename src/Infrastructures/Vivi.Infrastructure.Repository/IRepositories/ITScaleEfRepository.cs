@@ -7,7 +7,7 @@ namespace Vivi.Infrastructure.IRepositories;
 /// 适合传统三层模式开发，实体必须继承 EfEntity
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
-public interface ITScaleEfRepository<TEntity> : IEfBaseRepository<TEntity>
+public interface IEfRepository<TEntity> : IEfBaseRepository<TEntity>
    where TEntity : EfEntity
 {
     /// <summary>
@@ -49,7 +49,7 @@ public interface ITScaleEfRepository<TEntity> : IEfBaseRepository<TEntity>
     /// <param name="noTracking">是否开启跟踪，默认不开启，可选参数</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns><see cref="TEntity"/></returns>
-    Task<TEntity?> FindAsync(long keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, bool noTracking = true, CancellationToken cancellationToken = default);
+    Task<TEntity?> FindAsync(Guid keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, bool noTracking = true, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 根据条件查询,返回单个实体
@@ -102,7 +102,7 @@ public interface ITScaleEfRepository<TEntity> : IEfBaseRepository<TEntity>
     /// <param name="propertyNameAndValues">需要更新的字段与值</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns></returns>
-    Task<int> UpdateRangeAsync(Dictionary<long, List<(string propertyName, dynamic propertyValue)>> propertyNameAndValues, CancellationToken cancellationToken = default);
+    Task<int> UpdateRangeAsync(Dictionary<Guid, List<(string propertyName, dynamic propertyValue)>> propertyNameAndValues, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 删除实体
@@ -110,7 +110,7 @@ public interface ITScaleEfRepository<TEntity> : IEfBaseRepository<TEntity>
     /// <param name="keyValue">Id</param>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns></returns>
-    Task<int> DeleteAsync(long keyValue, CancellationToken cancellationToken = default);
+    Task<int> DeleteAsync(Guid keyValue, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 批量删除实体

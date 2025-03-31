@@ -4,35 +4,76 @@
         <name>Vivi.Dcs.Contracts</name>
     </assembly>
     <members>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceDto">
             <summary>
             智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Name">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceDto.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Model">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceDto.Model">
             <summary>
             设备型号
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Manufacturer">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceDto.Manufacturer">
             <summary>
             设备生产厂家
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.InstallationLocation">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceDto.InstallationLocation">
             <summary>
             设备安装位置
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDeviceDTO.Status">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceDto.Status">
             <summary>
             设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
             </summary>
         </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceRequestDto.Name">
+            <summary>
+            设备名称，如中央空调、风机盘管等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceRequestDto.Model">
+            <summary>
+            设备型号
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceRequestDto.Manufacturer">
+            <summary>
+            设备生产厂家
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceRequestDto.InstallationLocation">
+            <summary>
+            设备安装位置
+            </summary>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.ISmartDeviceAppService.GetListAsync">
+            <summary>
+            获取智能设备列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateDeviceCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceRequestDto)">
+            <summary>
+            新增智能设备
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.IDeleteDeviceCommand.DeleteAsync(System.Guid)">
+            <summary>
+            删除智能设备
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateDeviceCommand.UpdateAsync(System.Guid,Vivi.Dcs.Contracts.DTOs.SmartDevice.DeviceRequestDto)" -->
     </members>
 </doc>

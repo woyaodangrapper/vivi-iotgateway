@@ -5,22 +5,6 @@ namespace Vivi.SharedKernel.Application.Services;
 
 public abstract class AbstractAppService : IAppService
 {
-    public IObjectMapper Mapper
-    {
-        get
-        {
-            var httpContext = InfraHelper.Accessor.GetCurrentHttpContext();
-            if (httpContext is not null)
-                return httpContext.RequestServices.GetRequiredService<IObjectMapper>();
-            if (ServiceLocator.Provider is not null)
-            {
-                var mapper = ServiceLocator.Provider.GetService<IObjectMapper>();
-                return mapper ?? throw new NullReferenceException("'mapper = ServiceLocator.Provider.GetService' is null");
-            }
-            throw new NotImplementedException();
-        }
-    }
-
     protected AppSrvResult AppSrvResult() => new();
 
     protected AppSrvResult<TValue> AppSrvResult<TValue>(TValue value)

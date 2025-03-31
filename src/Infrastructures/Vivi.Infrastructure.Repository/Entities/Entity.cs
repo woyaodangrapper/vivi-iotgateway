@@ -1,7 +1,7 @@
 ﻿namespace Vivi.Infrastructure.Entities
 {
-    public class Entity : IEntity<long>
+    public class Entity : IEntity<Guid>
     {
-        public long Id { get; set; }
+        public Guid Id { get; set; }
     }
 }

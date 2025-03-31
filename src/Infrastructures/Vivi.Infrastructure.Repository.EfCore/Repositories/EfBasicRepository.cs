@@ -6,7 +6,7 @@
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class EfBasicRepository<TEntity> : AbstractEfBaseRepository<DbContext, TEntity>, IEfBasicRepository<TEntity>
-            where TEntity : Entity, IEfEntity<long>
+            where TEntity : Entity, IEfEntity<Guid>
     {
         public EfBasicRepository(DbContext dbContext)
             : base(dbContext)
@@ -31,7 +31,7 @@
             return await this.DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public virtual async Task<TEntity?> GetAsync(long keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> GetAsync(Guid keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, CancellationToken cancellationToken = default)
         {
             var query = this.GetDbSet(writeDb, false).Where(t => t.Id == keyValue);
             if (navigationPropertyPath is null)
@@ -40,7 +40,7 @@
                 return await query.Include(navigationPropertyPath).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public virtual async Task<TEntity?> GetAsync(long keyValue, IEnumerable<Expression<Func<TEntity, dynamic>>>? navigationPropertyPaths = null, bool writeDb = false, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> GetAsync(Guid keyValue, IEnumerable<Expression<Func<TEntity, dynamic>>>? navigationPropertyPaths = null, bool writeDb = false, CancellationToken cancellationToken = default)
         {
             if (navigationPropertyPaths is null)
                 return await GetAsync(keyValue, navigationPropertyPath: null, writeDb, cancellationToken);

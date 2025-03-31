@@ -15,10 +15,11 @@
 		<None Update="Vivi.Dcs.Application.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<PackageReference Include="MediatR" Version="12.4.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Caching\" />
+	  <Folder Include="Registrar\" />
 	</ItemGroup>
 
 </Project>

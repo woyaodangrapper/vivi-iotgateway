@@ -1,9 +1,9 @@
-﻿namespace Vivi.Dcs.Contracts.DTOs;
+﻿namespace Vivi.Dcs.Contracts.DTOs.SmartDevice;
 
 /// <summary>
 /// 智能设备DTO
 /// </summary>
-public class SmartDeviceDTO : OutputBaseAuditDTO
+public class DeviceDto : OutputBaseAuditDTO
 {
     /// <summary>
     /// 设备名称，如中央空调、风机盘管等

@@ -8,7 +8,7 @@ public class SmartDeviceEntity : EfFullAuditEntity
     /// 设备名称，如中央空调、风机盘管等
     /// </summary>
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
 
     /// <summary>
     /// 设备型号
