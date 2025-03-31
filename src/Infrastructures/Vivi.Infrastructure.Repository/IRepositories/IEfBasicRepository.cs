@@ -8,7 +8,7 @@ namespace Vivi.Infrastructure.IRepositories;
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public interface IEfBasicRepository<TEntity> : IEfBaseRepository<TEntity>
-           where TEntity : Entity, IEfEntity<long>
+           where TEntity : Entity, IEfEntity<Guid>
 {
     Task<int> UpdateRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 
@@ -16,5 +16,5 @@ public interface IEfBasicRepository<TEntity> : IEfBaseRepository<TEntity>
 
     Task<int> RemoveRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 
-    Task<TEntity?> GetAsync(long keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, CancellationToken cancellationToken = default);
+    Task<TEntity?> GetAsync(Guid keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, CancellationToken cancellationToken = default);
 }

@@ -10,11 +10,13 @@ public abstract partial class AbstractApplicationDependencyRegistrar
     /// <summary>
     /// 注册Application服务
     /// </summary>
-    protected virtual void AddAppliactionSerivcesWithInterceptors(Action<IServiceCollection> action = null)
+    protected virtual void AddAppliactionSerivcesWithInterceptors(Action<IServiceCollection>? action = null)
     {
         action?.Invoke(Services);
 
         var appServiceType = typeof(IAppService);
+
+        var a = ContractsLayerAssembly.GetExportedTypes();
         var serviceTypes = ContractsLayerAssembly.GetExportedTypes().Where(type => type.IsInterface && type.IsAssignableTo(appServiceType)).ToList();
         serviceTypes.ForEach(serviceType =>
         {

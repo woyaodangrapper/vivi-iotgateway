@@ -1,8 +1,8 @@
 ﻿namespace Vivi.Infrastructure.Repository.EfCore.TimescaleDB;
 
-public class PostgreSQLDbContext : AddDbContext
+public class TimescaleDBContext : AddDbContext
 {
-    public PostgreSQLDbContext(
+    public TimescaleDBContext(
         DbContextOptions options,
         IEntityInfo entityInfo)
         : base(options, entityInfo)

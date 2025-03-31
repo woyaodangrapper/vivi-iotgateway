@@ -12,10 +12,10 @@ public static class ServiceCollectionExtension
         if (services.HasRegistered(nameof(AddInfraEfCoreTimescaleDB)))
             return services;
 
-        services.TryAddScoped<IUnitOfWork, PostgreSQLUnitOfWork<PostgreSQLDbContext>>();
-        services.TryAddScoped(typeof(IEfRepository<>), typeof(EfRepository<>));
+        services.TryAddScoped<IUnitOfWork, TimescaleDBUnitOfWork<TimescaleDBContext>>();
+        services.TryAddScoped(typeof(ITScaleEfRepository<>), typeof(EfRepository<>));
         services.TryAddScoped(typeof(IEfBasicRepository<>), typeof(EfBasicRepository<>));
-        services.AddDbContext<DbContext, PostgreSQLDbContext>(optionsBuilder);
+        services.AddDbContext<DbContext, TimescaleDBContext>(optionsBuilder);
 
         return services;
     }

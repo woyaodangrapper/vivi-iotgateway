@@ -7,7 +7,7 @@
     /// <typeparam name="TEntity"></typeparam>
     public abstract class AbstractEfBaseRepository<TDbContext, TEntity> : IEfBaseRepository<TEntity>
        where TDbContext : DbContext
-       where TEntity : Entity, IEfEntity<long>
+       where TEntity : Entity, IEfEntity<Guid>
     {
         protected virtual TDbContext DbContext { get; }
 

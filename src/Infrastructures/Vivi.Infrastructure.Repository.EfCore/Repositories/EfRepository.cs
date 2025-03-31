@@ -46,7 +46,7 @@
             return queryAble;
         }
 
-        public virtual async Task<TEntity?> FindAsync(long keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, bool noTracking = true, CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity?> FindAsync(Guid keyValue, Expression<Func<TEntity, dynamic>>? navigationPropertyPath = null, bool writeDb = false, bool noTracking = true, CancellationToken cancellationToken = default)
         {
             var query = GetDbSet(writeDb, noTracking).Where(t => t.Id == keyValue);
             if (navigationPropertyPath is not null)
@@ -92,7 +92,7 @@
             return result;
         }
 
-        public virtual async Task<int> DeleteAsync(long keyValue, CancellationToken cancellationToken = default)
+        public virtual async Task<int> DeleteAsync(Guid keyValue, CancellationToken cancellationToken = default)
         {
             int rows = 0;
             //查询当前上下文中，有没有同Id实体
@@ -112,36 +112,6 @@
                 rows = 0;
             }
             return rows;
-
-            #region old code
-
-#pragma warning disable S125 // Sections of code should not be commented out
-            /*
-                        //如果实体被跟踪，调用Ef原生方法删除
-                        if (entity != null)
-                        {
-                            DbContext.Remove(entity);
-                            return await DbContext.SaveChangesAsync();
-                        }
-
-                        var mapping = DbContext.Model.FindEntityType(typeof(TEntity)); //3.0
-                        var properties = mapping.GetProperties();
-                        var schema = mapping.GetSchema() ?? "dbo";
-                        var tableName = mapping.GetTableName();
-                        var keyName = properties.Where(p => p.IsPrimaryKey()).Select(p => p.PropertyInfo.Name).First();
-                        var isSoftDelete = properties.Any(p => p.Name == "IsDeleted");
-
-                        var sql = isSoftDelete
-                                  ? $"update {tableName} set IsDeleted=true "
-                                  : $"delete from {tableName} "
-                                  ;
-                        var where = $" where {keyName}={keyValue};";
-
-                        return await DbContext.Database.ExecuteSqlRawAsync(string.Concat(sql, where), cancellationToken);
-                        */
-#pragma warning restore S125 // Sections of code should not be commented outs
-
-            #endregion old code
         }
 
         public virtual async Task<int> DeleteRangeAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default)
@@ -234,7 +204,7 @@
             return UpdateRangeInternalAsync(whereExpression, updatingExpression, cancellationToken);
         }
 
-        public virtual async Task<int> UpdateRangeAsync(Dictionary<long, List<(string propertyName, dynamic propertyValue)>> propertyNameAndValues, CancellationToken cancellationToken = default)
+        public virtual async Task<int> UpdateRangeAsync(Dictionary<Guid, List<(string propertyName, dynamic propertyValue)>> propertyNameAndValues, CancellationToken cancellationToken = default)
         {
             var existsEntities = DbContext.Set<TEntity>().Local.Where(x => propertyNameAndValues.ContainsKey(x.Id));
 

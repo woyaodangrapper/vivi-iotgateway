@@ -1,11 +1,11 @@
 ﻿namespace Vivi.Infrastructure.Repository.EfCore.TimescaleDB.Transaction;
 
-public class PostgreSQLUnitOfWork<TDbContext> : UnitOfWork<TDbContext>
-    where TDbContext : PostgreSQLDbContext
+public class TimescaleDBUnitOfWork<TDbContext> : UnitOfWork<TDbContext>
+    where TDbContext : TimescaleDBContext
 {
     private ICapPublisher? _publisher;
 
-    public PostgreSQLUnitOfWork(
+    public TimescaleDBUnitOfWork(
         TDbContext context
         , ICapPublisher? publisher = null)
         : base(context)

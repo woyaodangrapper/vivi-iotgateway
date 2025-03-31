@@ -8,7 +8,7 @@ public abstract partial class AbstractWebApiDependencyRegistrar
     protected virtual void AddSwaggerGen()
     {
         var openApiInfo = new OpenApiInfo { Title = ServiceInfo.ShortName, Version = ServiceInfo.Version };
-        //Services.AddEndpointsApiExplorer();
+        Services.AddEndpointsApiExplorer();
         Services
             .AddSwaggerGen(c =>
             {
@@ -39,8 +39,9 @@ public abstract partial class AbstractWebApiDependencyRegistrar
                         Array.Empty<string>()
                     }
                 });
+
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{ServiceInfo.StartAssembly.GetName().Name}.xml"), true);
-                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{ServiceInfo.StartAssembly.GetName().Name.Replace("WebApi", "Application.Contracts")}.xml"), true);
+                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{ServiceInfo.StartAssembly.GetName().Name?.Replace("ApiService", "Contracts")}.xml"), true);
             })
             .AddFluentValidationRulesToSwagger();
     }

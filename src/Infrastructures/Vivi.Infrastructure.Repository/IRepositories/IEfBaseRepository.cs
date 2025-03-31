@@ -7,7 +7,7 @@ namespace Vivi.Infrastructure.IRepositories;
 /// </summary>
 /// <typeparam name="TEntity"></typeparam>
 public interface IEfBaseRepository<TEntity> : IRepository<TEntity>
-           where TEntity : Entity, IEfEntity<long>
+           where TEntity : Entity, IEfEntity<Guid>
 {
     /// <summary>
     /// 插入单个实体
