@@ -1,4 +1,4 @@
-﻿namespace Vivi.Dcs.Contracts.DTOs.SmartDevice;
+﻿namespace Vivi.Dcs.Contracts.DTOs;
 
 /// <summary>
 /// 智能设备DTO

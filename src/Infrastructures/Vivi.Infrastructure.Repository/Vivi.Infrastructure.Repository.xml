@@ -788,5 +788,34 @@
             <param name="cancellationToken"><see cref="T:System.Threading.CancellationToken"/></param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.EntityFrameworkCore.NamingConverterStringExtension.IsNullOrWhiteSpace(System.String)">
+            <summary>
+                A string extension method that query if '@this' is null or whiteSpace.
+            </summary>
+            <param name="this">The @this to act on.</param>
+            <returns>true if null or whiteSpace, false if not.</returns>
+        </member>
+        <member name="M:Microsoft.EntityFrameworkCore.NamingConverterStringExtension.IsNotNullOrWhiteSpace(System.String)">
+            <summary>
+                A string extension method that query if '@this' is not null and not whiteSpace.
+            </summary>
+            <param name="this">The @this to act on.</param>
+            <returns>false if null or whiteSpace, true if not.</returns>
+        </member>
+        <member name="M:Microsoft.EntityFrameworkCore.ModelBuilderExtensions.ApplyColumnNamingConvention(Microsoft.EntityFrameworkCore.ModelBuilder,Microsoft.EntityFrameworkCore.FormatEnum)">
+            <summary>
+            批量应用 MapEntityAsColumn 方法，格式化所有实体的列名
+            </summary>
+            <param name="modelBuilder">ModelBuilder 实例</param>
+            <param name="formatEnum">命名格式</param>
+        </member>
+        <member name="M:Microsoft.EntityFrameworkCore.ModelBuilderExtensions.MapEntityAsColumn``1(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{``0},Microsoft.EntityFrameworkCore.FormatEnum)">
+            <summary>
+            将实体的属性映射到数据库列名，按照指定的命名格式
+            </summary>
+            <typeparam name="TEntity">实体类型</typeparam>
+            <param name="entityTypeBuilder">实体类型构建器</param>
+            <param name="formatEnum">命名格式</param>
+        </member>
     </members>
 </doc>

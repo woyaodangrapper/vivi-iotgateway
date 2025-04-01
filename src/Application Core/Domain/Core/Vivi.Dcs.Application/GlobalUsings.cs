@@ -1,6 +1,8 @@
 ﻿global using AutoMapper;
 global using Microsoft.Extensions.DependencyInjection;
 global using System.Reflection;
+global using Vivi.Dcs.Contracts.Commands;
+global using Vivi.Dcs.Contracts.DTOs;
 global using Vivi.Dcs.Contracts.IServices;
 global using Vivi.Dcs.Entities;
 global using Vivi.Infrastructure.IRepositories;

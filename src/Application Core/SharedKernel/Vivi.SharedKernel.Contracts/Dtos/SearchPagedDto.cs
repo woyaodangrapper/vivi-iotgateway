@@ -5,22 +5,22 @@
 /// </summary>
 public abstract class SearchPagedDto : IDto
 {
-    private int _pageIndex;
+    private int _pageNo;
     private int _pageSize;
 
     /// <summary>
     /// 页码
     /// </summary>
-    public int PageIndex
+    public int pageIndex
     {
-        get => _pageIndex < 1 ? 1 : _pageIndex;
-        set => _pageIndex = value;
+        get => _pageNo < 1 ? 1 : _pageNo;
+        set => _pageNo = value;
     }
 
     /// <summary>
     /// 每页显示条数
     /// </summary>
-    public int PageSize
+    public int pageSize
     {
         get
         {

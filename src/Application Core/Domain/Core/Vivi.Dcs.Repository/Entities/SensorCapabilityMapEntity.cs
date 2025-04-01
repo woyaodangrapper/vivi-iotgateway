@@ -2,6 +2,9 @@
 
 namespace Vivi.Dcs.Entities;
 
+/// <summary>
+/// 传感器能力映射表实体
+/// </summary>
 public class SensorCapabilityMapEntity : EfEntity
 {
     [Required]
@@ -9,5 +12,4 @@ public class SensorCapabilityMapEntity : EfEntity
 
     [Required]
     public Guid CapabilityId { get; set; }  // 传感器能力ID
-
 }

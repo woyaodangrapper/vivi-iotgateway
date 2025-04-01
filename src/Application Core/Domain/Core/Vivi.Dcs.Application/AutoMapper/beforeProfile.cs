@@ -1,6 +1,4 @@
-﻿using Vivi.Dcs.Contracts.DTOs.SmartDevice;
-
-namespace Vivi.Dcs.Application.AutoMapper;
+﻿namespace Vivi.Dcs.Application.AutoMapper;
 
 public class beforeProfile : Profile
 {

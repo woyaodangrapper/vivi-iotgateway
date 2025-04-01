@@ -1,6 +1,5 @@
-﻿namespace Vivi.Dcs.Contracts.DTOs.SmartDevice
+﻿namespace Vivi.Dcs.Contracts.DTOs;
+
+public class DeviceResponseDto
 {
-    public class DeviceResponseDto
-    {
-    }
 }

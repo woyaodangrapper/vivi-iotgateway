@@ -27,7 +27,7 @@ public static class ServiceCollectionExtension
 
         return AddInfraEfCoreTimescaleDB(services, options =>
         {
-            options.UseLowerCaseNamingConvention();
+            options.UseSnakeCaseNamingConvention();
             options.UseNpgsql(connectionString, optionsBuilder =>
             {
                 optionsBuilder.MinBatchSize(4)

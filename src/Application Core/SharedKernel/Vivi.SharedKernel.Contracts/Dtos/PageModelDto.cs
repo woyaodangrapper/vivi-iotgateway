@@ -15,7 +15,7 @@ public class PageModelDto<T> : IDto
     }
 
     public PageModelDto(SearchPagedDto search, IReadOnlyList<T> data, int count, dynamic xData = null)
-        : this(search.PageIndex, search.PageSize, data, count)
+        : this(search.pageIndex, search.pageSize, data, count)
     {
         this.XData = xData;
     }

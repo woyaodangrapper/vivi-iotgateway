@@ -17,6 +17,7 @@ public class EntityInfo : AbstracSharedEntityInfo
         builder.Entity<SensorDataEntity>().ToTable("sensor_data");
         builder.Entity<SmartDeviceEntity>().ToTable("smart_device");
         builder.Entity<SmartDeviceSensorEntity>().ToTable("smart_device_sensor");
+        // 列名规则已在 Vivi.Infrastructure.Repository.EfCore.* 配置，这里无需重复。如需表名规则，可在此配置。
+        // builder.ApplyColumnNamingConvention(); or  MapEntityAsColumn
     }
 }
-

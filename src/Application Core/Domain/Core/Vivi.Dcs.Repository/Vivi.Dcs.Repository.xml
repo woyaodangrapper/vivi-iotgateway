@@ -4,6 +4,26 @@
         <name>Vivi.Dcs.Repository</name>
     </assembly>
     <members>
+        <member name="T:Vivi.Dcs.Entities.SensorCapabilityEntity">
+            <summary>
+            传感器能力表实体
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.SensorCapabilityMapEntity">
+            <summary>
+            传感器能力映射表实体
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.SensorDataEntity">
+            <summary>
+            传感器日志表
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.SmartDeviceEntity">
+            <summary>
+            设备表实体
+            </summary>
+        </member>
         <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
@@ -27,6 +47,11 @@
         <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Status">
             <summary>
             设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.SmartDeviceSensorEntity">
+            <summary>
+            设备传感器表实体
             </summary>
         </member>
     </members>

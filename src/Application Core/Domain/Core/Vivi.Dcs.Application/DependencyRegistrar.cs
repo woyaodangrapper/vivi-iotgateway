@@ -1,7 +1,4 @@
-﻿using Vivi.Dcs.Contracts.IServices;
-using Vivi.Dcs.Entities;
-
-namespace Vivi.Dcs.Application.Registrar;
+﻿namespace Vivi.Dcs.Application.Registrar;
 
 public sealed class DependencyRegistrar(IServiceCollection services) : AbstractApplicationDependencyRegistrar(services)
 {
