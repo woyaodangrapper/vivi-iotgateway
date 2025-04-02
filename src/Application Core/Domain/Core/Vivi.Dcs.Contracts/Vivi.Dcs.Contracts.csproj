@@ -14,6 +14,7 @@
 		<None Update="Vivi.Dcs.Contracts.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<PackageReference Include="MediatR" Version="12.4.1" />
 	</ItemGroup>
 
 </Project>

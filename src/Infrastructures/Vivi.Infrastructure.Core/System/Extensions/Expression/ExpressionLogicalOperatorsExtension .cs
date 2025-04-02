@@ -41,6 +41,7 @@
         public static Expression<Func<T, bool>> AndIf<T>([NotNull] this Expression<Func<T, bool>> firstExpr, bool condition, Expression<Func<T, bool>> expr) =>
             condition ? And<T>(firstExpr, expr) : firstExpr;
 
+
         private static MemberExpression? ExtractMemberExpression(Expression expression)
         {
             if (expression.NodeType == ExpressionType.MemberAccess)

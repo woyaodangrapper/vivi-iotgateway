@@ -119,4 +119,6 @@ public interface IEfRepository<TEntity> : IEfBaseRepository<TEntity>
     /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
     /// <returns></returns>
     Task<int> DeleteRangeAsync(Expression<Func<TEntity, bool>> whereExpression, CancellationToken cancellationToken = default);
+
+
 }

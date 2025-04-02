@@ -1,0 +1,14 @@
+version: '3.3'
+
+services:
+  dotnet-app:
+    image: mcr.microsoft.com/dotnet/aspnet:9.0  # 选择合适的 .NET 版本
+    container_name: vivi_dotnet_server
+    working_dir: /app
+    volumes:
+      - ./publish:/app  # 映射本地的 publish 目录到容器的 /app 目录
+    command: ["dotnet", "Vivi.Dcs.Application.dll"]  # 执行 dotnet run
+    ports:
+      - "50010:50010"  # 你可以根据需要映射端口
+      - "50011:50011"
+    restart: unless-stopped

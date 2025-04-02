@@ -13,7 +13,8 @@ public abstract partial class AbstractWebApiDependencyRegistrar
             .AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(openApiInfo.Version, openApiInfo);
-
+                // 启用 Swagger 的注解支持
+                c.EnableAnnotations();
                 // 采用bearer token认证
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

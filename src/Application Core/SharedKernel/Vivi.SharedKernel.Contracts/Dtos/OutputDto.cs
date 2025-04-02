@@ -10,5 +10,5 @@ public abstract class OutputDTO : IDto
     /// <summary>
     /// 更新时间
     /// </summary>
-    public virtual Guid? UpdatedAt { get; set; }
+    public virtual DateTime? UpdatedAt { get; set; }
 }

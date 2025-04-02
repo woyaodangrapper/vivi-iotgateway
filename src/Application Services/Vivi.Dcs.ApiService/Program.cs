@@ -7,12 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 var webApiAssembly = Assembly.GetExecutingAssembly();
 var serviceInfo = ServiceInfo.CreateInstance(webApiAssembly);
 // Add services to the container.
-
 builder.Services.AddControllers();
 try
 {
     var app = builder
-    .Default(serviceInfo)
+    .Default(serviceInfo) //register services
     .Build();
 
     //Middlewares
@@ -24,7 +23,7 @@ try
 
     app.MapControllers();
 
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex)
 {
