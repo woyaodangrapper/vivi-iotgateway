@@ -23,5 +23,13 @@
 	  <ProjectReference Include="..\..\Application Core\Domain\Core\Vivi.Dcs.Application\Vivi.Dcs.Application.csproj" />
 	  <ProjectReference Include="..\..\Application Core\Domain\Core\Vivi.Dcs.Contracts\Vivi.Dcs.Contracts.csproj" />
 	</ItemGroup>
-
+	<ItemGroup>
+		<None Include="..\..\Application Core\SharedKernel\Vivi.SharedKernel.Application\**\NLog*.*">
+			<Link>%(RecursiveDir)/%(FileName)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="..\..\Application Core\SharedKernel\Vivi.SharedKernel.Application\bin\Debug\net9.0\ApiService\NLog\**" />
+	</ItemGroup>
 </Project>

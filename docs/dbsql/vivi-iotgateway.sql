@@ -17,73 +17,73 @@
 
 
 -- ----------------------------
--- Table structure for sensor_capability
+-- Table structure for unit_capab
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sensor_capability";
-CREATE TABLE "public"."sensor_capability" (
+DROP TABLE IF EXISTS "public"."unit_capab";
+CREATE TABLE "public"."unit_capab" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "unit" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
   "description" text COLLATE "pg_catalog"."default"
 )
 ;
-COMMENT ON COLUMN "public"."sensor_capability"."id" IS '传感器能力唯一ID，UUID';
-COMMENT ON COLUMN "public"."sensor_capability"."name" IS '传感器能力名称，如温度、湿度、风速等';
-COMMENT ON COLUMN "public"."sensor_capability"."unit" IS '传感器能力单位，如℃、%RH、m/s';
-COMMENT ON COLUMN "public"."sensor_capability"."description" IS '传感器能力描述';
-COMMENT ON TABLE "public"."sensor_capability" IS '传感器能力表，定义传感器的测量能力，如温度、湿度等';
+COMMENT ON COLUMN "public"."unit_capab"."id" IS '传感器能力唯一ID，UUID';
+COMMENT ON COLUMN "public"."unit_capab"."name" IS '传感器能力名称，如温度、湿度、风速等';
+COMMENT ON COLUMN "public"."unit_capab"."unit" IS '传感器能力单位，如℃、%RH、m/s';
+COMMENT ON COLUMN "public"."unit_capab"."description" IS '传感器能力描述';
+COMMENT ON TABLE "public"."unit_capab" IS '传感器能力表，定义传感器的测量能力，如温度、湿度等';
 
 -- ----------------------------
--- Records of sensor_capability
+-- Records of unit_capab
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for sensor_capability_map
+-- Table structure for unit_capab_map
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sensor_capability_map";
-CREATE TABLE "public"."sensor_capability_map" (
+DROP TABLE IF EXISTS "public"."unit_capab_map";
+CREATE TABLE "public"."unit_capab_map" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "sensor_id" uuid NOT NULL,
-  "capability_id" uuid NOT NULL
+  "unit_id" uuid NOT NULL,
+  "capab_id" uuid NOT NULL
 )
 ;
-COMMENT ON COLUMN "public"."sensor_capability_map"."id" IS '传感器能力映射唯一ID，UUID';
-COMMENT ON COLUMN "public"."sensor_capability_map"."sensor_id" IS '设备传感器ID';
-COMMENT ON COLUMN "public"."sensor_capability_map"."capability_id" IS '传感器能力ID';
-COMMENT ON TABLE "public"."sensor_capability_map" IS '传感器能力映射表，用于关联传感器和它具备的测量能力';
+COMMENT ON COLUMN "public"."unit_capab_map"."id" IS '传感器能力映射唯一ID，UUID';
+COMMENT ON COLUMN "public"."unit_capab_map"."unit_id" IS '设备传感器ID';
+COMMENT ON COLUMN "public"."unit_capab_map"."capab_id" IS '传感器能力ID';
+COMMENT ON TABLE "public"."unit_capab_map" IS '传感器能力映射表，用于关联传感器和它具备的测量能力';
 
 -- ----------------------------
--- Records of sensor_capability_map
+-- Records of unit_capab_map
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for sensor_data
+-- Table structure for unit_records
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."sensor_data";
-CREATE TABLE "public"."sensor_data" (
+DROP TABLE IF EXISTS "public"."unit_records";
+CREATE TABLE "public"."unit_records" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "sensor_id" uuid NOT NULL,
-  "capability_id" uuid NOT NULL,
+  "unit_id" uuid NOT NULL,
+  "capab_id" uuid NOT NULL,
   "value" numeric(10,2) NOT NULL,
   "timestamp" timestamp(6) DEFAULT now()
 )
 ;
-COMMENT ON COLUMN "public"."sensor_data"."id" IS '传感器数据唯一ID，UUID';
-COMMENT ON COLUMN "public"."sensor_data"."sensor_id" IS '设备传感器ID';
-COMMENT ON COLUMN "public"."sensor_data"."capability_id" IS '传感器能力ID';
-COMMENT ON COLUMN "public"."sensor_data"."value" IS '传感器采集数据值';
-COMMENT ON COLUMN "public"."sensor_data"."timestamp" IS '数据采集时间';
-COMMENT ON TABLE "public"."sensor_data" IS '传感器数据表，存储传感器的实时数据';
+COMMENT ON COLUMN "public"."unit_records"."id" IS '传感器数据唯一ID，UUID';
+COMMENT ON COLUMN "public"."unit_records"."unit_id" IS '设备传感器ID';
+COMMENT ON COLUMN "public"."unit_records"."capab_id" IS '传感器能力ID';
+COMMENT ON COLUMN "public"."unit_records"."value" IS '传感器采集数据值';
+COMMENT ON COLUMN "public"."unit_records"."timestamp" IS '数据采集时间';
+COMMENT ON TABLE "public"."unit_records" IS '传感器数据表，存储传感器的实时数据';
 
 -- ----------------------------
--- Records of sensor_data
+-- Records of unit_records
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for smart_device
+-- Table structure for device
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."smart_device";
-CREATE TABLE "public"."smart_device" (
+DROP TABLE IF EXISTS "public"."device";
+CREATE TABLE "public"."device" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "model" varchar(100) COLLATE "pg_catalog"."default",
@@ -94,79 +94,79 @@ CREATE TABLE "public"."smart_device" (
   "updated_at" timestamp(6) DEFAULT now()
 )
 ;
-COMMENT ON COLUMN "public"."smart_device"."id" IS '设备唯一ID，UUID';
-COMMENT ON COLUMN "public"."smart_device"."name" IS '设备名称，如中央空调、风机盘管等';
-COMMENT ON COLUMN "public"."smart_device"."model" IS '设备型号';
-COMMENT ON COLUMN "public"."smart_device"."manufacturer" IS '设备生产厂家';
-COMMENT ON COLUMN "public"."smart_device"."installation_location" IS '设备安装位置';
-COMMENT ON COLUMN "public"."smart_device"."status" IS '设备状态，如 active（启用）、inactive（停用）、maintenance（维护）';
-COMMENT ON COLUMN "public"."smart_device"."created_at" IS '记录创建时间';
-COMMENT ON COLUMN "public"."smart_device"."updated_at" IS '记录更新时间';
-COMMENT ON TABLE "public"."smart_device" IS '设备表，存储建筑节能设备（如空调、风机盘管等）的基本信息';
+COMMENT ON COLUMN "public"."device"."id" IS '设备唯一ID，UUID';
+COMMENT ON COLUMN "public"."device"."name" IS '设备名称，如中央空调、风机盘管等';
+COMMENT ON COLUMN "public"."device"."model" IS '设备型号';
+COMMENT ON COLUMN "public"."device"."manufacturer" IS '设备生产厂家';
+COMMENT ON COLUMN "public"."device"."installation_location" IS '设备安装位置';
+COMMENT ON COLUMN "public"."device"."status" IS '设备状态，如 active（启用）、inactive（停用）、maintenance（维护）';
+COMMENT ON COLUMN "public"."device"."created_at" IS '记录创建时间';
+COMMENT ON COLUMN "public"."device"."updated_at" IS '记录更新时间';
+COMMENT ON TABLE "public"."device" IS '设备表，存储建筑节能设备（如空调、风机盘管等）的基本信息';
 
 -- ----------------------------
--- Records of smart_device
+-- Records of device 
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for smart_device_sensor
+-- Table structure for device_unit
 -- ----------------------------
-DROP TABLE IF EXISTS "public"."smart_device_sensor";
-CREATE TABLE "public"."smart_device_sensor" (
+DROP TABLE IF EXISTS "public"."device_unit";
+CREATE TABLE "public"."device_unit" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "device_id" uuid NOT NULL,
-  "sensor_type" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+  "unit_type" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
   "installation_position" varchar(255) COLLATE "pg_catalog"."default"
 )
 ;
-COMMENT ON COLUMN "public"."smart_device_sensor"."id" IS '设备传感器唯一ID，UUID';
-COMMENT ON COLUMN "public"."smart_device_sensor"."device_id" IS '所属设备ID';
-COMMENT ON COLUMN "public"."smart_device_sensor"."sensor_type" IS '传感器类型，如温度传感器、压力传感器';
-COMMENT ON COLUMN "public"."smart_device_sensor"."installation_position" IS '传感器安装位置';
-COMMENT ON TABLE "public"."smart_device_sensor" IS '设备传感器表，记录安装在设备上的传感器信息';
+COMMENT ON COLUMN "public"."device_unit"."id" IS '设备传感器唯一ID，UUID';
+COMMENT ON COLUMN "public"."device_unit"."device_id" IS '所属设备ID';
+COMMENT ON COLUMN "public"."device_unit"."unit_type" IS '传感器类型，如温度传感器、压力传感器';
+COMMENT ON COLUMN "public"."device_unit"."installation_position" IS '传感器安装位置';
+COMMENT ON TABLE "public"."device_unit" IS '设备传感器表，记录安装在设备上的传感器信息';
 
 -- ----------------------------
--- Records of smart_device_sensor
+-- Records of device_unit
 -- ----------------------------
 
 -- ----------------------------
--- Primary Key structure for table sensor_capability
+-- Primary Key structure for table unit_capab
 -- ----------------------------
-ALTER TABLE "public"."sensor_capability" ADD CONSTRAINT "sensor_capability_pkey" PRIMARY KEY ("id");
+ALTER TABLE "public"."unit_capab" ADD CONSTRAINT "unit_capab_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- Primary Key structure for table sensor_capability_map
+-- Primary Key structure for table unit_capab_map
 -- ----------------------------
-ALTER TABLE "public"."sensor_capability_map" ADD CONSTRAINT "sensor_capability_map_pkey" PRIMARY KEY ("id");
+ALTER TABLE "public"."unit_capab_map" ADD CONSTRAINT "unit_capab_map_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- Primary Key structure for table sensor_data
+-- Primary Key structure for table unit_records
 -- ----------------------------
-ALTER TABLE "public"."sensor_data" ADD CONSTRAINT "sensor_data_pkey" PRIMARY KEY ("id");
+ALTER TABLE "public"."unit_records" ADD CONSTRAINT "unit_records_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- Primary Key structure for table smart_device
+-- Primary Key structure for table device
 -- ----------------------------
-ALTER TABLE "public"."smart_device" ADD CONSTRAINT "smart_device_pkey" PRIMARY KEY ("id");
+ALTER TABLE "public"."device" ADD CONSTRAINT "device_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- Primary Key structure for table smart_device_sensor
+-- Primary Key structure for table device_unit
 -- ----------------------------
-ALTER TABLE "public"."smart_device_sensor" ADD CONSTRAINT "smart_device_sensor_pkey" PRIMARY KEY ("id");
+ALTER TABLE "public"."device_unit" ADD CONSTRAINT "device_unit_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
--- Foreign Keys structure for table sensor_capability_map
+-- Foreign Keys structure for table unit_capab_map
 -- ----------------------------
-ALTER TABLE "public"."sensor_capability_map" ADD CONSTRAINT "sensor_capability_map_capability_id_fkey" FOREIGN KEY ("capability_id") REFERENCES "public"."sensor_capability" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
-ALTER TABLE "public"."sensor_capability_map" ADD CONSTRAINT "sensor_capability_map_sensor_id_fkey" FOREIGN KEY ("sensor_id") REFERENCES "public"."smart_device_sensor" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."unit_capab_map" ADD CONSTRAINT "unit_capab_map_capab_id_fkey" FOREIGN KEY ("capab_id") REFERENCES "public"."unit_capab" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."unit_capab_map" ADD CONSTRAINT "unit_capab_map_unit_id_fkey" FOREIGN KEY ("unit_id") REFERENCES "public"."device_unit" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- ----------------------------
--- Foreign Keys structure for table sensor_data
+-- Foreign Keys structure for table unit_records
 -- ----------------------------
-ALTER TABLE "public"."sensor_data" ADD CONSTRAINT "sensor_data_capability_id_fkey" FOREIGN KEY ("capability_id") REFERENCES "public"."sensor_capability" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
-ALTER TABLE "public"."sensor_data" ADD CONSTRAINT "sensor_data_sensor_id_fkey" FOREIGN KEY ("sensor_id") REFERENCES "public"."smart_device_sensor" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."unit_records" ADD CONSTRAINT "unit_records_capab_id_fkey" FOREIGN KEY ("capab_id") REFERENCES "public"."unit_capab" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."unit_records" ADD CONSTRAINT "unit_records_unit_id_fkey" FOREIGN KEY ("unit_id") REFERENCES "public"."device_unit" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- ----------------------------
--- Foreign Keys structure for table smart_device_sensor
+-- Foreign Keys structure for table device_unit
 -- ----------------------------
-ALTER TABLE "public"."smart_device_sensor" ADD CONSTRAINT "smart_device_sensor_device_id_fkey" FOREIGN KEY ("device_id") REFERENCES "public"."smart_device" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "public"."device_unit" ADD CONSTRAINT "device_unit_device_id_fkey" FOREIGN KEY ("device_id") REFERENCES "public"."device" ("id") ON DELETE CASCADE ON UPDATE NO ACTION;

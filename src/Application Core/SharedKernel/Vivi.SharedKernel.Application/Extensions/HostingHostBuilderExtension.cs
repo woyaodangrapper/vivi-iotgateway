@@ -13,19 +13,14 @@ public static class WebApplicationBuilderExtension
     /// <param name="serviceInfo"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static WebApplicationBuilder Default(this WebApplicationBuilder builder, IServiceInfo serviceInfo) // 
+    public static WebApplicationBuilder Default(this WebApplicationBuilder builder, IServiceInfo serviceInfo)
     {
-        Console.WriteLine($"Environment:{builder.Environment.EnvironmentName}");
-
-        if (builder is null)
-            throw new ArgumentNullException(nameof(builder));
-        if (serviceInfo is null)
-            throw new ArgumentNullException(nameof(serviceInfo));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(serviceInfo);
+        LogManager.Setup().LoadConfigurationFromAppSettings();
 
         // Add Default Configuration
         builder.Configuration.AddInMemoryCollection([new("ServiceName", serviceInfo.ServiceName)]);
-
-        //if (builder.Environment.IsProduction() || builder.Environment.IsStaging())
 
         OnSettingConfigurationChanged(builder.Configuration);
 
@@ -38,11 +33,8 @@ public static class WebApplicationBuilderExtension
         //Logging
         builder.Logging.ClearProviders();
         var logContainer = builder.Configuration.GetValue(NodeConsts.Logging_LogContainer, "console");
-        string path = $"\"{AppContext.BaseDirectory}/NLog/nlog-{logContainer}.config\"";
-        LogManager.Setup().LoadConfigurationFromFile(path).GetCurrentClassLogger(); ;
-
+        LogManager.Setup().LoadConfigurationFromFile($"{AppContext.BaseDirectory}/ApiService/NLog/nlog-{logContainer}.config");
         builder.Host.UseNLog();
-
         return builder;
     }
 

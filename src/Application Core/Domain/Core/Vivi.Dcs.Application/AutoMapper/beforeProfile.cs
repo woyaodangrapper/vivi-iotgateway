@@ -6,10 +6,10 @@ public class beforeProfile : Profile
     {
         CreateMap(typeof(PagedModel<>), typeof(PageModelDto<>)).ForMember("XData", opt => opt.Ignore());
 
-        CreateMap<DeviceDto, SmartDeviceEntity>();
-        CreateMap<SmartDeviceEntity, DeviceDto>();
+        CreateMap<DeviceDto, DeviceEntity>();
+        CreateMap<DeviceEntity, DeviceDto>();
 
-        CreateMap<DeviceRequestDto, SmartDeviceEntity>();
-        CreateMap<SmartDeviceEntity, DeviceRequestDto>();
+        CreateMap<DeviceRequestDto, DeviceEntity>();
+        CreateMap<DeviceEntity, DeviceRequestDto>();
     }
 }

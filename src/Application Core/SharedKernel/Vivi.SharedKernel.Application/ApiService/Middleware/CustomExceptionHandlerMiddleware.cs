@@ -28,29 +28,6 @@ public class CustomExceptionHandlerMiddleware
             await HandleExceptionAsync(context, ex);
         }
 
-        #region old code
-
-        //var statusCode = context.Response.StatusCode;
-        //string msg = string.Empty;
-        //if (statusCode == 401)
-        //{
-        //    msg = "未授权";
-        //}
-        //else if (statusCode == 403)
-        //{
-        //    msg = "未授权，没有权限";
-        //}
-        //else if (statusCode == 404)
-        //{
-        //    msg = "未找到服务";
-        //}
-
-        //if (!string.IsNullOrWhiteSpace(msg))
-        //{
-        //    await HandleExceptionAsync(context, statusCode, msg);
-        //}
-
-        #endregion old code
     }
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)

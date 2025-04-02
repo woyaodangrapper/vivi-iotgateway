@@ -4,54 +4,54 @@
         <name>Vivi.Dcs.Repository</name>
     </assembly>
     <members>
-        <member name="T:Vivi.Dcs.Entities.SensorCapabilityEntity">
-            <summary>
-            传感器能力表实体
-            </summary>
-        </member>
-        <member name="T:Vivi.Dcs.Entities.SensorCapabilityMapEntity">
-            <summary>
-            传感器能力映射表实体
-            </summary>
-        </member>
-        <member name="T:Vivi.Dcs.Entities.SensorDataEntity">
-            <summary>
-            传感器日志表
-            </summary>
-        </member>
-        <member name="T:Vivi.Dcs.Entities.SmartDeviceEntity">
+        <member name="T:Vivi.Dcs.Entities.DeviceEntity">
             <summary>
             设备表实体
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Name">
+        <member name="P:Vivi.Dcs.Entities.DeviceEntity.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Model">
+        <member name="P:Vivi.Dcs.Entities.DeviceEntity.Model">
             <summary>
             设备型号
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Manufacturer">
+        <member name="P:Vivi.Dcs.Entities.DeviceEntity.Manufacturer">
             <summary>
             设备生产厂家
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.InstallationLocation">
+        <member name="P:Vivi.Dcs.Entities.DeviceEntity.InstallationLocation">
             <summary>
             设备安装位置
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Entities.SmartDeviceEntity.Status">
+        <member name="P:Vivi.Dcs.Entities.DeviceEntity.Status">
             <summary>
             设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Entities.SmartDeviceSensorEntity">
+        <member name="T:Vivi.Dcs.Entities.DeviceUnitEntity">
             <summary>
             设备传感器表实体
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.UnitCapabEntity">
+            <summary>
+            传感器能力表实体
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.UnitCapabMapEntity">
+            <summary>
+            传感器能力映射表实体
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Entities.UnitRecordsEntity">
+            <summary>
+            传感器日志表
             </summary>
         </member>
     </members>
