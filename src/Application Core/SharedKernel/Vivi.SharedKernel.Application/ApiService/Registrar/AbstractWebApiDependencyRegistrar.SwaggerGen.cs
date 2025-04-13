@@ -1,4 +1,6 @@
-﻿namespace Vivi.SharedKernel.ApiService.Registrar;
+﻿using Vivi.SharedKernel.Application.Extensions;
+
+namespace Vivi.SharedKernel.ApiService.Registrar;
 
 public abstract partial class AbstractWebApiDependencyRegistrar
 {
@@ -44,6 +46,7 @@ public abstract partial class AbstractWebApiDependencyRegistrar
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{ServiceInfo.StartAssembly.GetName().Name}.xml"), true);
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{ServiceInfo.StartAssembly.GetName().Name?.Replace("ApiService", "Contracts")}.xml"), true);
             })
-            .AddFluentValidationRulesToSwagger();
+            .AddSimpleFluentValidation();
+        //.AddFluentValidationRulesToSwagger();
     }
 }

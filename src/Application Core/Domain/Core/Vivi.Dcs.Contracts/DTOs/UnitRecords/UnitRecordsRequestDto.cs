@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class UnitRecordsRequestDto
+public class UnitRecordsRequestDTO
 {
     /// <summary>
     /// 设备传感器ID

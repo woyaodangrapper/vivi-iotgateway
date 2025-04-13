@@ -10,7 +10,7 @@ public class UpdateDeviceCommand : BaseCommand
     /// <summary>
     /// 设备型号
     /// </summary>
-    public string? Model { get; set; }
+    public short? Model { get; set; }
 
     /// <summary>
     /// 设备生产厂家

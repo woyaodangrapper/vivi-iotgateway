@@ -3,7 +3,7 @@
 /// <summary>
 /// 智能设备DTO
 /// </summary>
-public class DeviceQueryDto : SearchPagedDto
+public class DeviceQueryDTO : SearchPagedDTO
 {
     /// <summary>
     /// 设备名称，如中央空调、风机盘管等
@@ -13,7 +13,12 @@ public class DeviceQueryDto : SearchPagedDto
     /// <summary>
     /// 设备型号
     /// </summary>
-    public string? Model { get; set; }
+    public short? Model { get; set; }
+
+    /// <summary>
+    /// 设备编号
+    /// </summary>
+    public string? Number { get; set; } = string.Empty;
 
     /// <summary>
     /// 设备生产厂家
@@ -28,5 +33,5 @@ public class DeviceQueryDto : SearchPagedDto
     /// <summary>
     /// 设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
     /// </summary>
-    public string? Status { get; set; }
+    public short? Status { get; set; }
 }

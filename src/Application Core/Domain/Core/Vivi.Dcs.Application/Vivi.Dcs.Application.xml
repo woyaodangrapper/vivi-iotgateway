@@ -4,5 +4,26 @@
         <name>Vivi.Dcs.Application</name>
     </assembly>
     <members>
+        <member name="M:Ardalis.ApiEndpoints.Expression.EndpointExtensions.Build``1(Vivi.SharedKernel.Application.Contracts.ResultModels.AppSrvResult{``0})">
+            <summary>
+            封装的 Result 返回逻辑，处理端点成功和失败的返回
+            </summary>
+            <typeparam name="TValue">返回类型</typeparam>
+            <param name="result"></param>
+            <returns>封装的 ActionResult</returns>
+        </member>
+        <member name="M:Ardalis.ApiEndpoints.Expression.EndpointExtensions.Build(Vivi.SharedKernel.Application.Contracts.ResultModels.AppSrvResult)">
+            <summary>
+            封装的 Result 返回逻辑，处理端点成功和失败的返回（无内容）
+            </summary>
+            <returns>封装的 ActionResult</returns>
+        </member>
+        <member name="M:Ardalis.ApiEndpoints.Expression.EndpointExtensions.Problem(Vivi.SharedKernel.Application.Contracts.ResultModels.ProblemDetails)">
+            <summary>
+            封装的 Problem 返回逻辑
+            </summary>
+            <param name="problemDetails"></param>
+            <returns>封装的 Problem 结果</returns>
+        </member>
     </members>
 </doc>

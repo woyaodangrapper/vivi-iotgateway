@@ -4,6 +4,46 @@
         <name>Vivi.Dcs.Repository</name>
     </assembly>
     <members>
+        <member name="T:Vivi.Dcs.Entities.AreaEntity">
+            <summary>
+            区域表实体
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.Pid">
+            <summary>
+            上级区域 ID，支持树结构，如省→市→区
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.Name">
+            <summary>
+            区域名称，例如 “A区”、“江南办公区”
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.Code">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.Type">
+            <summary>
+            区域类型，如 “楼宇、园区、楼层、功能区” 等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.Level">
+            <summary>
+            区域层级，例如：0=根区域，1=省，2=市...
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.Position">
+            <summary>
+            区域位置，支持坐标、GeoJSON 或多边形字符串，JSONB 格式存储
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.AreaEntity.BlockCode">
+            <summary>
+            行政区代码，遵循 GB/T 2260 标准
+            </summary>
+        </member>
         <member name="T:Vivi.Dcs.Entities.DeviceEntity">
             <summary>
             设备表实体
@@ -12,6 +52,11 @@
         <member name="P:Vivi.Dcs.Entities.DeviceEntity.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Entities.DeviceEntity.Number">
+            <summary>
+            设备编号
             </summary>
         </member>
         <member name="P:Vivi.Dcs.Entities.DeviceEntity.Model">
@@ -31,7 +76,7 @@
         </member>
         <member name="P:Vivi.Dcs.Entities.DeviceEntity.Status">
             <summary>
-            设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
+            设备状态：
             </summary>
         </member>
         <member name="T:Vivi.Dcs.Entities.DeviceUnitEntity">

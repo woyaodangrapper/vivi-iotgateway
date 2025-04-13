@@ -1,4 +1,4 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Dtos;
+﻿namespace Vivi.SharedKernel.Application.Contracts.DTOs;
 
 public static class SearchPagedDtoExtension
 {
@@ -7,5 +7,5 @@ public static class SearchPagedDtoExtension
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    public static int SkipRows(this SearchPagedDto dto) => (dto.pageIndex - 1) * dto.pageSize;
+    public static int SkipRows(this SearchPagedDTO dto) => (dto.pageIndex - 1) * dto.pageSize;
 }

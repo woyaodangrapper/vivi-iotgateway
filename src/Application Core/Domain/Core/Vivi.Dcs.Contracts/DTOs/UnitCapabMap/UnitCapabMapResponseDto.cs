@@ -1,5 +1,5 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class UnitCapabMapResponseDto
+public class UnitCapabMapResponseDTO
 {
 }

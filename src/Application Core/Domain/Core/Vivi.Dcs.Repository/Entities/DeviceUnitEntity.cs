@@ -12,7 +12,7 @@ public class DeviceUnitEntity : EfEntity
 
     [Required]
     [MaxLength(100)]
-    public string SensorType { get; set; }  // 传感器类型，如温度传感器、压力传感器
+    public string UnitType { get; set; }  // 传感器类型，如温度传感器、压力传感器
 
     [MaxLength(255)]
     public string? InstallationPosition { get; set; }  // 传感器安装位置

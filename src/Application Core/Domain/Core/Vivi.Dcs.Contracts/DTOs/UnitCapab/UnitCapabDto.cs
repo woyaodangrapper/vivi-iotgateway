@@ -3,7 +3,7 @@
 /// <summary>
 /// 传感器能力DTO
 /// </summary>
-public class UnitCapabDto : OutputBaseAuditDTO
+public class UnitCapabDTO : OutputBaseAuditDTO
 {
     /// <summary>
     /// 传感器能力唯一ID，UUID

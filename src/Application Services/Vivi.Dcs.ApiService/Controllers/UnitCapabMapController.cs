@@ -14,9 +14,9 @@ public class UnitCapabMapController : PlusControllerBase
     /// 查询传感器能力映射
     /// </summary>
     /// <returns></returns>
-    [HttpGet, Route("query")]
+    [HttpPost, Route("query")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<SearchPage<UnitCapabMapDto>>> GetPagedAsync([FromQuery] UnitCapabMapQueryDto request)
+    public async Task<ActionResult<SearchPage<UnitCapabMapDTO>>> GetPagedAsync([FromBody] UnitCapabMapQueryDTO request)
     => await _unitCapabMapAppService.GetPagedAsync(request);
 }

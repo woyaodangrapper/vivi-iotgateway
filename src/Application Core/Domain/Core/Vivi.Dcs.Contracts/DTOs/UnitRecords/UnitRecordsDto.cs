@@ -3,7 +3,7 @@
 /// <summary>
 /// 传感器日志DTO
 /// </summary>
-public class UnitRecordsDto : OutputBaseAuditDTO
+public class UnitRecordsDTO : OutputBaseAuditDTO
 {
     /// <summary>
     /// 传感器数据唯一ID，UUID

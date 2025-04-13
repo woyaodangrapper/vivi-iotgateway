@@ -1,5 +1,5 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class DeviceUnitResponseDto
+public class DeviceUnitResponseDTO
 {
 }

@@ -1,5 +1,5 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Dtos;
+﻿namespace Vivi.SharedKernel.Application.Contracts.DTOs;
 
-public abstract class SearchDto :  IDto
+public abstract class SearchDTO : IDTO
 {
 }

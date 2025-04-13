@@ -14,9 +14,9 @@ public class DeviceUnitController : PlusControllerBase
     /// 查询设备传感器
     /// </summary>
     /// <returns></returns>
-    [HttpGet, Route("query")]
+    [HttpPost, Route("query")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<SearchPage<DeviceUnitDto>>> GetPagedAsync([FromQuery] DeviceUnitQueryDto request)
+    public async Task<ActionResult<SearchPage<DeviceUnitDTO>>> GetPagedAsync([FromBody] DeviceUnitQueryDTO request)
     => await _deviceUnitAppService.GetPagedAsync(request);
 }

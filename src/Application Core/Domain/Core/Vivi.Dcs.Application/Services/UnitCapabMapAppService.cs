@@ -18,10 +18,11 @@ public class UnitCapabMapAppService : AbstractAppService, IUnitCapabMapAppServic
         _unitCapabMapRepository = unitCapabMapRepository;
     }
 
-    public async Task<AppSrvResult<long>> CreateAsync(UnitCapabMapRequestDto input)
+    public async Task<AppSrvResult<IdDTO>> CreateAsync(UnitCapabMapRequestDTO input)
     {
-        var unitCapabMapMapEntity = _mapper.Map<UnitCapabMapEntity>(input);
-        return await _unitCapabMapRepository.InsertAsync(unitCapabMapMapEntity);
+        var entity = _mapper.Map<UnitCapabMapEntity>(input);
+        await _unitCapabMapRepository.InsertAsync(entity);
+        return new IdDTO(entity.Id);
     }
 
     public async Task<AppSrvResult> DeleteAsync(Guid id)
@@ -30,7 +31,7 @@ public class UnitCapabMapAppService : AbstractAppService, IUnitCapabMapAppServic
         return AppSrvResult();
     }
 
-    public async Task<SearchPage<UnitCapabMapDto>> GetPagedAsync(UnitCapabMapQueryDto input)
+    public async Task<SearchPage<UnitCapabMapDTO>> GetPagedAsync(UnitCapabMapQueryDTO input)
     {
         var search = new QueryUnitCapabMapCommand()
         {
@@ -46,12 +47,12 @@ public class UnitCapabMapAppService : AbstractAppService, IUnitCapabMapAppServic
         ;
 
         return await _unitCapabMapRepository.QueryableAsync(
-             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDto { Name = x.Name, Model = x.Model }
-             search, whereExpression, x => _mapper.Map<UnitCapabMapDto>(x)
+             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDTO { Name = x.Name, Model = x.Model }
+             search, whereExpression, x => _mapper.Map<UnitCapabMapDTO>(x)
           );
     }
 
-    public async Task<AppSrvResult> UpdateAsync(UnitCapabMapRequestDto input)
+    public async Task<AppSrvResult> UpdateAsync(UnitCapabMapRequestDTO input)
     {
         var device = _mapper.Map<UnitCapabMapEntity>(input);
         var rwoAdd = await _unitCapabMapRepository.UpdateAsync(device, UpdatingProps<UnitCapabMapEntity>(x =>

@@ -1,11 +1,11 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Dtos;
+﻿namespace Vivi.SharedKernel.Application.Contracts.DTOs;
 
 /// <summary>
 /// DTO基类
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 [Serializable]
-public abstract class OutputFullAuditInfoDto : OutputBaseAuditDTO
+public abstract class OutputFullAuditInfoDTO : OutputBaseAuditDTO
 {
     /// <summary>
     /// 最后更新人

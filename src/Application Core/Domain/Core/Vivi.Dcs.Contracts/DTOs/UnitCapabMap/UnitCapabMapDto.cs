@@ -3,7 +3,7 @@
 /// <summary>
 /// 传感器能力映射DTO
 /// </summary>
-public class UnitCapabMapDto : OutputBaseAuditDTO
+public class UnitCapabMapDTO : OutputBaseAuditDTO
 {
     /// <summary>
     /// 传感器能力映射唯一ID，UUID

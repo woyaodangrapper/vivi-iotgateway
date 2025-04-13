@@ -1,9 +1,9 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Dtos;
+﻿namespace Vivi.SharedKernel.Application.Contracts.DTOs;
 
 /// <summary>
 /// 查询条件基类
 /// </summary>
-public abstract class SearchPagedDto : IDto
+public abstract class SearchPagedDTO : IDTO
 {
     private int _pageNo;
     private int _pageSize;

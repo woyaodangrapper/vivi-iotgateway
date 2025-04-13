@@ -1,38 +1,38 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
 
-namespace Vivi.Dcs.ApiService.Endpoints.SensorDataEndpoints;
+namespace Vivi.Dcs.ApiService.Endpoints.UnitDataEndpoints;
 
-// 设备端点-增删改查分离的中间人设计模式
-public record SensorDataUpdate(string Id, UpdateDeviceCommand Update) : IRequest<Task<AppSrvResult>>;
+// 传感器日志记录端点-增删改查分离的中间人设计模式
+public record UnitDataUpdate(string Id, UpdateUnitRecordsCommand Update) : IRequest<Task<AppSrvResult>>;
 
 [Route("endpoints")]
 public class UpdateUnitRecordsCommandHandler(
-  IDeviceAppService smartDeviceAppService,
+  IDeviceAppService unitRecordsAppService,
   ILogger<UpdateUnitRecordsCommandHandler> logger) : EndpointBaseAsync
-  .WithRequest<SensorDataUpdate>
+  .WithRequest<UnitDataUpdate>
   .WithActionResult<AppSrvResult>
 {
-    private readonly IDeviceAppService _deviceService = smartDeviceAppService;
+    private readonly IDeviceAppService _deviceService = unitRecordsAppService;
 
     [SwaggerOperation(
-      Summary = "更新设备",
-      Description = "根据设备 ID 更新智能设备参数",
-      OperationId = "SensorDataUpdate",
+      Summary = "更新传感器日志记录",
+      Description = "根据传感器日志记录 ID 更新传感器日志记录参数",
+      OperationId = "UnitDataUpdate",
       Tags = new[] { "Endpoints" })
     ]
     [HttpPut("unit/records/update")]
     [AllowAnonymous]
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] SensorDataUpdate request, CancellationToken cancellationToken = default)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] UnitDataUpdate request, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Deleting a device with id {Id}", request.Id);
-        return Ok(await _deviceService.UpdateAsync(new()
+        return (await _deviceService.UpdateAsync(new()
         {
             Id = new Guid(request.Id),
-            Name = request.Update.Name,
-            InstallationLocation = request.Update.InstallationLocation,
-            Manufacturer = request.Update.Manufacturer,
-            Model = request.Update.Model,
-        }));
+
+        })).Build();
     }
+
 }

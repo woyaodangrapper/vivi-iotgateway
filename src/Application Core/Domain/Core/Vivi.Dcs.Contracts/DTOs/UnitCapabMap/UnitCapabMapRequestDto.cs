@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class UnitCapabMapRequestDto
+public class UnitCapabMapRequestDTO
 {
     /// <summary>
     /// 传感器能力映射唯一ID，UUID

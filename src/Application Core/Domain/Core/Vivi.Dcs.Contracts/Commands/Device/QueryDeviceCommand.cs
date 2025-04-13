@@ -1,8 +1,11 @@
 ﻿namespace Vivi.Dcs.Contracts.Commands;
 
-public class QueryDeviceCommand : SearchPagedDto
+public class QueryDeviceCommand : SearchPagedDTO
 {
     public string? name { get; set; }
+    public short? model { get; set; }
+    public string? number { get; set; }
+    public short? status { get; set; }
     public DateTime? startTime { get; set; }
     public DateTime? endTime { get; set; }
 

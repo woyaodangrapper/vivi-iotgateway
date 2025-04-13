@@ -3,7 +3,7 @@
 /// <summary>
 /// 智能设备DTO
 /// </summary>
-public class DeviceUnitQueryDto : SearchPagedDto
+public class DeviceUnitQueryDTO : SearchPagedDTO
 {
     /// <summary>
     /// 所属设备ID
