@@ -26,5 +26,21 @@ public class AreaController(IAreaAppService areaAppService) : PlusControllerBase
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IdDTO[]>> AddOrUpdateRangeAsync([FromBody] AreaRequestDTO[] request)
-    => CreatedResult(await areaAppService.AddOrUpdateRangeAsync(request));
+    {
+        var result = await areaAppService.AddOrUpdateRangeAsync(request);
+        if (result.Content == null)
+            return Result(result.ProblemDetails);
+        return CreatedResult(result);
+    }
+
+
+    /// <summary>
+    /// 删除或更新地区列表
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("delOrUpdate")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> DeleteOrUpdateRangeAsync([FromBody] AreaRequestDTO[] request)
+     => Result(await areaAppService.DeleteOrUpdateRangeAsync(request));
 }

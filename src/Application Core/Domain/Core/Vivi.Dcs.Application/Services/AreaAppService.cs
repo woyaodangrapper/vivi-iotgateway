@@ -98,6 +98,7 @@ public class AreaAppService : AbstractAppService, IAreaAppService
             return Problem(HttpStatusCode.InternalServerError, "数据修改失败");
         var addEntitys = areas.Where(x => !areaEntitys.Select(a => a.Id).Contains(x.Id)).ToArray();
 
+
         if (addEntitys.Length > 0)
         {
             await _areaRepository.InsertRangeAsync(addEntitys);
@@ -106,4 +107,44 @@ public class AreaAppService : AbstractAppService, IAreaAppService
 
         return AppSrvResult();
     }
+
+    public async Task<AppSrvResult> DeleteOrUpdateRangeAsync(AreaRequestDTO[] input)
+    {
+        var areas = _mapper.Map<AreaEntity[]>(input);
+
+        // 查找现有的区域实体
+        var areaEntitys = _areaRepository.Where(x => areas.Select(a => a.Id).Contains(x.Id));
+
+        // 找到需要更新的区域，生成更新字典
+        var updateDict = input
+             .Where(dto => areaEntitys.Select(a => a.Id).Contains(dto.Id))
+             .ToDictionary(
+                 dto => dto.Id,
+                 dto => new List<(string, dynamic)>
+                 {
+                ("Pid", dto.Pid),
+                 }
+        );
+
+        // 执行更新操作
+        var affectedRows = await _areaRepository.UpdateRangeAsync(updateDict);
+        if (affectedRows == 0)
+            return Problem(HttpStatusCode.InternalServerError, "数据修改失败");
+
+        // 查找需要删除的区域
+        var deleteIds = _areaRepository
+            .Where(entity => !areaEntitys.Select(a => a.Id).Contains(entity.Id))  // 找出在 input 中没有的区域
+            ;
+
+        // 如果有需要删除的区域
+        if (deleteIds.Any())
+        {
+            var deleteResult = await deleteIds.ExecuteDeleteAsync();
+            if (deleteResult == 0)
+                return Problem(HttpStatusCode.InternalServerError, "数据删除失败");
+        }
+
+        return AppSrvResult();
+    }
+
 }

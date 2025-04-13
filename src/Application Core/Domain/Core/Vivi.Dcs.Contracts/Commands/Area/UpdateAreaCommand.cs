@@ -5,6 +5,8 @@ namespace Vivi.Dcs.Application.Commands;
 public class UpdateAreaCommand : BaseCommand
 {
 
+    public string Id { get; set; } = string.Empty;
+
     /// <summary>
     /// 区域名称，例如 “A区”、“江南办公区”
     /// </summary>

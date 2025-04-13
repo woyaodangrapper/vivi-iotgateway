@@ -5,7 +5,7 @@ using MediatR;
 namespace Vivi.Dcs.ApiService.Endpoints.SmartAreaEndpoints;
 
 // 地区端点-增删改查分离的中间人设计模式
-public record AreaUpdate(string Id, UpdateAreaCommand Update) : IRequest<Task<AppSrvResult>>;
+public record AreaUpdate(UpdateAreaCommand Update) : IRequest<Task<AppSrvResult>>;
 
 [Route("/endpoints/area")]
 public class UpdateAreaCommandHandler(
@@ -26,11 +26,11 @@ public class UpdateAreaCommandHandler(
     [AllowAnonymous]
     public override async Task<ActionResult> HandleAsync([FromBody] AreaUpdate request, CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Deleting a area with id {Id}", request.Id);
+        logger.LogInformation("Deleting a area with id {Id}", request.Update.Id);
         return (await _areaService.UpdateAsync(new()
         {
-            Id = new Guid(request.Id),
-
+            Id = new Guid(request.Update.Id),
+            Name = request.Update.Name,
             UpdatedAt = DateTime.UtcNow
         })).Build();
     }

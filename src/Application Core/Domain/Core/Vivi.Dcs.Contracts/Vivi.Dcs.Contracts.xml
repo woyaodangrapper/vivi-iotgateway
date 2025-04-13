@@ -620,6 +620,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.DeleteOrUpdateRangeAsync(Vivi.Dcs.Contracts.DTOs.AreaRequestDTO[])">
+            <summary>
+            删除或更新地区列表
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Vivi.Dcs.Contracts.IServices.ICreateAreaCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.AreaRequestDTO)">
             <summary>
             新增地区

@@ -19,6 +19,15 @@ public interface IAreaAppService : ICreateAreaCommand, IDeleteAreaCommand, IUpda
     /// <returns></returns>
     [OperateLog(LogName = "添加或更新")]
     Task<AppSrvResult<IdDTO[]>> AddOrUpdateRangeAsync(AreaRequestDTO[] input);
+
+
+
+    /// <summary>
+    /// 删除或更新地区列表
+    /// </summary>
+    /// <returns></returns>
+    [OperateLog(LogName = "删除或更新")]
+    Task<AppSrvResult> DeleteOrUpdateRangeAsync(AreaRequestDTO[] input);
 }
 
 public interface ICreateAreaCommand
