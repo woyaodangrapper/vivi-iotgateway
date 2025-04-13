@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class DeviceUnitRequestDto
+public class DeviceUnitRequestDTO
 {
     /// <summary>
     /// 所属设备ID

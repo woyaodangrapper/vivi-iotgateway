@@ -22,7 +22,8 @@ public sealed class WebApiDependencyRegistrar : AbstractWebApiDependencyRegistra
     public override void UseService()
     {
         UseWebApiDefault(endpointRoute: endpoint =>
-        { });
+        {
+        });
     }
 
 }

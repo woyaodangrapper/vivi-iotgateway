@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.Commands;
 
-public class QueryDeviceUnitCommand : SearchPagedDto
+public class QueryDeviceUnitCommand : SearchPagedDTO
 {
     /// <summary>
     /// 所属设备ID

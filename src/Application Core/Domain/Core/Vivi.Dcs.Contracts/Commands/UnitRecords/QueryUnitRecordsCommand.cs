@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.Commands;
 
-public class QueryUnitRecordsCommand : SearchPagedDto
+public class QueryUnitRecordsCommand : SearchPagedDTO
 {
     /// <summary>
     /// 设备传感器ID

@@ -10,7 +10,7 @@ public interface IUnitCapabAppService : ICreateUnitCapabCommand, IDeleteUnitCapa
     /// </summary>
     /// <returns></returns>
     [OperateLog(LogName = "查询传感器能力")]
-    Task<SearchPage<UnitCapabDto>> GetPagedAsync(UnitCapabQueryDto input);
+    Task<SearchPage<UnitCapabDTO>> GetPagedAsync(UnitCapabQueryDTO input);
 }
 
 public interface ICreateUnitCapabCommand
@@ -21,7 +21,7 @@ public interface ICreateUnitCapabCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "新增传感器能力")]
-    Task<AppSrvResult<long>> CreateAsync(UnitCapabRequestDto input);
+    Task<AppSrvResult<IdDTO>> CreateAsync(UnitCapabRequestDTO input);
 }
 
 public interface IDeleteUnitCapabCommand
@@ -43,5 +43,5 @@ public interface IUpdateUnitCapabCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "修改传感器能力")]
-    Task<AppSrvResult> UpdateAsync(UnitCapabRequestDto input);
+    Task<AppSrvResult> UpdateAsync(UnitCapabRequestDTO input);
 }

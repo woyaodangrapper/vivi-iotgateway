@@ -14,9 +14,9 @@ public class UnitRecordsController : PlusControllerBase
     /// 查询设备/传感器日志
     /// </summary>
     /// <returns></returns>
-    [HttpGet, Route("query")]
+    [HttpPost, Route("query")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<SearchPage<UnitRecordsDto>>> GetPagedAsync([FromQuery] UnitRecordsQueryDto request)
+    public async Task<ActionResult<SearchPage<UnitRecordsDTO>>> GetPagedAsync([FromBody] UnitRecordsQueryDTO request)
     => await _unitRecordsAppService.GetPagedAsync(request);
 }

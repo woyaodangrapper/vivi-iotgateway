@@ -14,9 +14,14 @@ public class DeviceEntity : EfFullAuditEntity
     public string Name { get; set; }
 
     /// <summary>
+    /// 设备编号
+    /// </summary>
+    public string? Number { get; set; }
+
+    /// <summary>
     /// 设备型号
     /// </summary>
-    public string? Model { get; set; }
+    public short? Model { get; set; }
 
     /// <summary>
     /// 设备生产厂家
@@ -29,7 +34,7 @@ public class DeviceEntity : EfFullAuditEntity
     public string? InstallationLocation { get; set; }
 
     /// <summary>
-    /// 设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
+    /// 设备状态：
     /// </summary>
-    public string Status { get; set; } = "active";
+    public short Status { get; set; } = 0;
 }

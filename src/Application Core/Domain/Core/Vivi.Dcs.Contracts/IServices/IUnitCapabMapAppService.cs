@@ -10,7 +10,7 @@ public interface IUnitCapabMapAppService : ICreateUnitCapabMapCommand, IDeleteUn
     /// </summary>
     /// <returns></returns>
     [OperateLog(LogName = "查询传感器能力映射")]
-    Task<SearchPage<UnitCapabMapDto>> GetPagedAsync(UnitCapabMapQueryDto input);
+    Task<SearchPage<UnitCapabMapDTO>> GetPagedAsync(UnitCapabMapQueryDTO input);
 }
 
 public interface ICreateUnitCapabMapCommand
@@ -21,7 +21,7 @@ public interface ICreateUnitCapabMapCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "新增传感器能力映射")]
-    Task<AppSrvResult<long>> CreateAsync(UnitCapabMapRequestDto input);
+    Task<AppSrvResult<IdDTO>> CreateAsync(UnitCapabMapRequestDTO input);
 }
 
 public interface IDeleteUnitCapabMapCommand
@@ -43,5 +43,5 @@ public interface IUpdateUnitCapabMapCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "修改传感器能力映射")]
-    Task<AppSrvResult> UpdateAsync(UnitCapabMapRequestDto input);
+    Task<AppSrvResult> UpdateAsync(UnitCapabMapRequestDTO input);
 }

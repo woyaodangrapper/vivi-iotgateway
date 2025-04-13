@@ -13,10 +13,10 @@ public class DeviceController : PlusControllerBase
     /// <summary>
     /// ≤È—Ø…Ë±∏
     /// </summary>
-    /// <returns></returns>
-    [HttpGet("query")]
+    /// <returns><see cref="SearchPage{DeviceDTO}"/></returns>
+    [HttpPost("query")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<SearchPage<DeviceDto>>> GetPagedAsync([FromQuery] DeviceQueryDto request)
+    public async Task<ActionResult<SearchPage<DeviceDTO>>> GetPagedAsync([FromBody] DeviceQueryDTO request)
     => await _deviceAppService.GetPagedAsync(request);
 }

@@ -10,7 +10,7 @@ public interface IDeviceUnitAppService : ICreateDeviceUnitCommand, IDeleteDevice
     /// </summary>
     /// <returns></returns>
     [OperateLog(LogName = "查询设备传感器")]
-    Task<SearchPage<DeviceUnitDto>> GetPagedAsync(DeviceUnitQueryDto input);
+    Task<SearchPage<DeviceUnitDTO>> GetPagedAsync(DeviceUnitQueryDTO input);
 }
 
 public interface ICreateDeviceUnitCommand
@@ -21,7 +21,7 @@ public interface ICreateDeviceUnitCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "新增设备传感器")]
-    Task<AppSrvResult<long>> CreateAsync(DeviceUnitRequestDto input);
+    Task<AppSrvResult<IdDTO>> CreateAsync(DeviceUnitRequestDTO input);
 }
 
 public interface IDeleteDeviceUnitCommand
@@ -43,5 +43,5 @@ public interface IUpdateDeviceUnitCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "修改设备传感器")]
-    Task<AppSrvResult> UpdateAsync(DeviceUnitRequestDto input);
+    Task<AppSrvResult> UpdateAsync(DeviceUnitRequestDTO input);
 }

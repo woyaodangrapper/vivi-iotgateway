@@ -10,7 +10,7 @@ public interface IUnitRecordsAppService : ICreateUnitRecordsCommand, IDeleteUnit
     /// </summary>
     /// <returns></returns>
     [OperateLog(LogName = "查询智能设备传感器日志")]
-    Task<SearchPage<UnitRecordsDto>> GetPagedAsync(UnitRecordsQueryDto input);
+    Task<SearchPage<UnitRecordsDTO>> GetPagedAsync(UnitRecordsQueryDTO input);
 }
 
 public interface ICreateUnitRecordsCommand
@@ -21,7 +21,7 @@ public interface ICreateUnitRecordsCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "新增智能设备传感器日志")]
-    Task<AppSrvResult<long>> CreateAsync(UnitRecordsRequestDto input);
+    Task<AppSrvResult<IdDTO>> CreateAsync(UnitRecordsRequestDTO input);
 }
 
 public interface IDeleteUnitRecordsCommand
@@ -43,5 +43,5 @@ public interface IUpdateUnitRecordsCommand
     /// <param name="input"></param>
     /// <returns></returns>
     [OperateLog(LogName = "修改智能设备传感器日志")]
-    Task<AppSrvResult> UpdateAsync(UnitRecordsRequestDto input);
+    Task<AppSrvResult> UpdateAsync(UnitRecordsRequestDTO input);
 }

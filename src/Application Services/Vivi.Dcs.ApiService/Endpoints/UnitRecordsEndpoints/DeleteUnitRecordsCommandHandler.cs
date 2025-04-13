@@ -1,32 +1,33 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
 
-namespace Vivi.Dcs.ApiService.Endpoints.SensorDataEndpoints;
+namespace Vivi.Dcs.ApiService.Endpoints.UnitDataEndpoints;
 
-// 设备端点-增删改查分离的中间人设计模式
-public record SensorDataDelete(string Id) : IRequest<Task<ActionResult>>;
+// 传感器日志记录端点-增删改查分离的中间人设计模式
+public record UnitDataDelete(string Id) : IRequest<Task<ActionResult>>;
 
 [Route("endpoints")]
 public class DeleteUnitRecordsCommandHandler(
-  IDeviceAppService smartDeviceAppService,
+  IDeviceAppService unitRecordsAppService,
   ILogger<DeleteUnitRecordsCommandHandler> logger) : EndpointBaseAsync
-  .WithRequest<SensorDataDelete>
-  .WithActionResult<AppSrvResult>
+  .WithRequest<UnitDataDelete>
+  .WithActionResult
 {
-    private readonly IDeviceAppService _deviceService = smartDeviceAppService;
+    private readonly IDeviceAppService _deviceService = unitRecordsAppService;
 
     [SwaggerOperation(
-      Summary = "删除设备",
-      Description = "根据设备 ID 删除智能设备",
-      OperationId = "SensorDataDelete",
+      Summary = "删除传感器日志记录",
+      Description = "根据传感器日志记录 ID 删除传感器日志记录",
+      OperationId = "UnitDataDelete",
       Tags = new[] { "Endpoints" })
     ]
     [HttpDelete("unit/records/delete")]
     [AllowAnonymous]
-
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync(SensorDataDelete request, CancellationToken cancellationToken = default)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public override async Task<ActionResult> HandleAsync(UnitDataDelete request, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Deleting a device with id {Id}", request.Id);
-        return Ok(await _deviceService.DeleteAsync(new(request.Id)));
+        return (await _deviceService.DeleteAsync(new(request.Id))).Build();
     }
 }

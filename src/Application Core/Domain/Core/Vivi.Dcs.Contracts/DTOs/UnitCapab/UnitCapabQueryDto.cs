@@ -3,7 +3,7 @@
 /// <summary>
 /// 智能设备DTO
 /// </summary>
-public class UnitCapabQueryDto : SearchPagedDto
+public class UnitCapabQueryDTO : SearchPagedDTO
 {
     /// <summary>
     /// 传感器能力名称，如温度、湿度、风速等

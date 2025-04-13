@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.Commands;
 
-public class QueryUnitCapabMapCommand : SearchPagedDto
+public class QueryUnitCapabMapCommand : SearchPagedDTO
 {
 
     /// <summary>

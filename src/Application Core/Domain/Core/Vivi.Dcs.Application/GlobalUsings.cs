@@ -7,7 +7,7 @@ global using Vivi.Dcs.Contracts.IServices;
 global using Vivi.Dcs.Entities;
 global using Vivi.Infrastructure.IRepositories;
 global using Vivi.Infrastructure.Mapper;
-global using Vivi.SharedKernel.Application.Contracts.Dtos;
+global using Vivi.SharedKernel.Application.Contracts.DTOs;
 global using Vivi.SharedKernel.Application.Contracts.ResultModels;
 global using Vivi.SharedKernel.Application.Registrar;
 global using Vivi.SharedKernel.Application.Services;

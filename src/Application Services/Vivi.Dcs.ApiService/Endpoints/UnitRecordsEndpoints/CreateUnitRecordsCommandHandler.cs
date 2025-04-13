@@ -1,37 +1,37 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
+using Vivi.SharedKernel.Application.Contracts.DTOs;
 
-namespace Vivi.Dcs.ApiService.Endpoints.SensorDataEndpoints;
+namespace Vivi.Dcs.ApiService.Endpoints.UnitRecordsEndpoints;
 
-// 设备端点-增删改查分离的中间人设计模式
-public record SensorDataCreate(CreateDeviceCommand Create) : IRequest<Task<AppSrvResult>>;
+// 传感器日志记录端点-增删改查分离的中间人设计模式
+public record UnitRecordsCreate(CreateUnitRecordsCommand Create) : IRequest<Task<long>>;
 
 [Route("endpoints")]
 public class CreateUnitRecordsCommandHandler(
-  IDeviceAppService smartDeviceAppService,
+  IDeviceAppService unitRecordsAppService,
   ILogger<CreateUnitRecordsCommandHandler> logger) : EndpointBaseAsync
-  .WithRequest<SensorDataCreate>
-  .WithActionResult<AppSrvResult>
+  .WithRequest<UnitRecordsCreate>
+  .WithActionResult<IdDTO>
 {
-    private readonly IDeviceAppService _deviceService = smartDeviceAppService;
+    private readonly IDeviceAppService _deviceService = unitRecordsAppService;
 
     [SwaggerOperation(
-      Summary = "创建设备",
-      Description = "根据设备添加智能设备",
-      OperationId = "SensorDataCreate",
+      Summary = "创建传感器日志记录",
+      Description = "根据传感器日志记录添加传感器日志记录",
+      OperationId = "UnitRecordsCreate",
       Tags = new[] { "Endpoints" })
     ]
     [HttpPost("unit/records/create")]
     [AllowAnonymous]
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync(SensorDataCreate request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult<IdDTO>> HandleAsync([FromBody] UnitRecordsCreate request, CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Creating a new device with name {Name}", request.Create.Name);
-        return Ok(await _deviceService.CreateAsync(new()
+        //logger.LogInformation("Creating a new device with name {Name}", request.Create.Name);
+        return (await _deviceService.CreateAsync(new()
         {
-            Name = request.Create.Name,
-            InstallationLocation = request.Create.InstallationLocation,
-            Manufacturer = request.Create.Manufacturer,
-            Model = request.Create.Model
-        }));
+
+        })).Build();
+
     }
 }

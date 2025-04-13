@@ -18,10 +18,11 @@ public class DeviceAppService : AbstractAppService, IDeviceAppService
         _deviceRepository = deviceRepository;
     }
 
-    public async Task<AppSrvResult<long>> CreateAsync(DeviceRequestDto input)
+    public async Task<AppSrvResult<IdDTO>> CreateAsync(DeviceRequestDTO input)
     {
-        var deviceEntity = _mapper.Map<DeviceEntity>(input);
-        return await _deviceRepository.InsertAsync(deviceEntity);
+        var entity = _mapper.Map<DeviceEntity>(input);
+        await _deviceRepository.InsertAsync(entity);
+        return new IdDTO(entity.Id);
     }
 
     public async Task<AppSrvResult> DeleteAsync(Guid id)
@@ -30,11 +31,14 @@ public class DeviceAppService : AbstractAppService, IDeviceAppService
         return AppSrvResult();
     }
 
-    public async Task<SearchPage<DeviceDto>> GetPagedAsync(DeviceQueryDto input)
+    public async Task<SearchPage<DeviceDTO>> GetPagedAsync(DeviceQueryDTO input)
     {
         var search = new QueryDeviceCommand()
         {
             name = input.Name,
+            model = input.Model,
+            number = input.Number,
+            status = input.Status,
             pageIndex = input.pageIndex,
             pageSize = input.pageSize,
         };
@@ -42,15 +46,18 @@ public class DeviceAppService : AbstractAppService, IDeviceAppService
         var whereExpression = ExpressionCreator
        .New<DeviceEntity>()
        .AndIf(!string.IsNullOrWhiteSpace(search.name), x => x.Name.Contains(search!.name!))
+       .AndIf(search.model.HasValue, x => x.Model == search!.model)
+       .AndIf(!string.IsNullOrWhiteSpace(search.number), x => x.Number != null && x.Number.Contains(search!.number!))
+       .AndIf(search.status.HasValue, x => x.Status == search!.status)
         // .NotDeleted();
         ;
         return await _deviceRepository.QueryableAsync(
-             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDto { Name = x.Name, Model = x.Model }
-             search, whereExpression, x => _mapper.Map<DeviceDto>(x)
+             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDTO { Name = x.Name, Model = x.Model }
+             search, whereExpression, x => _mapper.Map<DeviceDTO>(x)
           );
     }
 
-    public async Task<AppSrvResult> UpdateAsync(DeviceRequestDto input)
+    public async Task<AppSrvResult> UpdateAsync(DeviceRequestDTO input)
     {
         var device = _mapper.Map<DeviceEntity>(input);
         var rwoAdd = await _deviceRepository.UpdateAsync(device, UpdatingProps<DeviceEntity>(x =>

@@ -18,10 +18,11 @@ public class UnitRecordsAppService : AbstractAppService, IUnitRecordsAppService
         _unitRecordsRepository = unitRecordsRepository;
     }
 
-    public async Task<AppSrvResult<long>> CreateAsync(UnitRecordsRequestDto input)
+    public async Task<AppSrvResult<IdDTO>> CreateAsync(UnitRecordsRequestDTO input)
     {
-        var unitRecordsEntity = _mapper.Map<UnitRecordsEntity>(input);
-        return await _unitRecordsRepository.InsertAsync(unitRecordsEntity);
+        var entity = _mapper.Map<UnitRecordsEntity>(input);
+        await _unitRecordsRepository.InsertAsync(entity);
+        return new IdDTO(entity.Id);
     }
 
     public async Task<AppSrvResult> DeleteAsync(Guid id)
@@ -30,7 +31,7 @@ public class UnitRecordsAppService : AbstractAppService, IUnitRecordsAppService
         return AppSrvResult();
     }
 
-    public async Task<SearchPage<UnitRecordsDto>> GetPagedAsync(UnitRecordsQueryDto input)
+    public async Task<SearchPage<UnitRecordsDTO>> GetPagedAsync(UnitRecordsQueryDTO input)
     {
         var search = new QueryUnitRecordsCommand()
         {
@@ -47,12 +48,12 @@ public class UnitRecordsAppService : AbstractAppService, IUnitRecordsAppService
         ;
 
         return await _unitRecordsRepository.QueryableAsync(
-             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDto { Name = x.Name, Model = x.Model }
-             search, whereExpression, x => _mapper.Map<UnitRecordsDto>(x)
+             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDTO { Name = x.Name, Model = x.Model }
+             search, whereExpression, x => _mapper.Map<UnitRecordsDTO>(x)
           );
     }
 
-    public async Task<AppSrvResult> UpdateAsync(UnitRecordsRequestDto input)
+    public async Task<AppSrvResult> UpdateAsync(UnitRecordsRequestDTO input)
     {
         var device = _mapper.Map<UnitRecordsEntity>(input);
         var rwoAdd = await _unitRecordsRepository.UpdateAsync(device, UpdatingProps<UnitRecordsEntity>(x =>

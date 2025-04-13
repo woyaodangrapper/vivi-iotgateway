@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class DeviceRequestDto
+public class DeviceRequestDTO : OutputBaseAuditDTO
 {
     public Guid Id { get; set; }
 
@@ -12,7 +12,12 @@ public class DeviceRequestDto
     /// <summary>
     /// 设备型号
     /// </summary>
-    public string? Model { get; set; }
+    public short? Model { get; set; }
+
+    /// <summary>
+    /// 设备编号
+    /// </summary>
+    public string? Number { get; set; } = string.Empty;
 
     /// <summary>
     /// 设备生产厂家
@@ -23,4 +28,11 @@ public class DeviceRequestDto
     /// 设备安装位置
     /// </summary>
     public string? InstallationLocation { get; set; }
+
+    /// <summary>
+    /// 设备状态：
+    /// </summary>
+    public short? Status { get; set; } = 0;
+
+
 }

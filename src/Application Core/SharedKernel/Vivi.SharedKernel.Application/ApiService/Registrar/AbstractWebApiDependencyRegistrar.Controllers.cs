@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Vivi.SharedKernel.Application.Extensions;
+using Vivi.SharedKernel.Application.Filters;
 using ProblemDetails = Microsoft.AspNetCore.Mvc.ProblemDetails;
 
 namespace Vivi.SharedKernel.ApiService.Registrar;
@@ -15,7 +16,12 @@ public abstract partial class AbstractWebApiDependencyRegistrar
     protected virtual void AddControllers()
     {
         Services
-            .AddControllers(options => options.Filters.Add(typeof(CustomExceptionFilterAttribute)))
+            //.AddControllers(options => options.Filters.Add(typeof(CustomExceptionFilterAttribute)))
+            .AddControllers(options =>
+            {
+                options.Filters.Add(typeof(CustomExceptionFilterAttribute));
+                options.Filters.Add(typeof(ApiResponseInterceptorAttribute));
+            })
             .AddJsonOptions(options =>
             {
                 //options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());

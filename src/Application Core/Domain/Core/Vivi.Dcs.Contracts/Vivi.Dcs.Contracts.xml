@@ -4,6 +4,56 @@
         <name>Vivi.Dcs.Contracts</name>
     </assembly>
     <members>
+        <member name="P:Vivi.Dcs.Application.Commands.CreateAreaCommand.Name">
+            <summary>
+            区域名称，例如 “A区”、“江南办公区”
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.CreateAreaCommand.Code">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.CreateAreaCommand.Type">
+            <summary>
+            区域类型，如 “楼宇、园区、楼层、功能区” 等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.CreateAreaCommand.Level">
+            <summary>
+            区域层级，例如：0=根区域，1=省，2=市...
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.CreateAreaCommand.Position">
+            <summary>
+            区域位置，支持坐标、GeoJSON 或多边形字符串，JSONB 格式存储
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.Name">
+            <summary>
+            区域名称，例如 “A区”、“江南办公区”
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.Code">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.Type">
+            <summary>
+            区域类型，如 “楼宇、园区、楼层、功能区” 等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.Level">
+            <summary>
+            区域层级，例如：0=根区域，1=省，2=市...
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.Position">
+            <summary>
+            区域位置，支持坐标、GeoJSON 或多边形字符串，JSONB 格式存储
+            </summary>
+        </member>
         <member name="P:Vivi.Dcs.Application.Commands.CreateDeviceCommand.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
@@ -104,343 +154,494 @@
             数据采集时间
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceUnitDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.AreaDTO">
+            <summary>
+            智能设备DTO
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaDTO.Pid">
+            <summary>
+            上级区域 ID，支持树结构，如省→市→区
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaDTO.Name">
+            <summary>
+            区域名称，例如 “A区”、“江南办公区”
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaDTO.Code">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaDTO.Type">
+            <summary>
+            区域类型，如 “楼宇、园区、楼层、功能区” 等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaDTO.Level">
+            <summary>
+            区域层级，例如：0=根区域，1=省，2=市...
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaDTO.Position">
+            <summary>
+            区域位置，支持坐标、GeoJSON 或多边形字符串，JSONB 格式存储
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Contracts.DTOs.AreaQueryDTO">
+            <summary>
+            智能设备DTO
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaQueryDTO.Name">
+            <summary>
+            区域名称，例如 “A区”、“江南办公区”
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaQueryDTO.Code">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaQueryDTO.Type">
+            <summary>
+            区域类型，如 “楼宇、园区、楼层、功能区” 等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaQueryDTO.Level">
+            <summary>
+            区域层级，例如：0=根区域，1=省，2=市...
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaQueryDTO.BlockCode">
+            <summary>
+            行政区划代码，遵循 GB/T 2260 标准
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaRequestDTO.Pid">
+            <summary>
+            上级区域 ID，支持树结构，如省→市→区
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaRequestDTO.Name">
+            <summary>
+            区域名称，例如 “A区”、“江南办公区”
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaRequestDTO.Code">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaRequestDTO.Type">
+            <summary>
+            区域类型，如 “楼宇、园区、楼层、功能区” 等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaRequestDTO.Level">
+            <summary>
+            区域层级，例如：0=根区域，1=省，2=市...
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.AreaRequestDTO.Position">
+            <summary>
+            区域位置，支持坐标、GeoJSON 或多边形字符串，JSONB 格式存储
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceUnitDTO">
             <summary>
             智能设备传感器DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDto.Id">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDTO.Id">
             <summary>
             设备传感器唯一ID，UUID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDto.DeviceId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDTO.DeviceId">
             <summary>
             所属设备ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDto.SensorType">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDTO.UnitType">
             <summary>
             传感器类型，如温度传感器、压力传感器
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDto.InstallationPosition">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitDTO.InstallationPosition">
             <summary>
             传感器安装位置（可选）
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDTO">
             <summary>
             智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDto.DeviceId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDTO.DeviceId">
             <summary>
             所属设备ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDto.UnitType">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDTO.UnitType">
             <summary>
             传感器类型，如温度传感器、压力传感器
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDto.InstallationPosition">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDTO.InstallationPosition">
             <summary>
             传感器安装位置（可选）
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDto.DeviceId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDTO.DeviceId">
             <summary>
             所属设备ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDto.UnitType">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDTO.UnitType">
             <summary>
             传感器类型，如温度传感器、压力传感器
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDto.InstallationPosition">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDTO.InstallationPosition">
             <summary>
             传感器安装位置（可选）
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceDTO">
             <summary>
             智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDto.Name">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.Id">
+            <summary>
+            设备唯一编码
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDto.Model">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.Number">
+            <summary>
+            设备编号
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.Model">
             <summary>
             设备型号
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDto.Manufacturer">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.Manufacturer">
             <summary>
             设备生产厂家
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDto.InstallationLocation">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.InstallationLocation">
             <summary>
             设备安装位置
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDto.Status">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceDTO.Status">
+            <summary>
+            fail - 通信失败，设备无法正常通信；
+            audit - 无效设备，设备不符合使用条件或无效；
+            executing - 运行中，设备正在工作或运行；
+            pending - 未启用，设备尚未投入使用；
+            finish - 生命周期结束，设备已达到使用寿命或已退役；
+            </summary>
+        </member>
+        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO">
+            <summary>
+            智能设备DTO
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO.Name">
+            <summary>
+            设备名称，如中央空调、风机盘管等
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO.Model">
+            <summary>
+            设备型号
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO.Number">
+            <summary>
+            设备编号
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO.Manufacturer">
+            <summary>
+            设备生产厂家
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO.InstallationLocation">
+            <summary>
+            设备安装位置
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO.Status">
             <summary>
             设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceQueryDto">
-            <summary>
-            智能设备DTO
-            </summary>
-        </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDto.Name">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO.Name">
             <summary>
             设备名称，如中央空调、风机盘管等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDto.Model">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO.Model">
             <summary>
             设备型号
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDto.Manufacturer">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO.Number">
+            <summary>
+            设备编号
+            </summary>
+        </member>
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO.Manufacturer">
             <summary>
             设备生产厂家
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDto.InstallationLocation">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO.InstallationLocation">
             <summary>
             设备安装位置
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceQueryDto.Status">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO.Status">
             <summary>
-            设备状态，如 active（启用）、inactive（停用）、maintenance（维护）
+            设备状态：
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDto.Name">
-            <summary>
-            设备名称，如中央空调、风机盘管等
-            </summary>
-        </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDto.Model">
-            <summary>
-            设备型号
-            </summary>
-        </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDto.Manufacturer">
-            <summary>
-            设备生产厂家
-            </summary>
-        </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.DeviceRequestDto.InstallationLocation">
-            <summary>
-            设备安装位置
-            </summary>
-        </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDTO">
             <summary>
             传感器能力映射DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDto.Id">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDTO.Id">
             <summary>
             传感器能力映射唯一ID，UUID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDto.UnitId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDTO.UnitId">
             <summary>
             设备传感器ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDto.CapabId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapDTO.CapabId">
             <summary>
             传感器能力ID
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDTO">
             <summary>
             智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDto.Id">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDTO.Id">
             <summary>
             传感器能力映射唯一ID，UUID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDto.UnitId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDTO.UnitId">
             <summary>
             设备传感器ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDto.CapabId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDTO.CapabId">
             <summary>
             传感器能力ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDto.Id">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDTO.Id">
             <summary>
             传感器能力映射唯一ID，UUID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDto.UnitId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDTO.UnitId">
             <summary>
             设备传感器ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDto.CapabId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDTO.CapabId">
             <summary>
             传感器能力ID
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabDTO">
             <summary>
             传感器能力DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDto.Id">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDTO.Id">
             <summary>
             传感器能力唯一ID，UUID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDto.Name">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDTO.Name">
             <summary>
             传感器能力名称，如温度、湿度、风速等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDto.Unit">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDTO.Unit">
             <summary>
             传感器能力单位，如℃、%RH、m/s
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDto.Description">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabDTO.Description">
             <summary>
             传感器能力描述
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDTO">
             <summary>
             智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDto.Name">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDTO.Name">
             <summary>
             传感器能力名称，如温度、湿度、风速等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDto.Unit">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDTO.Unit">
             <summary>
             传感器能力单位，如℃、%RH、m/s
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDto.Description">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDTO.Description">
             <summary>
             传感器能力描述
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDto.Name">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDTO.Name">
             <summary>
             传感器能力名称，如温度、湿度、风速等
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDto.Unit">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDTO.Unit">
             <summary>
             传感器能力单位，如℃、%RH、m/s
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDto.Description">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDTO.Description">
             <summary>
             传感器能力描述
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitRecordsDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitRecordsDTO">
             <summary>
             传感器日志DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDto.Id">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDTO.Id">
             <summary>
             传感器数据唯一ID，UUID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDto.UnitId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDTO.UnitId">
             <summary>
             设备传感器ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDto.CapabId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDTO.CapabId">
             <summary>
             传感器能力ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDto.Value">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDTO.Value">
             <summary>
             传感器采集数据值（保留两位小数）
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDto.Timestamp">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsDTO.Timestamp">
             <summary>
             数据采集时间
             </summary>
         </member>
-        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDto">
+        <member name="T:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDTO">
             <summary>
             智能设备DTO
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDto.UnitId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDTO.UnitId">
             <summary>
             设备传感器ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDto.CapabId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDTO.CapabId">
             <summary>
             传感器能力ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDto.Value">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDTO.Value">
             <summary>
             传感器采集数据值（保留两位小数）
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDto.Timestamp">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDTO.Timestamp">
             <summary>
             数据采集时间
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDto.UnitId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO.UnitId">
             <summary>
             设备传感器ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDto.CapabId">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO.CapabId">
             <summary>
             传感器能力ID
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDto.Value">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO.Value">
             <summary>
             传感器采集数据值（保留两位小数）
             </summary>
         </member>
-        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDto.Timestamp">
+        <member name="P:Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO.Timestamp">
             <summary>
             数据采集时间
             </summary>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.IDeviceAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.DeviceQueryDto)">
+        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.GetListAsync(Vivi.Dcs.Contracts.DTOs.AreaQueryDTO)">
+            <summary>
+            获取地区列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.AddOrUpdateRangeAsync(Vivi.Dcs.Contracts.DTOs.AreaRequestDTO[])">
+            <summary>
+            添加或更新地区列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateAreaCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.AreaRequestDTO)">
+            <summary>
+            新增地区
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.IDeleteAreaCommand.DeleteAsync(System.Guid)">
+            <summary>
+            删除地区
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateAreaCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.AreaRequestDTO)" -->
+        <member name="M:Vivi.Dcs.Contracts.IServices.IDeviceAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.DeviceQueryDTO)">
             <summary>
             获取智能设备列表
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateDeviceCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.DeviceRequestDto)">
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateDeviceCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO)">
             <summary>
             新增智能设备
             </summary>
@@ -454,14 +655,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateDeviceCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.DeviceRequestDto)" -->
-        <member name="M:Vivi.Dcs.Contracts.IServices.IDeviceUnitAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDto)">
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateDeviceCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.DeviceRequestDTO)" -->
+        <member name="M:Vivi.Dcs.Contracts.IServices.IDeviceUnitAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.DeviceUnitQueryDTO)">
             <summary>
             获取设备传感器列表
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateDeviceUnitCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDto)">
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateDeviceUnitCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDTO)">
             <summary>
             新增设备传感器
             </summary>
@@ -475,14 +676,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateDeviceUnitCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDto)" -->
-        <member name="M:Vivi.Dcs.Contracts.IServices.IUnitCapabAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDto)">
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateDeviceUnitCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.DeviceUnitRequestDTO)" -->
+        <member name="M:Vivi.Dcs.Contracts.IServices.IUnitCapabAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabQueryDTO)">
             <summary>
             获取传感器能力列表
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateUnitCapabCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDto)">
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateUnitCapabCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDTO)">
             <summary>
             新增传感器能力
             </summary>
@@ -496,14 +697,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitCapabCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDto)" -->
-        <member name="M:Vivi.Dcs.Contracts.IServices.IUnitCapabMapAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDto)">
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitCapabCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabRequestDTO)" -->
+        <member name="M:Vivi.Dcs.Contracts.IServices.IUnitCapabMapAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabMapQueryDTO)">
             <summary>
             获取传感器能力映射列表
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateUnitCapabMapCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDto)">
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateUnitCapabMapCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDTO)">
             <summary>
             新增传感器能力映射
             </summary>
@@ -517,14 +718,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitCapabMapCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDto)" -->
-        <member name="M:Vivi.Dcs.Contracts.IServices.IUnitRecordsAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDto)">
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitCapabMapCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitCapabMapRequestDTO)" -->
+        <member name="M:Vivi.Dcs.Contracts.IServices.IUnitRecordsAppService.GetPagedAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsQueryDTO)">
             <summary>
             获取智能设备传感器日志列表
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateUnitRecordsCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDto)">
+        <member name="M:Vivi.Dcs.Contracts.IServices.ICreateUnitRecordsCommand.CreateAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO)">
             <summary>
             新增智能设备传感器日志
             </summary>
@@ -538,6 +739,6 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitRecordsCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDto)" -->
+        <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitRecordsCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO)" -->
     </members>
 </doc>

@@ -8,7 +8,7 @@ namespace Vivi.Dcs.Entities;
 public class UnitCapabMapEntity : EfEntity
 {
     [Required]
-    public Guid SensorId { get; set; }  // 设备传感器ID
+    public Guid UnitId { get; set; }  // 设备传感器ID
 
     [Required]
     public Guid CapabilityId { get; set; }  // 传感器能力ID

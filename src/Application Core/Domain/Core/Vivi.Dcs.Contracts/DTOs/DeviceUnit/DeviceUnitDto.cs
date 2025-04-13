@@ -3,7 +3,7 @@
 /// <summary>
 /// 智能设备传感器DTO
 /// </summary>
-public class DeviceUnitDto : OutputBaseAuditDTO
+public class DeviceUnitDTO : OutputBaseAuditDTO
 {
     /// <summary>
     /// 设备传感器唯一ID，UUID
@@ -18,7 +18,7 @@ public class DeviceUnitDto : OutputBaseAuditDTO
     /// <summary>
     /// 传感器类型，如温度传感器、压力传感器
     /// </summary>
-    public string SensorType { get; set; } = string.Empty;
+    public string UnitType { get; set; } = string.Empty;
 
     /// <summary>
     /// 传感器安装位置（可选）

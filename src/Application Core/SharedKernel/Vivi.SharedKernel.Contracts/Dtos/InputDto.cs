@@ -1,8 +1,8 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Dtos;
+﻿namespace Vivi.SharedKernel.Application.Contracts.DTOs;
 
 /// <summary>
 /// 输入DTO基类
 /// </summary>
-public abstract class InputDto : IDto
+public abstract class InputDTO : IDTO
 {
 }

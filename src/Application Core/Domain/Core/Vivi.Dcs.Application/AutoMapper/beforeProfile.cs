@@ -4,12 +4,14 @@ public class beforeProfile : Profile
 {
     public beforeProfile()
     {
-        CreateMap(typeof(PagedModel<>), typeof(PageModelDto<>)).ForMember("XData", opt => opt.Ignore());
+        CreateMap<DeviceDTO, DeviceEntity>();
+        CreateMap<DeviceEntity, DeviceDTO>();
+        CreateMap<DeviceRequestDTO, DeviceEntity>();
+        CreateMap<DeviceEntity, DeviceRequestDTO>();
 
-        CreateMap<DeviceDto, DeviceEntity>();
-        CreateMap<DeviceEntity, DeviceDto>();
-
-        CreateMap<DeviceRequestDto, DeviceEntity>();
-        CreateMap<DeviceEntity, DeviceRequestDto>();
+        CreateMap<AreaDTO, AreaEntity>();
+        CreateMap<AreaEntity, AreaDTO>();
+        CreateMap<AreaRequestDTO, AreaEntity>();
+        CreateMap<AreaEntity, AreaRequestDTO>();
     }
 }

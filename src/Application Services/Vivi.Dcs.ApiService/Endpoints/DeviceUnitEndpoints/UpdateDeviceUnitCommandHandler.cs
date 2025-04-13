@@ -1,38 +1,36 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
 
-namespace Vivi.Dcs.ApiService.Endpoints.SmartDeviceSensorEndpoints;
+namespace Vivi.Dcs.ApiService.Endpoints.DeviceUnitEndpoints;
 
-// 设备端点-增删改查分离的中间人设计模式
-public record DeviceSensorUpdate(string Id, UpdateDeviceCommand Update) : IRequest<Task<AppSrvResult>>;
+// 传感器端点-增删改查分离的中间人设计模式
+public record DeviceUnitUpdate(string Id, UpdateDeviceUnitCommand Update) : IRequest<Task<AppSrvResult>>;
 
 [Route("/endpoints/device/unit")]
 public class UpdateDeviceUnitCommandHandler(
-  IDeviceAppService smartDeviceAppService,
+  IDeviceUnitAppService deviceUnitAppService,
   ILogger<UpdateDeviceUnitCommandHandler> logger) : EndpointBaseAsync
-  .WithRequest<DeviceSensorUpdate>
+  .WithRequest<DeviceUnitUpdate>
   .WithActionResult<AppSrvResult>
 {
-    private readonly IDeviceAppService _deviceService = smartDeviceAppService;
+    private readonly IDeviceUnitAppService _deviceUnitService = deviceUnitAppService;
 
     [HttpPut("update")]
     [SwaggerOperation(
-      Summary = "更新设备",
-      Description = "根据设备 ID 更新智能设备参数",
-      OperationId = "SensorUpdate",
+      Summary = "更新传感器",
+      Description = "根据传感器 ID 更新传感器参数",
+      OperationId = "UnitUpdate",
       Tags = new[] { "Endpoints" })
     ]
     [AllowAnonymous]
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] DeviceSensorUpdate request, CancellationToken cancellationToken = default)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] DeviceUnitUpdate request, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Deleting a device with id {Id}", request.Id);
-        return Ok(await _deviceService.UpdateAsync(new()
+        return (await _deviceUnitService.UpdateAsync(new()
         {
-            Id = new Guid(request.Id),
-            Name = request.Update.Name,
-            InstallationLocation = request.Update.InstallationLocation,
-            Manufacturer = request.Update.Manufacturer,
-            Model = request.Update.Model,
-        }));
+
+        })).Build();
     }
 }

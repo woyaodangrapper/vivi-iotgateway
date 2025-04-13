@@ -1,38 +1,38 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
 
-namespace Vivi.Dcs.ApiService.Endpoints.SensorCapabilityMap;
+namespace Vivi.Dcs.ApiService.Endpoints.UnitCapabilityMap;
 
-// 设备端点-增删改查分离的中间人设计模式
-public record SensorCapabilityMapUpdate(string Id, UpdateDeviceCommand Update) : IRequest<Task<AppSrvResult>>;
+// 设备传感器能力映射端点-增删改查分离的中间人设计模式
+public record UnitCapabilityMapUpdate(string Id, UpdateUnitCapabMapCommand Update) : IRequest<Task<AppSrvResult>>;
 
 [Route("/endpoints/unit/capab/map")]
 public class UpdateUnitCapabMapCommandHandler(
   IDeviceAppService smartDeviceAppService,
   ILogger<UpdateUnitCapabMapCommandHandler> logger) : EndpointBaseAsync
-  .WithRequest<SensorCapabilityMapUpdate>
+  .WithRequest<UnitCapabilityMapUpdate>
   .WithActionResult<AppSrvResult>
 {
     private readonly IDeviceAppService _deviceService = smartDeviceAppService;
 
     [HttpPut("update")]
     [SwaggerOperation(
-      Summary = "更新设备",
-      Description = "根据设备 ID 更新智能设备参数",
-      OperationId = "SensorCapabilityMapUpdate",
+      Summary = "更新设备传感器能力映射",
+      Description = "根据设备传感器能力映射 ID 更新设备传感器能力映射参数",
+      OperationId = "UnitCapabilityMapUpdate",
       Tags = new[] { "Endpoints" })
     ]
     [AllowAnonymous]
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] SensorCapabilityMapUpdate request, CancellationToken cancellationToken = default)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] UnitCapabilityMapUpdate request, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Deleting a device with id {Id}", request.Id);
-        return Ok(await _deviceService.UpdateAsync(new()
+        return (await _deviceService.UpdateAsync(new()
         {
             Id = new Guid(request.Id),
-            Name = request.Update.Name,
-            InstallationLocation = request.Update.InstallationLocation,
-            Manufacturer = request.Update.Manufacturer,
-            Model = request.Update.Model,
-        }));
+            UpdatedAt = DateTime.UtcNow
+
+        })).Build();
     }
 }

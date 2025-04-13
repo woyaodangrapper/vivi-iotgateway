@@ -1,4 +1,5 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
 
 namespace Vivi.Dcs.ApiService.Endpoints.SmartDeviceEndpoints;
@@ -8,12 +9,12 @@ public record DeviceDelete(string Id) : IRequest<Task<ActionResult>>;
 
 [Route("/endpoints/device")]
 public class DeleteDeviceCommandHandler(
-  IDeviceAppService smartDeviceAppService,
+  IDeviceAppService deviceAppService,
   ILogger<DeleteDeviceCommandHandler> logger) : EndpointBaseAsync
   .WithRequest<DeviceDelete>
-  .WithActionResult<AppSrvResult>
+  .WithActionResult
 {
-    private readonly IDeviceAppService _deviceService = smartDeviceAppService;
+    private readonly IDeviceAppService _deviceService = deviceAppService;
 
     [HttpDelete("delete")]
     [SwaggerOperation(
@@ -23,9 +24,9 @@ public class DeleteDeviceCommandHandler(
       Tags = new[] { "Endpoints" })
     ]
     [AllowAnonymous]
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync(DeviceDelete request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult> HandleAsync(DeviceDelete request, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Deleting a device with id {Id}", request.Id);
-        return Ok(await _deviceService.DeleteAsync(new(request.Id)));
+        return (await _deviceService.DeleteAsync(new(request.Id))).Build();
     }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// 智能设备DTO
 /// </summary>
-public class UnitCapabMapQueryDto : SearchPagedDto
+public class UnitCapabMapQueryDTO : SearchPagedDTO
 {
     /// <summary>
     /// 传感器能力映射唯一ID，UUID

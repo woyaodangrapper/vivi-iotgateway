@@ -3,7 +3,7 @@
 /// <summary>
 /// 智能设备DTO
 /// </summary>
-public class UnitRecordsQueryDto : SearchPagedDto
+public class UnitRecordsQueryDTO : SearchPagedDTO
 {
     /// <summary>
     /// 设备传感器ID

@@ -6,31 +6,32 @@ namespace Vivi.Dcs.Application.Implements;
 
 public class DeviceUnitAppService : AbstractAppService, IDeviceUnitAppService
 {
-    private readonly IEfRepository<DeviceUnitEntity> _deviceUnitSensorRepository;
+    private readonly IEfRepository<DeviceUnitEntity> _deviceUnitRepository;
     private readonly IObjectMapper _mapper;
 
     public DeviceUnitAppService(ILogger<DeviceUnitAppService> logger,
-         IEfRepository<DeviceUnitEntity> deviceUnitSensorRepository,
+         IEfRepository<DeviceUnitEntity> deviceUnitRepository,
          IObjectMapper mapper
         )
     {
         _mapper = mapper;
-        _deviceUnitSensorRepository = deviceUnitSensorRepository;
+        _deviceUnitRepository = deviceUnitRepository;
     }
 
-    public async Task<AppSrvResult<long>> CreateAsync(DeviceUnitRequestDto input)
+    public async Task<AppSrvResult<IdDTO>> CreateAsync(DeviceUnitRequestDTO input)
     {
-        var deviceUnitSensorEntity = _mapper.Map<DeviceUnitEntity>(input);
-        return await _deviceUnitSensorRepository.InsertAsync(deviceUnitSensorEntity);
+        var entity = _mapper.Map<DeviceUnitEntity>(input);
+        await _deviceUnitRepository.InsertAsync(entity);
+        return new IdDTO(entity.Id);
     }
 
     public async Task<AppSrvResult> DeleteAsync(Guid id)
     {
-        await _deviceUnitSensorRepository.DeleteAsync(id);
+        await _deviceUnitRepository.DeleteAsync(id);
         return AppSrvResult();
     }
 
-    public async Task<SearchPage<DeviceUnitDto>> GetPagedAsync(DeviceUnitQueryDto input)
+    public async Task<SearchPage<DeviceUnitDTO>> GetPagedAsync(DeviceUnitQueryDTO input)
     {
         var search = new QueryDeviceUnitCommand()
         {
@@ -46,16 +47,16 @@ public class DeviceUnitAppService : AbstractAppService, IDeviceUnitAppService
         // .NotDeleted();
         ;
 
-        return await _deviceUnitSensorRepository.QueryableAsync(
-             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDto { Name = x.Name, Model = x.Model }
-             search, whereExpression, x => _mapper.Map<DeviceUnitDto>(x)
+        return await _deviceUnitRepository.QueryableAsync(
+             // _mapper.Map 仅作为演示，实际项目请使用 => new DeviceDTO { Name = x.Name, Model = x.Model }
+             search, whereExpression, x => _mapper.Map<DeviceUnitDTO>(x)
           );
     }
 
-    public async Task<AppSrvResult> UpdateAsync(DeviceUnitRequestDto input)
+    public async Task<AppSrvResult> UpdateAsync(DeviceUnitRequestDTO input)
     {
         var device = _mapper.Map<DeviceUnitEntity>(input);
-        var rwoAdd = await _deviceUnitSensorRepository.UpdateAsync(device, UpdatingProps<DeviceUnitEntity>(x =>
+        var rwoAdd = await _deviceUnitRepository.UpdateAsync(device, UpdatingProps<DeviceUnitEntity>(x =>
          x.Equals(device)
             ));
         if (rwoAdd is 0)

@@ -1,4 +1,5 @@
 ﻿using Ardalis.ApiEndpoints;
+using Ardalis.ApiEndpoints.Expression;
 using MediatR;
 
 namespace Vivi.Dcs.ApiService.Endpoints.SmartDeviceEndpoints;
@@ -8,12 +9,12 @@ public record DeviceUpdate(string Id, UpdateDeviceCommand Update) : IRequest<Tas
 
 [Route("/endpoints/device")]
 public class UpdateDeviceCommandHandler(
-  IDeviceAppService smartDeviceAppService,
+  IDeviceAppService deviceAppService,
   ILogger<UpdateDeviceCommandHandler> logger) : EndpointBaseAsync
   .WithRequest<DeviceUpdate>
-  .WithActionResult<AppSrvResult>
+  .WithActionResult
 {
-    private readonly IDeviceAppService _deviceService = smartDeviceAppService;
+    private readonly IDeviceAppService _deviceService = deviceAppService;
 
     [HttpPut("update")]
     [SwaggerOperation(
@@ -23,16 +24,17 @@ public class UpdateDeviceCommandHandler(
       Tags = new[] { "Endpoints" })
     ]
     [AllowAnonymous]
-    public override async Task<ActionResult<AppSrvResult>> HandleAsync([FromBody] DeviceUpdate request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult> HandleAsync([FromBody] DeviceUpdate request, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Deleting a device with id {Id}", request.Id);
-        return Ok(await _deviceService.UpdateAsync(new()
+        return (await _deviceService.UpdateAsync(new()
         {
             Id = new Guid(request.Id),
             Name = request.Update.Name,
             InstallationLocation = request.Update.InstallationLocation,
             Manufacturer = request.Update.Manufacturer,
             Model = request.Update.Model,
-        }));
+            UpdatedAt = DateTime.Now
+        })).Build();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.Commands;
 
-public class QueryUnitCapabCommand : SearchPagedDto
+public class QueryUnitCapabCommand : SearchPagedDTO
 {
     /// <summary>
     /// 传感器能力名称，如温度、湿度、风速等

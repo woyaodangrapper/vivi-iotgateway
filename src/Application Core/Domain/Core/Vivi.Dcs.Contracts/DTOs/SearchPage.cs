@@ -1,6 +1,6 @@
 ﻿namespace Vivi.Dcs.Contracts.DTOs;
 
-public class SearchPage<T> : SearchPagedDto
+public class SearchPage<T> : SearchPagedDTO
 {
     public SearchPage(int pageNo, int pageSize, IReadOnlyList<T> list, int total)
     {
@@ -10,12 +10,12 @@ public class SearchPage<T> : SearchPagedDto
         this.list = list;
     }
 
-    public SearchPage(SearchPagedDto search)
+    public SearchPage(SearchPagedDTO search)
         : this(search, default, default)
     {
     }
 
-    public SearchPage(SearchPagedDto search, IReadOnlyList<T> list, int total)
+    public SearchPage(SearchPagedDTO search, IReadOnlyList<T> list, int total)
     : this(search.pageIndex, search.pageSize, list, total)
     {
         this.list = list;

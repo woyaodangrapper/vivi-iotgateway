@@ -1,26 +1,26 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Dtos;
+﻿namespace Vivi.SharedKernel.Application.Contracts.DTOs;
 
 [Serializable]
-public class PageModelDto<T> : IDto
+public class PageModelDTO<T> : IDTO
 {
     private IReadOnlyList<T> _data = Array.Empty<T>();
 
-    public PageModelDto()
+    public PageModelDTO()
     {
     }
 
-    public PageModelDto(SearchPagedDto search)
+    public PageModelDTO(SearchPagedDTO search)
         : this(search, default, default)
     {
     }
 
-    public PageModelDto(SearchPagedDto search, IReadOnlyList<T> data, int count, dynamic xData = null)
+    public PageModelDTO(SearchPagedDTO search, IReadOnlyList<T> data, int count, dynamic xData = null)
         : this(search.pageIndex, search.pageSize, data, count)
     {
         this.XData = xData;
     }
 
-    public PageModelDto(int pageIndex, int pageSize, IReadOnlyList<T> data, int count, dynamic xData = null)
+    public PageModelDTO(int pageIndex, int pageSize, IReadOnlyList<T> data, int count, dynamic xData = null)
     {
         this.PageIndex = pageIndex;
         this.PageSize = pageSize;
