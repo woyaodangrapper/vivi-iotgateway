@@ -14,11 +14,25 @@ public interface IAreaAppService : ICreateAreaCommand, IDeleteAreaCommand, IUpda
 
 
     /// <summary>
+    /// 获取地区树结构
+    /// </summary>
+    /// <returns></returns>
+    [OperateLog(LogName = "查询地区结构")]
+    Task<List<AreaTreeNodeDTO>> GetNodesAsync(AreaQueryDTO input);
+
+    /// <summary>
+    /// 获取地区树结构
+    /// </summary>
+    /// <returns></returns>
+    [OperateLog(LogName = "删除地区结构")]
+    Task<AppSrvResult> DeleteNodesAsync(AreaTreeNodeDTO[] input);
+
+    /// <summary>
     /// 添加或更新地区列表
     /// </summary>
     /// <returns></returns>
     [OperateLog(LogName = "添加或更新")]
-    Task<AppSrvResult<IdDTO[]>> AddOrUpdateRangeAsync(AreaRequestDTO[] input);
+    Task<AppSrvResult<IdDTO[]>> AddOrUpdateRangeAsync(AreaTreeNodeDTO[] input);
 
 
 

@@ -1,4 +1,6 @@
-﻿namespace Vivi.Dcs.Application.Commands;
+﻿using System.Text.Json.Nodes;
+
+namespace Vivi.Dcs.Application.Commands;
 
 public class UpdateDeviceCommand : BaseCommand
 {
@@ -20,5 +22,5 @@ public class UpdateDeviceCommand : BaseCommand
     /// <summary>
     /// 设备安装位置
     /// </summary>
-    public string? InstallationLocation { get; set; }
+    public JsonObject? InstallationLocation { get; set; }
 }

@@ -18,6 +18,11 @@ public class UpdateAreaCommand : BaseCommand
     public string Code { get; set; } = "110000";
 
     /// <summary>
+    /// 区域编码，如 REG001，用于快速索引
+    /// </summary>
+    public string BlockCode { get; set; } = "110000";
+
+    /// <summary>
     /// 区域类型，如 “楼宇、园区、楼层、功能区” 等
     /// </summary>
     public string? Type { get; set; }

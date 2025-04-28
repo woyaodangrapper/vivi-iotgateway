@@ -39,6 +39,11 @@
             区域编码，如 REG001，用于快速索引
             </summary>
         </member>
+        <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.BlockCode">
+            <summary>
+            区域编码，如 REG001，用于快速索引
+            </summary>
+        </member>
         <member name="P:Vivi.Dcs.Application.Commands.UpdateAreaCommand.Type">
             <summary>
             区域类型，如 “楼宇、园区、楼层、功能区” 等
@@ -248,6 +253,18 @@
             <summary>
             区域位置，支持坐标、GeoJSON 或多边形字符串，JSONB 格式存储
             </summary>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.DTOs.AreaTreeNodeDTO.Flatten">
+            <summary>
+            扁平化为列表
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.DTOs.AreaTreeNodeDTO.Build(System.Collections.Generic.List{Vivi.Dcs.Contracts.DTOs.AreaTreeNodeDTO})">
+            <summary>
+            递归构建树形结构
+            </summary>
+            <param name="children"></param>
         </member>
         <member name="T:Vivi.Dcs.Contracts.DTOs.DeviceUnitDTO">
             <summary>
@@ -614,7 +631,19 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.AddOrUpdateRangeAsync(Vivi.Dcs.Contracts.DTOs.AreaRequestDTO[])">
+        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.GetNodesAsync(Vivi.Dcs.Contracts.DTOs.AreaQueryDTO)">
+            <summary>
+            获取地区树结构
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.DeleteNodesAsync(Vivi.Dcs.Contracts.DTOs.AreaTreeNodeDTO[])">
+            <summary>
+            获取地区树结构
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Vivi.Dcs.Contracts.IServices.IAreaAppService.AddOrUpdateRangeAsync(Vivi.Dcs.Contracts.DTOs.AreaTreeNodeDTO[])">
             <summary>
             添加或更新地区列表
             </summary>

@@ -16,7 +16,6 @@ public abstract partial class AbstractApplicationDependencyRegistrar
 
         var appServiceType = typeof(IAppService);
 
-        var a = ContractsLayerAssembly.GetExportedTypes();
         var serviceTypes = ContractsLayerAssembly.GetExportedTypes().Where(type => type.IsInterface && type.IsAssignableTo(appServiceType)).ToList();
         serviceTypes.ForEach(serviceType =>
         {

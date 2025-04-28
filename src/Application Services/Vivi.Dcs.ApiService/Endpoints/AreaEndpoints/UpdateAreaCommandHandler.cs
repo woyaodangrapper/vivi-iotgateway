@@ -31,6 +31,7 @@ public class UpdateAreaCommandHandler(
         {
             Id = new Guid(request.Update.Id),
             Name = request.Update.Name,
+            BlockCode = request.Update.BlockCode,
             UpdatedAt = DateTime.UtcNow
         })).Build();
     }

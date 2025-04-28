@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Nodes;
 
 namespace Vivi.Dcs.Entities;
 
@@ -31,7 +33,8 @@ public class DeviceEntity : EfFullAuditEntity
     /// <summary>
     /// 设备安装位置
     /// </summary>
-    public string? InstallationLocation { get; set; }
+    [Column(TypeName = "jsonb")]
+    public JsonNode? InstallationLocation { get; set; }
 
     /// <summary>
     /// 设备状态：

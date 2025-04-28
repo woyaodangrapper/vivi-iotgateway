@@ -1,4 +1,6 @@
-﻿namespace Vivi.Dcs.Contracts.DTOs;
+﻿using System.Text.Json.Nodes;
+
+namespace Vivi.Dcs.Contracts.DTOs;
 
 /// <summary>
 /// 智能设备DTO
@@ -34,7 +36,7 @@ public class DeviceDTO : OutputBaseAuditDTO
     /// <summary>
     /// 设备安装位置
     /// </summary>
-    public string? InstallationLocation { get; set; }
+    public JsonNode? InstallationLocation { get; set; }
 
     /// <summary>
     /// fail - 通信失败，设备无法正常通信；
