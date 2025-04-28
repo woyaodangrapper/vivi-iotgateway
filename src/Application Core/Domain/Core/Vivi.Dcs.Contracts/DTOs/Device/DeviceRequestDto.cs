@@ -1,4 +1,6 @@
-﻿namespace Vivi.Dcs.Contracts.DTOs;
+﻿using System.Text.Json.Nodes;
+
+namespace Vivi.Dcs.Contracts.DTOs;
 
 public class DeviceRequestDTO : OutputBaseAuditDTO
 {
@@ -27,7 +29,7 @@ public class DeviceRequestDTO : OutputBaseAuditDTO
     /// <summary>
     /// 设备安装位置
     /// </summary>
-    public string? InstallationLocation { get; set; }
+    public JsonNode? InstallationLocation { get; set; }
 
     /// <summary>
     /// 设备状态：

@@ -69,35 +69,40 @@ public class AreaAppService : AbstractAppService, IAreaAppService
         return AppSrvResult();
     }
 
-
-    public async Task<AppSrvResult<IdDTO[]>> AddOrUpdateRangeAsync(AreaRequestDTO[] input)
+    public async Task<AppSrvResult<IdDTO[]>> AddOrUpdateRangeAsync(AreaTreeNodeDTO[] input)
     {
+        // 扁平化一次
+        var treeNodes = input.SelectMany(node => node.Flatten()).ToList();
+        var treeNodeIds = treeNodes.Select(x => x.Id).ToList();
 
-        var areas = _mapper.Map<AreaEntity[]>(input);
-        var areaEntitys = _areaRepository.Where(x => areas.Select(a => a.Id).Contains(x.Id));
+        // 直接查询所有相关的 areaEntitys
+        var areaEntitys = _areaRepository.Where(x => treeNodeIds.Contains(x.Id)).ToList();
 
-        var updateDict = input
-             .Where(dto => areaEntitys.Select(a => a.Id).Contains(dto.Id))
-             .ToDictionary(
-                 dto => dto.Id,
-                 dto => new List<(string, dynamic)>
-                 {
-                    ("Pid", dto.Pid),
-                    ("Name", dto.Name),
-                    ("Code", dto.Code),
-                    ("Type", dto.Type),
-                    ("Level", dto.Level),
-                    ("Position", dto.Position),
-                    ("BlockCode", dto.BlockCode)
-                 }
-        );
+        // 直接构建 updateDict
+        var areaEntityIds = areaEntitys.Select(x => x.Id).ToHashSet(); // 使用 HashSet 提高查找性能
+        var updateDict = treeNodes
+            .Where(dto => areaEntityIds.Contains(dto.Id))
+            .ToDictionary(
+                dto => dto.Id,
+                dto => new List<(string, dynamic)>
+                {
+                ("Pid", dto.Pid),
+                ("Name", dto.Name),
+                ("Code", dto.Code),
+                ("Type", dto.Type),
+                ("Level", dto.Level),
+                ("Position", dto.Position),
+                ("BlockCode", dto.BlockCode)
+                }
+            );
 
-
+        // 更新操作
         var affectedRows = await _areaRepository.UpdateRangeAsync(updateDict);
-        if (affectedRows is 0)
+        if (affectedRows == 0)
             return Problem(HttpStatusCode.InternalServerError, "数据修改失败");
-        var addEntitys = areas.Where(x => !areaEntitys.Select(a => a.Id).Contains(x.Id)).ToArray();
 
+        // 获取需要新增的节点
+        var addEntitys = _mapper.Map<AreaEntity[]>(treeNodes.Where(x => !areaEntityIds.Contains(x.Id)).ToArray());
         if (addEntitys.Length > 0)
         {
             await _areaRepository.InsertRangeAsync(addEntitys);
@@ -106,4 +111,82 @@ public class AreaAppService : AbstractAppService, IAreaAppService
 
         return AppSrvResult();
     }
+
+
+    public async Task<AppSrvResult> DeleteOrUpdateRangeAsync(AreaRequestDTO[] input)
+    {
+        var areas = _mapper.Map<AreaEntity[]>(input);
+
+        // 查找现有的区域实体
+        var areaEntitys = _areaRepository.Where(x => areas.Select(a => a.Id).Contains(x.Id));
+
+        // 找到需要更新的区域，生成更新字典
+        var updateDict = input
+             .Where(dto => areaEntitys.Select(a => a.Id).Contains(dto.Id))
+             .ToDictionary(
+                 dto => dto.Id,
+                 dto => new List<(string, dynamic)>
+                 {
+                    ("Pid", dto.Pid),
+                 }
+        );
+
+        // 执行更新操作
+        var affectedRows = await _areaRepository.UpdateRangeAsync(updateDict);
+        if (affectedRows == 0)
+            return Problem(HttpStatusCode.InternalServerError, "数据修改失败");
+
+        // 查找需要删除的区域
+        var deleteIds = _areaRepository
+            .Where(entity => !areaEntitys.Select(a => a.Id).Contains(entity.Id))  // 找出在 input 中没有的区域
+            ;
+
+        // 如果有需要删除的区域
+        if (deleteIds.Any())
+        {
+            var deleteResult = await deleteIds.ExecuteDeleteAsync();
+            if (deleteResult == 0)
+                return Problem(HttpStatusCode.InternalServerError, "数据删除失败");
+        }
+
+        return AppSrvResult();
+    }
+
+
+    public async Task<List<AreaTreeNodeDTO>> GetNodesAsync(AreaQueryDTO input)
+    {
+        var whereList = await GetListAsync(input);
+        // 将 AreaDTO 转换为 AreaTreeNodeDTO，同时初始化 Children
+        var areaTreeNodes = whereList.Select(area => new AreaTreeNodeDTO
+        {
+            Id = area.Id,
+            Name = area.Name,
+            Code = area.Code,
+            Type = area.Type,
+            Level = area.Level,
+            Position = area.Position,
+            BlockCode = area.BlockCode,
+            Pid = area.Pid,
+            Children = [] // 初始化 Children
+        }).ToList();
+
+        // 获取根节点 (Pid == null 或 0)
+        var rootNodes = areaTreeNodes.Where(n => n.Pid == null).ToList();
+        rootNodes.ForEach(node => node.Build(areaTreeNodes)); // 构建树形结构
+        return rootNodes;
+    }
+
+    public async Task<AppSrvResult> DeleteNodesAsync(AreaTreeNodeDTO[] input)
+    {
+        var deleteIds = input.SelectMany(node => node.Flatten().Select(a => a.Id));
+        var areaEntitys = _areaRepository.Where(x => deleteIds.Contains(x.Id));
+        if (deleteIds.Any())
+        {
+            var deleteResult = await areaEntitys.ExecuteDeleteAsync();
+            if (deleteResult == 0)
+                return Problem(HttpStatusCode.InternalServerError, "数据删除失败");
+        }
+        return AppSrvResult();
+    }
+
 }

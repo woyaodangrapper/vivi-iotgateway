@@ -5,6 +5,8 @@ namespace Vivi.Dcs.Application.Commands;
 public class UpdateAreaCommand : BaseCommand
 {
 
+    public string Id { get; set; } = string.Empty;
+
     /// <summary>
     /// 区域名称，例如 “A区”、“江南办公区”
     /// </summary>
@@ -14,6 +16,11 @@ public class UpdateAreaCommand : BaseCommand
     /// 区域编码，如 REG001，用于快速索引
     /// </summary>
     public string Code { get; set; } = "110000";
+
+    /// <summary>
+    /// 区域编码，如 REG001，用于快速索引
+    /// </summary>
+    public string BlockCode { get; set; } = "110000";
 
     /// <summary>
     /// 区域类型，如 “楼宇、园区、楼层、功能区” 等

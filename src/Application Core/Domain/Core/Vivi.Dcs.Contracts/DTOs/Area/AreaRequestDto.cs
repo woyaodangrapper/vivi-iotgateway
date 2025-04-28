@@ -28,7 +28,7 @@ public class AreaRequestDTO : OutputBaseAuditDTO
     public string? IdString
     {
         get => base.Id.ToString();
-        set => base.Id = Guid.TryParse(value, out var guid) ? guid : throw new ArgumentNullException();
+        set => base.Id = Guid.TryParse(value, out var guid) ? guid : throw new ArgumentNullException(nameof(value), "The provided value for IdString is null or invalid.");
     }
     [JsonPropertyName("pid")]
     public string? PidString
@@ -41,7 +41,7 @@ public class AreaRequestDTO : OutputBaseAuditDTO
     /// <summary>
     /// 区域名称，例如 “A区”、“江南办公区”
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string? Name { get; set; } = string.Empty;
 
     /// <summary>
     /// 区域编码，如 REG001，用于快速索引

@@ -9,7 +9,6 @@ public static class ServiceCollectionExtension
     {
         if (services.HasRegistered(nameof(AddInfraEfCorePostgreSQL)))
             return services;
-
         services.TryAddScoped<IUnitOfWork, PostgreSQLUnitOfWork<PostgreSQLDbContext>>();
         services.TryAddScoped(typeof(IEfRepository<>), typeof(EfRepository<>));
         services.TryAddScoped(typeof(IEfBasicRepository<>), typeof(EfBasicRepository<>));
@@ -22,12 +21,17 @@ public static class ServiceCollectionExtension
     {
         var connectionString = section.GetValue<string>("DefaultConnection");
         var serviceInfo = services.GetServiceInfo();
-
+        //NpgsqlConnection.GlobalTypeMapper.EnableDynamicJson();
         return AddInfraEfCorePostgreSQL(services, options =>
         {
             options.UseSnakeCaseNamingConvention();
             options.UseNpgsql(connectionString, optionsBuilder =>
             {
+                optionsBuilder.ConfigureDataSource(dataSource =>
+                {
+                    dataSource.EnableDynamicJson();// 启用动态JSON支持
+                    dataSource.ConfigureJsonOptions(new() { PropertyNameCaseInsensitive = true });
+                });
                 optionsBuilder.MinBatchSize(4)
                               .MigrationsAssembly(serviceInfo?.StartAssembly?.GetName()?.Name?.Replace("ApiService", "Migrations"))
                               .UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);

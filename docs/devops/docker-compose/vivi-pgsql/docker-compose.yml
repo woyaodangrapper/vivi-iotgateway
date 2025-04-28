@@ -22,3 +22,22 @@ services:
       - ../vivi/postgres:/var/lib/postgresql/data
     ports:
       - 9032:5432
+# {'CHECK_EMAIL_DELIVERABILITY': False, 'ALLOW_SPECIAL_EMAIL_DOMAINS': [], 'GLOBALLY_DELIVERABLE': True}
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    depends_on:
+      - postgres
+    user: '$UID:$GID'
+    environment:
+      CHECK_EMAIL_DELIVERABILITY: False
+      ALLOW_SPECIAL_EMAIL_DOMAINS: null
+      GLOBALLY_DELIVERABLE: True
+      PGADMIN_DEFAULT_EMAIL: root@example.com
+      PGADMIN_DEFAULT_PASSWORD: root123
+    ports:
+      - 9033:80
+    restart: unless-stopped
+    volumes:
+      - ../vivi/postgres/pgadmin:/var/lib/pgadmin
+      - ./pgadmin4/servers.json:/pgadmin4/servers.json:ro

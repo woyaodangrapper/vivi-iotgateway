@@ -12,7 +12,7 @@
  Target Server Version : 170004 (170004)
  File Encoding         : 65001
 
- Date: 11/04/2025 18:00:02
+ Date: 27/04/2025 09:43:40
 */
 
 
@@ -54,7 +54,6 @@ CREATE TABLE "public"."device" (
   "name" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
   "model" int2,
   "number" varchar(100) COLLATE "pg_catalog"."default",
-  "area_id" uuid,
   "manufacturer" varchar(255) COLLATE "pg_catalog"."default",
   "installation_location" jsonb,
   "status" int2 DEFAULT 0,
@@ -66,7 +65,6 @@ COMMENT ON COLUMN "public"."device"."id" IS '设备唯一ID，UUID';
 COMMENT ON COLUMN "public"."device"."name" IS '设备名称，如中央空调、风机盘管等';
 COMMENT ON COLUMN "public"."device"."model" IS '设备型号';
 COMMENT ON COLUMN "public"."device"."number" IS '设备编号';
-COMMENT ON COLUMN "public"."device"."area_id" IS '所属区域ID';
 COMMENT ON COLUMN "public"."device"."manufacturer" IS '设备生产厂家';
 COMMENT ON COLUMN "public"."device"."installation_location" IS '设备安装位置';
 COMMENT ON COLUMN "public"."device"."status" IS '设备状态，如 FAIL（0）通信失败、AUDIT_PENDING（1）无效设备、EXEC_PENDING（2）未启用、EXECUTING（3）运行中、FINISH（4）生命周期结束。';
@@ -180,11 +178,6 @@ ALTER TABLE "public"."unit_capab_map" ADD CONSTRAINT "unit_capab_map_pkey" PRIMA
 -- Primary Key structure for table unit_records
 -- ----------------------------
 ALTER TABLE "public"."unit_records" ADD CONSTRAINT "unit_records_pkey" PRIMARY KEY ("id");
-
--- ----------------------------
--- Foreign Keys structure for table device
--- ----------------------------
-ALTER TABLE "public"."device" ADD CONSTRAINT "device_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "public"."area" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- ----------------------------
 -- Foreign Keys structure for table device_unit

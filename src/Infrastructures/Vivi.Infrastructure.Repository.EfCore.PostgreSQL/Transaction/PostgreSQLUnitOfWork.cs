@@ -10,6 +10,7 @@ public class PostgreSQLUnitOfWork<TDbContext> : UnitOfWork<TDbContext>
         , ICapPublisher? publisher = null)
         : base(context)
     {
+
         _publisher = publisher;
     }
 

@@ -1,4 +1,6 @@
-﻿namespace Vivi.Dcs.Contracts.DTOs;
+﻿using System.Text.Json.Nodes;
+
+namespace Vivi.Dcs.Contracts.DTOs;
 
 /// <summary>
 /// 智能设备DTO
@@ -28,7 +30,7 @@ public class DeviceQueryDTO : SearchPagedDTO
     /// <summary>
     /// 设备安装位置
     /// </summary>
-    public string? InstallationLocation { get; set; }
+    public JsonNode? InstallationLocation { get; set; }
 
     /// <summary>
     /// 设备状态，如 active（启用）、inactive（停用）、maintenance（维护）

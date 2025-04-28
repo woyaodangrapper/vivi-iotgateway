@@ -16,13 +16,7 @@ public class EntityInfo : AbstracSharedEntityInfo
         if (modelBuilder is not ModelBuilder builder)
             throw new ArgumentNullException(nameof(modelBuilder));
 
-        JsonObject? test = null;
-
-
-
-        builder.Entity<AreaEntity>().ToTable("area").Property(e => e.Position)
-        .HasConversion(new JsonObjectConverter())
-        .HasColumnType("jsonb");
+        builder.Entity<AreaEntity>().ToTable("area");
 
         builder.Entity<DeviceEntity>().ToTable("device");
         builder.Entity<UnitCapabEntity>().ToTable("unit_capab");
@@ -38,7 +32,7 @@ public class EntityInfo : AbstracSharedEntityInfo
 
 
 
-public class JsonObjectConverter : ValueConverter<JsonNode?, string?>
+public class JsonObjectConverter : ValueConverter<JsonObject?, string?>
 {
     public JsonObjectConverter() : base(
         v => v == null ? null : ToString(v),
@@ -47,12 +41,12 @@ public class JsonObjectConverter : ValueConverter<JsonNode?, string?>
     { }
 
     // 写入数据库时：JsonObject → string
-    protected static string ToString(JsonNode v)
+    protected static string ToString(JsonObject v)
      => v.ToJsonString();
 
 
     // 从数据库读取时：string → JsonObject
-    protected static JsonNode ToObject(string v)
-    => JsonNode.Parse(v, null)!.AsObject();
+    protected static JsonObject ToObject(string v)
+     => JsonNode.Parse(v, null)!.AsObject();
 
 }
