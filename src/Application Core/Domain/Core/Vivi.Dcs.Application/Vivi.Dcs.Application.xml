@@ -4,6 +4,21 @@
         <name>Vivi.Dcs.Application</name>
     </assembly>
     <members>
+        <member name="M:Vivi.Dcs.Application.Workers.HeartbeatWorker.TryProbeAsync(Vivi.Dcs.Contracts.Requests.AsprtuVerify,System.Threading.CancellationToken)">
+            <summary>
+            异步探测指定服务的注册接口是否可用
+            </summary>
+            <param name="verify">包含地址和应用ID的验证对象</param>
+            <param name="cancellationToken">取消令牌，支持取消操作</param>
+            <returns>返回是否成功探测到服务（HTTP请求成功）</returns>
+        </member>
+        <member name="M:Vivi.Dcs.Application.Workers.HeartbeatWorker.Rebuild(System.Predicate{Vivi.Dcs.Contracts.Requests.AsprtuVerify})">
+            <summary>
+            根据条件筛选队列中的元素，将满足条件的元素重新入队到目标队列
+            </summary>
+            <param name="predicate">判断元素是否满足条件的委托</param>
+            <exception cref="T:System.ArgumentNullException">当传入的委托为空时抛出异常</exception>
+        </member>
         <member name="M:Ardalis.ApiEndpoints.Expression.EndpointExtensions.Build``1(Vivi.SharedKernel.Application.Contracts.ResultModels.AppSrvResult{``0})">
             <summary>
             封装的 Result 返回逻辑，处理端点成功和失败的返回

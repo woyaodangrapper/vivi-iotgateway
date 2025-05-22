@@ -1,5 +1,5 @@
 ﻿using Vivi.Dcs.Contracts.DTOs;
-using Vivi.SharedKernel.Application.Contracts.Attributes;
+using Vivi.SharedKernel.Contracts.Attributes;
 
 namespace Vivi.Dcs.Contracts.IServices;
 

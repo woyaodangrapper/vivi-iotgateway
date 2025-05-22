@@ -11,6 +11,8 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
 		<PackageReference Include="NLog" Version="5.4.0" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.4.0" />
+		<PackageReference Include="System.Reactive" Version="6.0.1" />
+		<PackageReference Include="ZiggyCreatures.FusionCache" Version="2.2.0" />
 	</ItemGroup>
 
 </Project>

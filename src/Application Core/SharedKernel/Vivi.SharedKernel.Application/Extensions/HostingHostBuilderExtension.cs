@@ -29,7 +29,6 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddSingleton(typeof(IServiceInfo), serviceInfo);
         builder.Services.AddVivi(serviceInfo);
 
-
         //Logging
         builder.Logging.ClearProviders();
         var logContainer = builder.Configuration.GetValue(NodeConsts.Logging_LogContainer, "console");

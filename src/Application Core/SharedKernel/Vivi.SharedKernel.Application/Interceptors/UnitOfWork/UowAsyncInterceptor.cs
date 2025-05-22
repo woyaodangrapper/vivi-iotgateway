@@ -1,6 +1,6 @@
 ﻿using Castle.DynamicProxy;
-using Vivi.SharedKernel.Application.Contracts.Attributes;
 using System.Diagnostics.CodeAnalysis;
+using Vivi.SharedKernel.Contracts.Attributes;
 
 namespace Vivi.SharedKernel.Application.Interceptors;
 

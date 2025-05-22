@@ -775,5 +775,10 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:Vivi.Dcs.Contracts.IServices.IUpdateUnitRecordsCommand.UpdateAsync(Vivi.Dcs.Contracts.DTOs.UnitRecordsRequestDTO)" -->
+        <member name="T:Vivi.Dcs.Contracts.Requests.AsprtuVerify">
+            <summary>
+            远程编排验证请求参数
+            </summary>
+        </member>
     </members>
 </doc>

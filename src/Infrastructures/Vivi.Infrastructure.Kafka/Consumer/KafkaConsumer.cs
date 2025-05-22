@@ -58,5 +58,4 @@ namespace Vivi.Infrastructure.Kafka.Consumer
             _consumer?.Dispose();
         }
     }
-
 }

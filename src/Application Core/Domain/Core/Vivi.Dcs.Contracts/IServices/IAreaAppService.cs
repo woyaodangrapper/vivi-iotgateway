@@ -1,5 +1,5 @@
 ﻿using Vivi.Dcs.Contracts.DTOs;
-using Vivi.SharedKernel.Application.Contracts.Attributes;
+using Vivi.SharedKernel.Contracts.Attributes;
 
 namespace Vivi.Dcs.Contracts.IServices;
 
@@ -11,7 +11,6 @@ public interface IAreaAppService : ICreateAreaCommand, IDeleteAreaCommand, IUpda
     /// <returns></returns>
     [OperateLog(LogName = "查询地区")]
     Task<List<AreaDTO>> GetListAsync(AreaQueryDTO input);
-
 
     /// <summary>
     /// 获取地区树结构
@@ -33,8 +32,6 @@ public interface IAreaAppService : ICreateAreaCommand, IDeleteAreaCommand, IUpda
     /// <returns></returns>
     [OperateLog(LogName = "添加或更新")]
     Task<AppSrvResult<IdDTO[]>> AddOrUpdateRangeAsync(AreaTreeNodeDTO[] input);
-
-
 
     /// <summary>
     /// 删除或更新地区列表

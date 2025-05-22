@@ -1,4 +1,6 @@
-﻿using Vivi.SharedKernel.ApiService.Registrar;
+﻿using Vivi.Dcs.Contracts.Requests;
+using Vivi.SharedKernel.ApiService.Registrar;
+using Vivi.SharedKernel.Application.Extensions;
 
 namespace Vivi.Dcs.ApiService.Registrar;
 
@@ -16,6 +18,7 @@ public sealed class WebApiDependencyRegistrar : AbstractWebApiDependencyRegistra
 
     public override void AddServes()
     {
+        Services.AddQueueFactory<AsprtuVerify>();
         AddWebApiDefault();
     }
 
@@ -25,5 +28,4 @@ public sealed class WebApiDependencyRegistrar : AbstractWebApiDependencyRegistra
         {
         });
     }
-
 }

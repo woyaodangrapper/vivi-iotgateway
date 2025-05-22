@@ -8,12 +8,12 @@
 		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Kafka\Vivi.Infrastructure.Kafka.csproj" />
 		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Mapper\Vivi.Infrastructure.Mapper.csproj" />
 		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.Dapper\Vivi.Infrastructure.Repository.Dapper.csproj" />
-		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.EfCore.TimescaleDB\Vivi.Infrastructure.Repository.EfCore.TimescaleDB.csproj" />
 		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.EfCore.PostgreSQL\Vivi.Infrastructure.Repository.EfCore.PostgreSQL.csproj" />
 		<ProjectReference Include="..\..\..\Infrastructures\Vivi.Infrastructure.Repository.EfCore\Vivi.Infrastructure.Repository.EfCore.csproj" />
 		<ProjectReference Include="..\Vivi.SharedKernel.Contracts\Vivi.SharedKernel.Contracts.csproj" />
 		<ProjectReference Include="..\Vivi.SharedKernel.Repository\Vivi.SharedKernel.Repository.csproj" />
 		<ProjectReference Include="..\Vivi.SharedKernel\Vivi.SharedKernel.csproj" />
+
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
@@ -43,14 +43,14 @@
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="ApiService\NLog\nlog-console.config">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="ApiService\NLog\nlog-loki.config">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="ApiService\NLog\nlog-mongodb.config">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<None Update="ApiService\NLog\nlog-console.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="ApiService\NLog\nlog-loki.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="ApiService\NLog\nlog-mongodb.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>

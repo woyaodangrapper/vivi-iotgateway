@@ -1,4 +1,4 @@
-﻿namespace Vivi.SharedKernel.Application.Contracts.Attributes;
+﻿namespace Vivi.SharedKernel.Contracts.Attributes;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = true)]
 public class OperateLogAttribute : Attribute

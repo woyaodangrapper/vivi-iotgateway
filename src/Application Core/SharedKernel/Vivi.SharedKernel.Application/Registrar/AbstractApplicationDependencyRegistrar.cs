@@ -17,7 +17,6 @@ public abstract partial class AbstractApplicationDependencyRegistrar : IDependen
     protected IConfigurationSection TSdbSection { get; init; }
     protected IConfigurationSection PGsqlSection { get; init; }
 
-
     protected AbstractApplicationDependencyRegistrar(IServiceCollection services)
     {
         Services = services ?? throw new ArgumentException("IServiceCollection is null.");
